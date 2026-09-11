@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Ajouter une question - Flash connaissances</title>
+
+  <style>
+
+    :root {
+      --ink: #1a1a2e;
+      --ink2: #2d3561;
+      --gold: #c9a84c;
+      --gold2: #f0d080;
+      --cream: #faf8f2;
+      --paper: #f2ede0;
+      --blue: #1a5fa8;
+      --blue2: #4d8fd4;
+      --blue-bg: #e4eef8;
+      --green: #4a7c59;
+      --green2: #6aab79;
+      --red: #c0392b;
+      --border: #d8cdb4;
+      --shadow: rgba(26, 26, 46, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      background:
+        linear-gradient(
+          135deg,
+          #111525,
+          #202952
+        );
+
+      color: var(--ink);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      padding: 30px;
+    }
+
+    .conteneur {
+      width: 100%;
+      max-width: 1100px;
+      min-height: 700px;
+
+      background: var(--cream);
+
+      border-radius: 24px;
+
+      box-shadow:
+        0 25px 60px var(--shadow);
+
+      padding: 45px;
+
+      position: relative;
+      overflow: hidden;
+    }
+
+    .conteneur::before {
+      content: "";
+
+      position: absolute;
+
+      top: 0;
+      left: 0;
+      right: 0;
+
+      height: 7px;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--blue),
+          var(--gold),
+          var(--blue)
+        );
+    }
+
+    .entete {
+      margin-bottom: 35px;
+      padding-bottom: 25px;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .petitTitre {
+      margin: 0 0 8px 0;
+
+      font-size: 14px;
+      font-weight: bold;
+
+      letter-spacing: 2px;
+      text-transform: uppercase;
+
+      color: var(--gold);
+    }
+
+    h1 {
+      margin: 0;
+
+      color: var(--blue);
+
+      font-size: 44px;
+
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin: 10px 0 0 0;
+
+      color: var(--ink2);
+
+      font-size: 24px;
+
+      font-weight: normal;
+    }
+
+    .formulaireCarte {
+      background: var(--paper);
+
+      border: 1px solid var(--border);
+
+      border-radius: 18px;
+
+      padding: 30px;
+
+      box-shadow:
+        0 8px 20px var(--shadow);
+    }
+
+    .titreSection {
+      margin: 0 0 25px 0;
+
+      font-size: 20px;
+      font-weight: bold;
+
+      color: var(--ink2);
+    }
+
+    .champ {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+
+      margin-bottom: 10px;
+
+      font-weight: bold;
+
+      color: var(--ink2);
+    }
+
+    select,
+    textarea {
+      width: 100%;
+
+      padding: 15px 16px;
+
+      border: 2px solid var(--border);
+
+      border-radius: 12px;
+
+      background: white;
+
+      color: var(--ink);
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      font-size: 17px;
+
+      outline: none;
+
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    textarea {
+      min-height: 120px;
+
+      resize: vertical;
+    }
+
+    textarea#question {
+      min-height: 150px;
+    }
+
+    textarea#reponse {
+      min-height: 120px;
+    }
+
+    select:focus,
+    textarea:focus {
+      border-color: var(--blue);
+
+      box-shadow:
+        0 0 0 3px rgba(26, 95, 168, 0.12);
+    }
+
+    .actions {
+      display: flex;
+
+      align-items: center;
+
+      gap: 15px;
+
+      margin-top: 28px;
+    }
+
+    #enregistrer {
+      border: none;
+
+      border-radius: 12px;
+
+      padding: 16px 28px;
+
+      background: var(--blue);
+
+      color: white;
+
+      font-size: 16px;
+      font-weight: bold;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 6px 15px var(--shadow);
+
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    #enregistrer:hover {
+      background: var(--blue2);
+
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 9px 20px var(--shadow);
+    }
+
+    #enregistrer:active {
+      transform: translateY(0);
+    }
+
+    #message {
+      margin: 20px 0 0 0;
+
+      padding: 15px;
+
+      border-radius: 12px;
+
+      background: var(--blue-bg);
+
+      color: var(--blue);
+
+      font-weight: bold;
+
+      text-align: center;
+    }
+
+    #message:empty {
+      display: none;
+    }
+
+    .aide {
+      margin: 0 0 25px 0;
+
+      color: #666;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+    }
+
+    .pied {
+      margin-top: 35px;
+
+      text-align: center;
+
+      color: #777;
+
+      font-size: 13px;
+    }
+
+    @media (max-width: 820px) {
+
+      body {
+        padding: 15px;
+
+        align-items: flex-start;
+      }
+
+      .conteneur {
+        min-height: auto;
+
+        padding: 30px 25px;
+
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      h2 {
+        font-size: 21px;
+      }
+
+      .formulaireCarte {
+        padding: 25px;
+      }
+    }
+
+    @media (max-width: 500px) {
+
+      body {
+        padding: 10px;
+      }
+
+      .conteneur {
+        padding: 25px 18px;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      h2 {
+        font-size: 19px;
+      }
+
+      .formulaireCarte {
+        padding: 20px;
+      }
+
+      select,
+      textarea {
+        font-size: 16px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      #enregistrer {
+        width: 100%;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="conteneur">
+
+
+<div class="entete">
+
+  <p class="petitTitre">
+    Flash connaissances
+  </p>
+
+  <h1>
+    Ajouter une question
+  </h1>
+
+  <h2>
+    Enrichir la banque de connaissances.
+  </h2>
+
+</div>
+
+
+<div class="formulaireCarte">
+
+  <p class="titreSection">
+    Nouvelle question
+  </p>
+
+  <p class="aide">
+    Choisissez la classe et la matière, puis saisissez
+    la question et sa réponse.
+  </p>
+
+
+  <form id="questionForm">
+
+
+    <div class="champ">
+
+      <label for="classe">
+        Classe
+      </label>
+
+      <select id="classe" required>
+
+        <option value="">
+          -- Choisir une classe --
+        </option>
+
+        <option value="6e A">
+          6e A
+        </option>
+
+        <option value="6e B">
+          6e B
+        </option>
+
+        <option value="6e C">
+          6e C
+        </option>
+
+        <option value="6e D">
+          6e D
+        </option>
+
+        <option value="6e E">
+          6e E
+        </option>
+
+        <option value="6e F">
+          6e F
+        </option>
+
+        <option value="5e A">
+          5e A
+        </option>
+
+        <option value="5e B">
+          5e B
+        </option>
+
+        <option value="5e C">
+          5e C
+        </option>
+
+        <option value="5e D">
+          5e D
+        </option>
+
+        <option value="5e E">
+          5e E
+        </option>
+
+        <option value="5e F">
+          5e F
+        </option>
+
+        <option value="4e A">
+          4e A
+        </option>
+
+        <option value="4e B">
+          4e B
+        </option>
+
+        <option value="4e C">
+          4e C
+        </option>
+
+        <option value="4e D">
+          4e D
+        </option>
+
+        <option value="4e E">
+          4e E
+        </option>
+
+        <option value="4e F">
+          4e F
+        </option>
+
+        <option value="3e A">
+          3e A
+        </option>
+
+        <option value="3e B">
+          3e B
+        </option>
+
+        <option value="3e C">
+          3e C
+        </option>
+
+        <option value="3e D">
+          3e D
+        </option>
+
+        <option value="3e E">
+          3e E
+        </option>
+
+        <option value="3e F">
+          3e F
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="champ">
+
+      <label for="matiere">
+        Matière
+      </label>
+
+      <select id="matiere" required>
+
+        <option value="">
+          -- Choisir une matière --
+        </option>
+
+        <option value="Mathématiques">
+          Mathématiques
+        </option>
+
+        <option value="Français">
+          Français
+        </option>
+
+        <option value="Histoire, géographie et Emc">
+          Histoire, géographie et Emc
+        </option>
+
+        <option value="Anglais">
+          Anglais
+        </option>
+
+        <option value="Espagnol">
+          Espagnol 
+        </option>
+
+        <option value="Allemand">
+          Allemand
+        </option>
+
+        <option value="Physique-chimie">
+          Sciences
+        </option>
+
+        <option value="SVT">
+          SVT
+        </option>
+
+        <option value="Technologie">
+          Technologie
+        </option>
+
+        <option value="EPS">
+          EPS
+        </option>
+
+        <option value="Arts plastiques">
+          Arts plastiques
+        </option>
+
+        <option value="Éducation musicale">
+          Éducation musicale
+        </option>
+
+        <option value="Latin">
+          Latin
+        </option>
+
+        <option value="Enseignement professionnel">
+          Enseignement professionnel
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="champ">
+
+      <label for="question">
+        Question
+      </label>
+
+      <textarea
+        id="question"
+        placeholder="Écrivez la question..."
+        required
+      ></textarea>
+
+    </div>
+
+
+    <div class="champ">
+
+      <label for="reponse">
+        Réponse
+      </label>
+
+      <textarea
+        id="reponse"
+        placeholder="Écrivez la réponse..."
+        required
+      ></textarea>
+
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        type="submit"
+        id="enregistrer"
+      >
+        ENREGISTRER LA QUESTION
+      </button>
+
+    </div>
+
+
+  </form>
+
+
+  <p id="message"></p>
+
+</div>
+
+
+<div class="pied">
+  Flash connaissances · Banque de questions du collège Simone Sauteur
+</div>
+
+
+  </div>
+
+  <script type="module">
+
+    import {
+      initializeApp
+    } from
+      "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from
+      "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyA9qwre5oVVnkadGxnpCSAbYAuBnSBM7y4",
+
+      authDomain:
+        "flash-connaissances.firebaseapp.com",
+
+      projectId:
+        "flash-connaissances",
+
+      storageBucket:
+        "flash-connaissances.firebasestorage.app",
+
+      messagingSenderId:
+        "620283456808",
+
+      appId:
+        "1:620283456808:web:96bb65f597775838a5f41d"
+    };
+
+
+    const app =
+      initializeApp(firebaseConfig);
+
+
+    const db =
+      getFirestore(app);
+
+
+    const formulaire =
+      document.getElementById("questionForm");
+
+
+    const message =
+      document.getElementById("message");
+
+
+    formulaire.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+
+        const classe =
+          document.getElementById("classe")
+            .value
+            .trim();
+
+
+        const matiere =
+          document.getElementById("matiere")
+            .value
+            .trim();
+
+
+        const question =
+          document.getElementById("question")
+            .value
+            .trim();
+
+
+        const reponse =
+          document.getElementById("reponse")
+            .value
+            .trim();
+
+
+        try {
+
+          await addDoc(
+            collection(db, "questions"),
+            {
+
+              classe: classe,
+
+              matiere: matiere,
+
+              question: question,
+
+              reponse: reponse,
+
+              date: serverTimestamp(),
+
+              statut: "active"
+
+            }
+          );
+
+
+          message.textContent =
+            "Question enregistrée !";
+
+
+          formulaire.reset();
+
+        }
+
+        catch (erreur) {
+
+          console.error(erreur);
+
+          message.textContent =
+            "Erreur lors de l'enregistrement.";
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+
+</html>
