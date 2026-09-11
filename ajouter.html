@@ -173,6 +173,7 @@
       color: var(--ink2);
     }
 
+    input,
     select,
     textarea {
       width: 100%;
@@ -201,6 +202,15 @@
         box-shadow 0.15s ease;
     }
 
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--blue);
+
+      box-shadow:
+        0 0 0 3px rgba(26, 95, 168, 0.12);
+    }
+
     select {
       cursor: pointer;
     }
@@ -219,14 +229,6 @@
       min-height: 120px;
     }
 
-    select:focus,
-    textarea:focus {
-      border-color: var(--blue);
-
-      box-shadow:
-        0 0 0 3px rgba(26, 95, 168, 0.12);
-    }
-
     .actions {
       display: flex;
 
@@ -237,7 +239,7 @@
       margin-top: 28px;
     }
 
-    #enregistrer {
+    button {
       border: none;
 
       border-radius: 12px;
@@ -262,7 +264,7 @@
         box-shadow 0.15s ease;
     }
 
-    #enregistrer:hover {
+    button:hover {
       background: var(--blue2);
 
       transform: translateY(-2px);
@@ -271,8 +273,16 @@
         0 9px 20px var(--shadow);
     }
 
-    #enregistrer:active {
+    button:active {
       transform: translateY(0);
+    }
+
+    #deconnexion {
+      background: #777;
+    }
+
+    #deconnexion:hover {
+      background: #666;
     }
 
     #message {
@@ -303,6 +313,54 @@
       font-size: 14px;
 
       line-height: 1.5;
+    }
+
+    .connexion {
+      max-width: 550px;
+
+      margin: 0 auto;
+    }
+
+    .connexionMessage {
+      margin: 0 0 25px 0;
+
+      color: #666;
+
+      font-size: 15px;
+
+      line-height: 1.5;
+    }
+
+    #zoneApplication {
+      display: none;
+    }
+
+    #zoneConnexion {
+      display: block;
+    }
+
+    .utilisateurConnecte {
+      margin-bottom: 25px;
+
+      padding: 12px 15px;
+
+      border-radius: 12px;
+
+      background: #e7f2e9;
+
+      color: var(--green);
+
+      font-size: 14px;
+
+      font-weight: bold;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 15px;
     }
 
     .pied {
@@ -366,6 +424,7 @@
         padding: 20px;
       }
 
+      input,
       select,
       textarea {
         font-size: 16px;
@@ -375,8 +434,14 @@
         flex-direction: column;
       }
 
-      #enregistrer {
+      button {
         width: 100%;
+      }
+
+      .utilisateurConnecte {
+        flex-direction: column;
+
+        align-items: stretch;
       }
     }
 
@@ -388,7 +453,7 @@
 
   <div class="conteneur">
 
-
+```
 <div class="entete">
 
   <p class="petitTitre">
@@ -406,253 +471,344 @@
 </div>
 
 
-<div class="formulaireCarte">
+<!-- ZONE DE CONNEXION -->
+
+<div
+  id="zoneConnexion"
+  class="formulaireCarte connexion"
+>
 
   <p class="titreSection">
-    Nouvelle question
+    Accès enseignants
   </p>
 
-  <p class="aide">
-    Choisissez la classe et la matière, puis saisissez
-    la question et sa réponse.
+  <p class="connexionMessage">
+    Connectez-vous avec le compte commun des enseignants
+    pour accéder à la banque de questions.
   </p>
 
 
-  <form id="questionForm">
+  <div class="champ">
 
+    <label for="email">
+      Adresse e-mail
+    </label>
 
-    <div class="champ">
+    <input
+      type="email"
+      id="email"
+      value="profs.simone.sauteur@gmail.com"
+      autocomplete="username"
+      required
+    >
 
-      <label for="classe">
-        Classe
-      </label>
+  </div>
 
-      <select id="classe" required>
 
-        <option value="">
-          -- Choisir une classe --
-        </option>
+  <div class="champ">
 
-        <option value="6e A">
-          6e A
-        </option>
+    <label for="motDePasse">
+      Mot de passe
+    </label>
 
-        <option value="6e B">
-          6e B
-        </option>
+    <input
+      type="password"
+      id="motDePasse"
+      autocomplete="current-password"
+      required
+    >
 
-        <option value="6e C">
-          6e C
-        </option>
+  </div>
 
-        <option value="6e D">
-          6e D
-        </option>
 
-        <option value="6e E">
-          6e E
-        </option>
+  <div class="actions">
 
-        <option value="6e F">
-          6e F
-        </option>
+    <button
+      type="button"
+      id="connexion"
+    >
+      SE CONNECTER
+    </button>
 
-        <option value="5e A">
-          5e A
-        </option>
+  </div>
 
-        <option value="5e B">
-          5e B
-        </option>
 
-        <option value="5e C">
-          5e C
-        </option>
+  <p id="messageConnexion"></p>
 
-        <option value="5e D">
-          5e D
-        </option>
+</div>
 
-        <option value="5e E">
-          5e E
-        </option>
 
-        <option value="5e F">
-          5e F
-        </option>
+<!-- APPLICATION D'AJOUT -->
 
-        <option value="4e A">
-          4e A
-        </option>
+<div
+  id="zoneApplication"
+>
 
-        <option value="4e B">
-          4e B
-        </option>
+  <div class="utilisateurConnecte">
 
-        <option value="4e C">
-          4e C
-        </option>
+    <span>
+      Connecté en tant qu'enseignant
+    </span>
 
-        <option value="4e D">
-          4e D
-        </option>
+    <button
+      type="button"
+      id="deconnexion"
+    >
+      SE DÉCONNECTER
+    </button>
 
-        <option value="4e E">
-          4e E
-        </option>
+  </div>
 
-        <option value="4e F">
-          4e F
-        </option>
 
-        <option value="3e A">
-          3e A
-        </option>
+  <div class="formulaireCarte">
 
-        <option value="3e B">
-          3e B
-        </option>
+    <p class="titreSection">
+      Nouvelle question
+    </p>
 
-        <option value="3e C">
-          3e C
-        </option>
+    <p class="aide">
+      Choisissez la classe et la matière, puis saisissez
+      la question et sa réponse.
+    </p>
 
-        <option value="3e D">
-          3e D
-        </option>
 
-        <option value="3e E">
-          3e E
-        </option>
+    <form id="questionForm">
 
-        <option value="3e F">
-          3e F
-        </option>
 
-      </select>
+      <div class="champ">
 
-    </div>
+        <label for="classe">
+          Classe
+        </label>
 
+        <select id="classe" required>
 
-    <div class="champ">
+          <option value="">
+            -- Choisir une classe --
+          </option>
 
-      <label for="matiere">
-        Matière
-      </label>
+          <option value="6e A">
+            6e A
+          </option>
 
-      <select id="matiere" required>
+          <option value="6e B">
+            6e B
+          </option>
 
-        <option value="">
-          -- Choisir une matière --
-        </option>
+          <option value="6e C">
+            6e C
+          </option>
 
-        <option value="Mathématiques">
-          Mathématiques
-        </option>
+          <option value="6e D">
+            6e D
+          </option>
 
-        <option value="Français">
-          Français
-        </option>
+          <option value="6e E">
+            6e E
+          </option>
 
-        <option value="Histoire, géographie et Emc">
-          Histoire, géographie et Emc
-        </option>
+          <option value="6e F">
+            6e F
+          </option>
 
-        <option value="Anglais">
-          Anglais
-        </option>
+          <option value="5e A">
+            5e A
+          </option>
 
-        <option value="Espagnol">
-          Espagnol 
-        </option>
+          <option value="5e B">
+            5e B
+          </option>
 
-        <option value="Allemand">
-          Allemand
-        </option>
+          <option value="5e C">
+            5e C
+          </option>
 
-        <option value="Physique-chimie">
-          Sciences
-        </option>
+          <option value="5e D">
+            5e D
+          </option>
 
-        <option value="SVT">
-          SVT
-        </option>
+          <option value="5e E">
+            5e E
+          </option>
 
-        <option value="Technologie">
-          Technologie
-        </option>
+          <option value="5e F">
+            5e F
+          </option>
 
-        <option value="EPS">
-          EPS
-        </option>
+          <option value="4e A">
+            4e A
+          </option>
 
-        <option value="Arts plastiques">
-          Arts plastiques
-        </option>
+          <option value="4e B">
+            4e B
+          </option>
 
-        <option value="Éducation musicale">
-          Éducation musicale
-        </option>
+          <option value="4e C">
+            4e C
+          </option>
 
-        <option value="Latin">
-          Latin
-        </option>
+          <option value="4e D">
+            4e D
+          </option>
 
-        <option value="Enseignement professionnel">
-          Enseignement professionnel
-        </option>
+          <option value="4e E">
+            4e E
+          </option>
 
-      </select>
+          <option value="4e F">
+            4e F
+          </option>
 
-    </div>
+          <option value="3e A">
+            3e A
+          </option>
 
+          <option value="3e B">
+            3e B
+          </option>
 
-    <div class="champ">
+          <option value="3e C">
+            3e C
+          </option>
 
-      <label for="question">
-        Question
-      </label>
+          <option value="3e D">
+            3e D
+          </option>
 
-      <textarea
-        id="question"
-        placeholder="Écrivez la question..."
-        required
-      ></textarea>
+          <option value="3e E">
+            3e E
+          </option>
 
-    </div>
+          <option value="3e F">
+            3e F
+          </option>
 
+        </select>
 
-    <div class="champ">
+      </div>
 
-      <label for="reponse">
-        Réponse
-      </label>
 
-      <textarea
-        id="reponse"
-        placeholder="Écrivez la réponse..."
-        required
-      ></textarea>
+      <div class="champ">
 
-    </div>
+        <label for="matiere">
+          Matière
+        </label>
 
+        <select id="matiere" required>
 
-    <div class="actions">
+          <option value="">
+            -- Choisir une matière --
+          </option>
 
-      <button
-        type="submit"
-        id="enregistrer"
-      >
-        ENREGISTRER LA QUESTION
-      </button>
+          <option value="Mathématiques">
+            Mathématiques
+          </option>
 
-    </div>
+          <option value="Français">
+            Français
+          </option>
 
+          <option value="Histoire, géographie et Emc">
+            Histoire, géographie et Emc
+          </option>
 
-  </form>
+          <option value="Anglais">
+            Anglais
+          </option>
 
+          <option value="Espagnol">
+            Espagnol
+          </option>
 
-  <p id="message"></p>
+          <option value="Allemand">
+            Allemand
+          </option>
+
+          <option value="Physique-chimie">
+            Sciences
+          </option>
+
+          <option value="SVT">
+            SVT
+          </option>
+
+          <option value="Technologie">
+            Technologie
+          </option>
+
+          <option value="EPS">
+            EPS
+          </option>
+
+          <option value="Arts plastiques">
+            Arts plastiques
+          </option>
+
+          <option value="Éducation musicale">
+            Éducation musicale
+          </option>
+
+          <option value="Latin">
+            Latin
+          </option>
+
+          <option value="Enseignement professionnel">
+            Enseignement professionnel
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="champ">
+
+        <label for="question">
+          Question
+        </label>
+
+        <textarea
+          id="question"
+          placeholder="Écrivez la question..."
+          required
+        ></textarea>
+
+      </div>
+
+
+      <div class="champ">
+
+        <label for="reponse">
+          Réponse
+        </label>
+
+        <textarea
+          id="reponse"
+          placeholder="Écrivez la réponse..."
+          required
+        ></textarea>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          type="submit"
+          id="enregistrer"
+        >
+          ENREGISTRER LA QUESTION
+        </button>
+
+      </div>
+
+
+    </form>
+
+
+    <p id="message"></p>
+
+  </div>
 
 </div>
 
@@ -660,7 +816,7 @@
 <div class="pied">
   Flash connaissances · Banque de questions du collège Simone Sauteur
 </div>
-
+```
 
   </div>
 
@@ -679,6 +835,15 @@
       serverTimestamp
     } from
       "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from
+      "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
     const firebaseConfig = {
@@ -711,6 +876,38 @@
       getFirestore(app);
 
 
+    const auth =
+      getAuth(app);
+
+
+    const zoneConnexion =
+      document.getElementById("zoneConnexion");
+
+
+    const zoneApplication =
+      document.getElementById("zoneApplication");
+
+
+    const boutonConnexion =
+      document.getElementById("connexion");
+
+
+    const boutonDeconnexion =
+      document.getElementById("deconnexion");
+
+
+    const email =
+      document.getElementById("email");
+
+
+    const motDePasse =
+      document.getElementById("motDePasse");
+
+
+    const messageConnexion =
+      document.getElementById("messageConnexion");
+
+
     const formulaire =
       document.getElementById("questionForm");
 
@@ -719,11 +916,153 @@
       document.getElementById("message");
 
 
+    // Vérification de l'état de connexion
+
+    onAuthStateChanged(
+      auth,
+      (utilisateur) => {
+
+        if (
+          utilisateur &&
+          utilisateur.email ===
+            "profs.simone.sauteur@gmail.com"
+        ) {
+
+          zoneConnexion.style.display =
+            "none";
+
+          zoneApplication.style.display =
+            "block";
+
+        } else {
+
+          zoneConnexion.style.display =
+            "block";
+
+          zoneApplication.style.display =
+            "none";
+
+        }
+
+      }
+    );
+
+
+    // Connexion enseignant
+
+    boutonConnexion.addEventListener(
+      "click",
+      async () => {
+
+        const adresse =
+          email.value.trim();
+
+        const motDePasseSaisi =
+          motDePasse.value;
+
+
+        if (!adresse || !motDePasseSaisi) {
+
+          messageConnexion.textContent =
+            "Veuillez saisir l'adresse e-mail et le mot de passe.";
+
+          return;
+        }
+
+
+        try {
+
+          const resultat =
+            await signInWithEmailAndPassword(
+              auth,
+              adresse,
+              motDePasseSaisi
+            );
+
+
+          if (
+            resultat.user.email !==
+            "profs.simone.sauteur@gmail.com"
+          ) {
+
+            await signOut(auth);
+
+            messageConnexion.textContent =
+              "Ce compte n'est pas autorisé pour les enseignants.";
+
+            return;
+          }
+
+
+          messageConnexion.textContent =
+            "";
+
+          motDePasse.value = "";
+
+        }
+
+        catch (erreur) {
+
+          console.error(erreur);
+
+          messageConnexion.textContent =
+            "Connexion impossible. Vérifiez l'adresse et le mot de passe.";
+
+        }
+
+      }
+    );
+
+
+    // Déconnexion
+
+    boutonDeconnexion.addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          await signOut(auth);
+
+        }
+
+        catch (erreur) {
+
+          console.error(erreur);
+
+          message.textContent =
+            "Erreur lors de la déconnexion.";
+
+        }
+
+      }
+    );
+
+
+    // Enregistrement d'une question
+
     formulaire.addEventListener(
       "submit",
       async (event) => {
 
         event.preventDefault();
+
+
+        const utilisateur =
+          auth.currentUser;
+
+
+        if (
+          !utilisateur ||
+          utilisateur.email !==
+            "profs.simone.sauteur@gmail.com"
+        ) {
+
+          message.textContent =
+            "Vous devez être connecté en tant qu'enseignant.";
+
+          return;
+        }
 
 
         const classe =
