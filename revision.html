@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flash connaissances — Révision</title>
+<style>
+:root{--ink:#1a1a2e;--ink2:#2d3561;--gold:#c9a84c;--gold2:#f0d080;--cream:#faf8f2;--paper:#f2ede0;--blue:#1a5fa8;--blue2:#4d8fd4;--blue-bg:#e4eef8;--green:#4a7c59;--green2:#6aab79;--border:#d8cdb4;--shadow:rgba(26,26,46,.18)}
+*{box-sizing:border-box}html{min-height:100%}body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#111525,#202952);color:var(--ink);display:flex;justify-content:center;align-items:center;padding:30px}.conteneur{width:100%;max-width:1100px;min-height:700px;background:var(--cream);border-radius:24px;box-shadow:0 25px 60px var(--shadow);padding:45px;position:relative;overflow:hidden}.conteneur:before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:linear-gradient(90deg,var(--blue),var(--gold),var(--blue))}.entete{margin-bottom:35px;padding-bottom:25px;border-bottom:1px solid var(--border)}.petitTitre{margin:0 0 8px;font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}h1{margin:0;color:var(--blue);font-size:44px;line-height:1.1}h2{margin:10px 0 0;color:var(--ink2);font-size:24px;font-weight:normal}.configuration{background:var(--paper);border:1px solid var(--border);border-radius:18px;padding:25px;margin-bottom:30px}.titreSection{margin:0 0 18px;font-size:18px;font-weight:bold;color:var(--ink2)}.choix{margin-bottom:18px}.choix:last-child{margin-bottom:0}label{display:block;margin-bottom:10px;font-weight:bold;color:var(--ink2)}select{width:100%;max-width:520px;padding:15px 16px;border:2px solid var(--border);border-radius:12px;background:#fff;color:var(--ink);font-size:18px;cursor:pointer;outline:none}select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,95,168,.12)}.hidden{display:none!important}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}button{border:none;border-radius:12px;padding:15px 24px;font-size:16px;font-weight:bold;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;box-shadow:0 6px 15px var(--shadow)}button:hover{transform:translateY(-2px);box-shadow:0 9px 20px var(--shadow)}button:active{transform:translateY(0)}#voirReponse{background:var(--gold);color:var(--ink)}#voirReponse:hover{background:var(--gold2)}#suivante{background:var(--green);color:#fff}#suivante:hover{background:var(--green2)}.secondary{background:var(--blue);color:#fff}.secondary:hover{background:var(--blue2)}.pdf{background:var(--gold);color:var(--ink)}.pdf:hover{background:var(--gold2)}.zoneQuiz{margin-top:30px}.barreQuiz{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}.etiquette{display:inline-block;padding:7px 12px;border-radius:20px;background:var(--blue-bg);color:var(--blue);font-size:13px;font-weight:bold;letter-spacing:1px;text-transform:uppercase}.compteur{font-weight:bold;color:var(--ink2)}#question{margin:15px 0 0;padding:40px 35px;min-height:210px;background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:0 10px 25px var(--shadow);font-size:34px;line-height:1.3;font-weight:bold;display:flex;align-items:center;justify-content:center;text-align:center}.reponse{margin:20px 0 0;padding:28px;background:var(--blue-bg);border-left:7px solid var(--blue);border-radius:14px;font-size:28px;line-height:1.35;font-weight:bold;text-align:center;box-shadow:0 6px 18px var(--shadow)}.pied{margin-top:35px;text-align:center;color:#777;font-size:13px}.message{padding:20px;background:var(--paper);border:1px solid var(--border);border-radius:14px;color:var(--ink2);font-weight:bold}@media(max-width:820px){body{padding:15px;align-items:flex-start}.conteneur{min-height:auto;padding:30px 25px;border-radius:18px}h1{font-size:36px}h2{font-size:21px}#question{min-height:180px;font-size:28px;padding:30px 22px}.reponse{font-size:24px}}@media(max-width:500px){body{padding:8px}.conteneur{padding:22px 15px}h1{font-size:30px}h2{font-size:19px}.configuration{padding:20px}select{max-width:none;font-size:16px}.actions{flex-direction:column}button{width:100%}#question{min-height:160px;font-size:23px;padding:25px 18px}.reponse{font-size:21px;padding:22px}}
+@page{size:A4 portrait;margin:0}
+@media print{
+  html,body{width:210mm;height:297mm;margin:0;padding:0;background:#fff;display:block}
+  .conteneur{width:210mm;height:297mm;max-width:none;min-height:0;margin:0;padding:0;background:#fff;border-radius:0;box-shadow:none;overflow:visible}
+  .conteneur:before,.entete,.configuration,.screen-only,.pied,.pdf-header{display:none!important}
+  .print-only{display:block!important}
+  #quizSection{display:block!important;margin:0;padding:0}
+  #printCards{display:block!important;margin:0;padding:0}
+  .print-sheet{width:210mm;height:297mm;margin:0;padding:8mm;box-sizing:border-box;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,1fr);gap:4mm;page-break-after:always;break-after:page}
+  .print-sheet:last-child{page-break-after:auto;break-after:auto}
+  .pdf-card{border:1px dashed #555;border-radius:4px;padding:5mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;min-width:0;min-height:0}
+  .pdf-card .numero{font-size:10px;margin-bottom:3mm;color:#555}
+  .pdf-card .libelle{font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:3mm;color:#555}
+  .pdf-question{font-size:16px;font-weight:bold;line-height:1.25}
+  .pdf-answer{font-size:15px;font-weight:bold;line-height:1.25}
+  .pdf-back .pdf-answer{font-size:15px}
+  .pdf-back .libelle{font-size:10px}
+}
+
+.print-only{display:none}.pdf-header,.print-card-list{display:none}
+</style>
+</head>
+<body>
+<div class="conteneur">
+  <div class="entete">
+    <p class="petitTitre">Flash connaissances</p>
+    <h1>Révision</h1>
+    <h2>Une question, une réflexion, une réponse.</h2>
+  </div>
+
+  <section class="configuration screen-only">
+    <p class="titreSection">Préparer la révision</p>
+    <div class="choix">
+      <label for="classSelect">1. Choisir une classe</label>
+      <select id="classSelect"><option value="">— Choisir une classe —</option></select>
+    </div>
+    <div class="choix">
+      <label for="subjectSelect">2. Choisir une matière</label>
+      <select id="subjectSelect" disabled><option value="">— Choisir une matière —</option></select>
+    </div>
+    <div class="choix">
+      <label for="chapterSelect">3. Choisir un chapitre</label>
+      <select id="chapterSelect" disabled><option value="">— Choisir un chapitre —</option></select>
+    </div>
+    <div id="configMessage" class="message hidden"></div>
+    <div id="chapterActions" class="actions hidden">
+      <button id="backChapter" type="button" class="secondary">← CHOISIR UN AUTRE CHAPITRE</button>
+      <button id="printButton" type="button" class="pdf">🖨️ PDF / IMPRIMER LES FLASH CARDS</button>
+    </div>
+  </section>
+
+  <section id="quizSection" class="zoneQuiz hidden">
+    <div class="screen-only">
+      <div class="barreQuiz">
+        <span class="etiquette">Flash card</span>
+        <span id="compteur" class="compteur"></span>
+      </div>
+      <p id="question">La question apparaîtra ici.</p>
+      <div class="actions">
+        <button id="voirReponse" type="button">VOIR LA RÉPONSE</button>
+        <button id="suivante" type="button" class="hidden">QUESTION SUIVANTE</button>
+      </div>
+      <p id="texteReponse" class="reponse hidden"></p>
+    </div>
+
+    <div id="printCards" class="print-only print-card-list"></div>
+  </section>
+
+  <div class="pied screen-only">Flash connaissances · Révision du collège Simone Sauteur</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyA9qwre5oVVnkadGxnpCSAbYAuBnSBM7y4",
+  authDomain:"flash-connaissances-simone.firebaseapp.com",
+  projectId:"flash-connaissances-simone",
+  storageBucket:"flash-connaissances-simone.firebasestorage.app",
+  messagingSenderId:"268185082285",
+  appId:"1:268185082285:web:2f4d3e8f6f8d8f7b8c9d10"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const $=id=>document.getElementById(id);
+
+let questions=[];
+let questionsChapitre=[];
+let indexQuestion=0;
+let questionActuelle=null;
+let selectedClass="";
+let selectedSubject="";
+let selectedChapter="";
+
+function norm(value){return String(value??"").trim().replace(/\s+/g," ").toLowerCase();}
+function unique(values){const seen=new Set();return values.filter(v=>{const k=norm(v);if(!k||seen.has(k))return false;seen.add(k);return true;});}
+function setOptions(select,values,placeholder){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);values.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;select.appendChild(o)});select.disabled=values.length===0;}
+function hideQuiz(){
+  $("quizSection").classList.add("hidden");
+  $("chapterActions").classList.add("hidden");
+}
+function showQuiz(){
+  $("quizSection").classList.remove("hidden");
+  $("chapterActions").classList.remove("hidden");
+}
+
+$("classSelect").addEventListener("change",()=>{
+  selectedClass=$("classSelect").value;
+  selectedSubject="";selectedChapter="";
+  setOptions($("subjectSelect"),unique(questions.filter(q=>norm(q.classe)===norm(selectedClass)).map(q=>q.matiere)),"— Choisir une matière —");
+  setOptions($("chapterSelect"),[],"— Choisir un chapitre —");
+  hideQuiz();
+});
+
+$("subjectSelect").addEventListener("change",()=>{
+  selectedSubject=$("subjectSelect").value;
+  selectedChapter="";
+  setOptions($("chapterSelect"),unique(questions.filter(q=>norm(q.classe)===norm(selectedClass)&&norm(q.matiere)===norm(selectedSubject)).map(q=>q.chapitre)),"— Choisir un chapitre —");
+  hideQuiz();
+});
+
+$("chapterSelect").addEventListener("change",()=>{
+  selectedChapter=$("chapterSelect").value;
+  if(selectedChapter) startChapter(); else hideQuiz();
+});
+
+function startChapter(){
+  questionsChapitre=questions.filter(q=>norm(q.classe)===norm(selectedClass)&&norm(q.matiere)===norm(selectedSubject)&&norm(q.chapitre)===norm(selectedChapter));
+  indexQuestion=0;
+  if(!questionsChapitre.length){
+    $("configMessage").textContent="Aucune question active disponible dans ce chapitre.";
+    $("configMessage").classList.remove("hidden");
+    hideQuiz();return;
+  }
+  $("configMessage").classList.add("hidden");
+  showQuiz();
+  afficherQuestion();
+  preparerPDF();
+}
+
+function afficherQuestion(){
+  if(indexQuestion>=questionsChapitre.length){
+    $("question").textContent="Toutes les questions de ce chapitre ont été parcourues.";
+    $("compteur").textContent=questionsChapitre.length+" / "+questionsChapitre.length;
+    $("voirReponse").classList.add("hidden");
+    $("suivante").classList.add("hidden");
+    $("texteReponse").classList.add("hidden");
+    return;
+  }
+  questionActuelle=questionsChapitre[indexQuestion];
+  $("compteur").textContent=(indexQuestion+1)+" / "+questionsChapitre.length;
+  $("question").textContent=questionActuelle.question||"Question sans texte";
+  $("texteReponse").textContent="";
+  $("texteReponse").classList.add("hidden");
+  $("voirReponse").classList.remove("hidden");
+  $("suivante").classList.add("hidden");
+}
+
+$("voirReponse").addEventListener("click",()=>{
+  if(!questionActuelle)return;
+  $("texteReponse").textContent=questionActuelle.reponse||"Aucune réponse renseignée.";
+  $("texteReponse").classList.remove("hidden");
+  $("voirReponse").classList.add("hidden");
+  $("suivante").classList.remove("hidden");
+});
+
+$("suivante").addEventListener("click",()=>{indexQuestion++;afficherQuestion();});
+
+$("backChapter").addEventListener("click",()=>{
+  hideQuiz();
+  $("chapterSelect").value="";
+  selectedChapter="";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+function preparerPDF(){
+  const box=$("printCards");box.innerHTML="";
+  const taillePage=8;
+  for(let debut=0;debut<questionsChapitre.length;debut+=taillePage){
+    const groupe=questionsChapitre.slice(debut,debut+taillePage);
+
+    const recto=document.createElement("div");
+    recto.className="print-sheet";
+    groupe.forEach((q,i)=>{
+      const card=document.createElement("div");card.className="pdf-card";
+      const numero=document.createElement("div");numero.className="numero";numero.textContent="Carte "+(debut+i+1);
+      const libelle=document.createElement("div");libelle.className="libelle";libelle.textContent="Question";
+      const question=document.createElement("div");question.className="pdf-question";question.textContent=q.question||"";
+      card.append(numero,libelle,question);recto.appendChild(card);
+    });
+    while(recto.children.length<taillePage){const vide=document.createElement("div");vide.className="pdf-card";vide.style.visibility="hidden";recto.appendChild(vide)}
+    box.appendChild(recto);
+
+    const verso=document.createElement("div");
+    verso.className="print-sheet back";
+    // Pour une impression recto-verso sur le bord long, les colonnes doivent être inversées au verso.
+    for(let ligne=0;ligne<4;ligne++){
+      const debutLigne=ligne*2;
+      const indices=[debutLigne+1,debutLigne];
+      indices.forEach(pos=>{
+        const q=groupe[pos];
+        const card=document.createElement("div");card.className="pdf-card pdf-back";
+        if(q){
+          const numero=document.createElement("div");numero.className="numero";numero.textContent="Carte "+(debut+pos+1);
+          const libelle=document.createElement("div");libelle.className="libelle";libelle.textContent="Réponse";
+          const answer=document.createElement("div");answer.className="pdf-answer";answer.textContent=q.reponse||"";
+          card.append(numero,libelle,answer);
+        }else{card.style.visibility="hidden";}
+        verso.appendChild(card);
+      });
+    }
+    box.appendChild(verso);
+  }
+}
+
+$("printButton").addEventListener("click",()=>{preparerPDF();window.print();});
+
+async function chargerQuestions(){
+  try{
+    const snap=await getDocs(collection(db,"questions"));
+    questions=snap.docs.map(d=>({id:d.id,...d.data()})).filter(q=>norm(q.statut)==="active");
+    setOptions($("classSelect"),unique(questions.map(q=>q.classe)),"— Choisir une classe —");
+    if(!questions.length){$("configMessage").textContent="Aucune question active n'est disponible.";$("configMessage").classList.remove("hidden");}
+  }catch(erreur){
+    console.error(erreur);
+    $("classSelect").innerHTML='<option value="">Erreur de chargement</option>';
+    $("classSelect").disabled=true;
+    $("configMessage").textContent="Impossible de charger les questions. Vérifie la connexion à Firebase.";
+    $("configMessage").classList.remove("hidden");
+  }
+}
+
+chargerQuestions();
+</script>
+</body>
+</html>

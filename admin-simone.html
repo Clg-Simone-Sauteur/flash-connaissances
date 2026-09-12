@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration - Flash connaissances</title>
+
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --ink2: #2d3561;
+      --gold: #c9a84c;
+      --gold2: #f0d080;
+      --cream: #faf8f2;
+      --paper: #f2ede0;
+      --blue: #1a5fa8;
+      --blue2: #4d8fd4;
+      --blue-bg: #e4eef8;
+      --green: #4a7c59;
+      --green2: #6aab79;
+      --red: #c0392b;
+      --border: #d8cdb4;
+      --shadow: rgba(26, 26, 46, 0.18);
+      --muted: #777;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #111525, #202952);
+      color: var(--ink);
+      padding: 30px;
+    }
+
+    .conteneur {
+      width: 100%;
+      max-width: 1250px;
+      min-height: 700px;
+      margin: 0 auto;
+      background: var(--cream);
+      border-radius: 24px;
+      box-shadow: 0 25px 60px var(--shadow);
+      padding: 45px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .conteneur::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 7px;
+      background: linear-gradient(90deg, var(--blue), var(--gold), var(--blue));
+    }
+
+    .entete {
+      margin-bottom: 30px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .petitTitre {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--blue);
+      font-size: 44px;
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin: 10px 0 0;
+      color: var(--ink2);
+      font-size: 24px;
+      font-weight: normal;
+    }
+
+    .carte {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 8px 20px var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .connexion {
+      max-width: 550px;
+      margin: 0 auto;
+    }
+
+    .titreSection {
+      margin: 0 0 18px;
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--ink2);
+    }
+
+    .aide {
+      margin: 0 0 20px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      font-weight: bold;
+      color: var(--ink2);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 15px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      color: var(--ink);
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 95, 168, 0.12);
+    }
+
+    .champ { margin-bottom: 18px; }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 22px;
+      background: var(--blue);
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 15px var(--shadow);
+      transition: transform .15s ease, background .15s ease;
+    }
+
+    button:hover {
+      background: var(--blue2);
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary { background: #777; }
+    .secondary:hover { background: #666; }
+
+    .success { background: var(--green); }
+    .success:hover { background: var(--green2); }
+
+    .danger { background: var(--red); }
+    .danger:hover { background: #a93226; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .utilisateurConnecte {
+      margin-bottom: 20px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      background: #e7f2e9;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #zoneApplication, #editModal {
+      display: none;
+    }
+
+    .filtres {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .recherche {
+      grid-column: 1 / -1;
+    }
+
+    .resume {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--blue-bg);
+      color: var(--blue);
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .liste {
+      display: grid;
+      gap: 14px;
+    }
+
+    .questionCarte {
+      background: white;
+      border: 1px solid var(--border);
+      border-left: 6px solid var(--blue);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .questionCarte.inactive {
+      border-left-color: #999;
+      opacity: .72;
+    }
+
+    .ligneMeta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .meta {
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink2);
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .statutActive { background: #e7f2e9; color: var(--green); }
+    .statutInactive { background: #eee; color: #666; }
+
+    .questionTexte {
+      margin: 0 0 12px;
+      font-size: 19px;
+      font-weight: bold;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .reponse {
+      margin: 0 0 14px;
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--blue-bg);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .classes {
+      margin: 0 0 15px;
+      color: var(--ink2);
+      font-size: 14px;
+    }
+
+    .classes strong { color: var(--blue); }
+
+    .petit {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty, .chargement {
+      padding: 35px 20px;
+      text-align: center;
+      color: #666;
+      background: white;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+
+    .message {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .message:empty { display: none; }
+    .success-message { background: #e7f2e9; color: var(--green); }
+    .error-message { background: #fbe9e7; color: var(--red); }
+    .info-message { background: var(--blue-bg); color: var(--blue); }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .navigation h3 {
+      margin: 0;
+      color: var(--ink2);
+      font-size: 20px;
+    }
+
+    .modalFond {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 21, 37, .65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 20;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 750px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--cream);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,.3);
+    }
+
+    .modal h3 {
+      margin-top: 0;
+      color: var(--blue);
+      font-size: 28px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      padding: 14px 15px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      resize: vertical;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26,95,168,.12);
+    }
+
+    .confirmationTexte {
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .hidden { display: none !important; }
+
+    .pied {
+      margin-top: 30px;
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      body { padding: 15px; }
+      .conteneur { padding: 30px 25px; }
+      .filtres { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .conteneur { padding: 25px 18px; }
+      h1 { font-size: 32px; }
+      h2 { font-size: 20px; }
+      .filtres { grid-template-columns: 1fr; }
+      .navigation, .utilisateurConnecte { flex-direction: column; align-items: stretch; }
+      button { width: 100%; }
+      .actions { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="conteneur">
+
+    <div class="entete">
+      <p class="petitTitre">Flash connaissances</p>
+      <h1>Administration</h1>
+      <h2>Gérer simplement la banque de questions.</h2>
+    </div>
+
+    <div id="loginCard" class="carte connexion">
+      <p class="titreSection">Accès administrateur</p>
+      <p class="aide">
+        Connectez-vous avec le compte administrateur pour consulter et gérer
+        les questions de la banque.
+      </p>
+
+      <div class="champ">
+        <label for="email">Adresse e-mail</label>
+        <input id="email" type="email"
+               value="clg.simone.sauteur@gmail.com"
+               autocomplete="username">
+      </div>
+
+      <div class="champ">
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" autocomplete="current-password">
+      </div>
+
+      <div class="actions">
+        <button type="button" id="loginButton">SE CONNECTER</button>
+      </div>
+
+      <div id="loginMessage" class="message"></div>
+    </div>
+
+    <div id="zoneApplication">
+
+      <div class="utilisateurConnecte">
+        <span>Connecté en tant qu'administrateur</span>
+        <button type="button" id="logoutButton" class="secondary">SE DÉCONNECTER</button>
+      </div>
+
+      <div class="carte">
+        <div class="navigation">
+          <h3>Classe → Matière → Chapitre → Questions</h3>
+          <button type="button" id="resetButton" class="secondary">RÉINITIALISER</button>
+        </div>
+
+        <div class="filtres">
+          <div class="recherche">
+            <label for="searchInput">Rechercher une question</label>
+            <input id="searchInput" type="search"
+                   placeholder="Question, réponse ou chapitre...">
+          </div>
+
+          <div>
+            <label for="classeFilter">Classe</label>
+            <select id="classeFilter">
+              <option value="">Toutes les classes</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="matiereFilter">Matière</label>
+            <select id="matiereFilter">
+              <option value="">Toutes les matières</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="chapitreFilter">Chapitre</label>
+            <select id="chapitreFilter">
+              <option value="">Tous les chapitres</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="statutFilter">Statut</label>
+            <select id="statutFilter">
+              <option value="">Tous</option>
+              <option value="active">Actives</option>
+              <option value="inactive">Inactives</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="resume" id="resume"></div>
+      </div>
+
+      <div class="carte">
+        <div class="navigation">
+          <h3 id="titreListe">Questions</h3>
+          <span class="petit" id="dateMiseAJour"></span>
+        </div>
+
+        <div id="listeQuestions" class="liste">
+          <div class="chargement">Chargement des questions...</div>
+        </div>
+
+        <div id="appMessage" class="message"></div>
+      </div>
+
+    </div>
+
+    <div class="pied">
+      Flash connaissances · Administration de la banque de questions
+    </div>
+  </div>
+
+  <div id="modalFond" class="modalFond">
+    <div class="modal">
+      <h3 id="modalTitre">Modifier la question</h3>
+
+      <div id="modalContenu">
+
+        <div class="champ">
+          <label for="editMatiere">Matière</label>
+          <select id="editMatiere"></select>
+        </div>
+
+        <div class="champ">
+          <label for="editChapitre">Chapitre</label>
+          <input id="editChapitre" type="text" maxlength="150">
+        </div>
+
+        <div class="champ">
+          <label for="editQuestion">Question</label>
+          <textarea id="editQuestion"></textarea>
+        </div>
+
+        <div class="champ">
+          <label for="editReponse">Réponse</label>
+          <textarea id="editReponse"></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="cancelEditButton" class="secondary">ANNULER</button>
+          <button type="button" id="saveEditButton" class="success">ENREGISTRER LES MODIFICATIONS</button>
+        </div>
+
+        <div id="editMessage" class="message"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmFond" class="modalFond">
+    <div class="modal">
+      <h3 id="confirmTitre">Confirmation</h3>
+      <div id="confirmTexte" class="confirmationTexte"></div>
+
+      <div class="actions">
+        <button type="button" id="cancelConfirmButton" class="secondary">ANNULER</button>
+        <button type="button" id="confirmActionButton" class="danger">CONFIRMER</button>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    updateDoc,
+    deleteDoc,
+    doc,
+    Timestamp
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDr6UgkWn-BFCEpAqi4f0AmMkoOE3q3EQg",
+    authDomain: "flash-connaissances-simone.firebaseapp.com",
+    projectId: "flash-connaissances-simone",
+    storageBucket: "flash-connaissances-simone.firebasestorage.app",
+    messagingSenderId: "268185082285",
+    appId: "1:268185082285:web:a8dbafcf0500a892206924"
+  };
+
+  const ADMIN_EMAIL = "clg.simone.sauteur@gmail.com";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const loginCard = document.getElementById("loginCard");
+  const zoneApplication = document.getElementById("zoneApplication");
+
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const loginButton = document.getElementById("loginButton");
+  const logoutButton = document.getElementById("logoutButton");
+  const loginMessage = document.getElementById("loginMessage");
+
+  const searchInput = document.getElementById("searchInput");
+  const classeFilter = document.getElementById("classeFilter");
+  const matiereFilter = document.getElementById("matiereFilter");
+  const chapitreFilter = document.getElementById("chapitreFilter");
+  const statutFilter = document.getElementById("statutFilter");
+  const resetButton = document.getElementById("resetButton");
+
+  const listeQuestions = document.getElementById("listeQuestions");
+  const titreListe = document.getElementById("titreListe");
+  const resume = document.getElementById("resume");
+  const appMessage = document.getElementById("appMessage");
+  const dateMiseAJour = document.getElementById("dateMiseAJour");
+
+  const modalFond = document.getElementById("modalFond");
+  const editMatiere = document.getElementById("editMatiere");
+  const editChapitre = document.getElementById("editChapitre");
+  const editQuestion = document.getElementById("editQuestion");
+  const editReponse = document.getElementById("editReponse");
+  const cancelEditButton = document.getElementById("cancelEditButton");
+  const saveEditButton = document.getElementById("saveEditButton");
+  const editMessage = document.getElementById("editMessage");
+
+  const confirmFond = document.getElementById("confirmFond");
+  const confirmTitre = document.getElementById("confirmTitre");
+  const confirmTexte = document.getElementById("confirmTexte");
+  const cancelConfirmButton = document.getElementById("cancelConfirmButton");
+  const confirmActionButton = document.getElementById("confirmActionButton");
+
+  let allDocuments = [];
+  let groupedQuestions = [];
+  let currentGroup = null;
+  let pendingConfirmation = null;
+
+  const MATIERES = [
+    "Mathématiques",
+    "Français",
+    "Histoire, géographie et Emc",
+    "Anglais",
+    "Espagnol",
+    "Allemand",
+    "Sciences",
+    "SVT",
+    "Technologie",
+    "EPS",
+    "Arts plastiques",
+    "Éducation musicale",
+    "Latin",
+    "Enseignement professionnel"
+  ];
+
+  function showMessage(element, text, type = "info-message") {
+    element.textContent = text;
+    element.className = "message " + type;
+  }
+
+  function clearMessage(element) {
+    element.textContent = "";
+    element.className = "message";
+  }
+
+  function cleanText(value) {
+    return typeof value === "string" ? value.trim() : "";
+  }
+
+  function normalize(value) {
+    return cleanText(value)
+      .replace(/\s+/g, " ")
+      .toLocaleLowerCase("fr-FR");
+  }
+
+  function dateToMillis(value) {
+    if (!value) return 0;
+    if (typeof value.toMillis === "function") return value.toMillis();
+    if (value instanceof Date) return value.getTime();
+    return 0;
+  }
+
+  function formatDate(value) {
+    const millis = dateToMillis(value);
+    if (!millis) return "Date inconnue";
+
+    return new Intl.DateTimeFormat("fr-FR", {
+      dateStyle: "short",
+      timeStyle: "short"
+    }).format(new Date(millis));
+  }
+
+  /*
+    RÈGLE DE REGROUPEMENT :
+    Deux documents sont considérés comme la même question si
+    matière + chapitre + question + réponse + date + statut sont identiques.
+    La classe est volontairement exclue de cette clé.
+  */
+  function makeGroupKey(data) {
+    return [
+      normalize(data.matiere),
+      normalize(data.chapitre),
+      normalize(data.question),
+      normalize(data.reponse),
+      String(dateToMillis(data.date)),
+      normalize(data.statut)
+    ].join("||");
+  }
+
+  function rebuildGroups() {
+    const groups = new Map();
+
+    allDocuments.forEach(item => {
+      const key = makeGroupKey(item.data);
+
+      if (!groups.has(key)) {
+        groups.set(key, {
+          key,
+          data: { ...item.data },
+          ids: [],
+          classes: []
+        });
+      }
+
+      const group = groups.get(key);
+      group.ids.push(item.id);
+
+      const classe = cleanText(item.data.classe);
+      if (classe && !group.classes.includes(classe)) {
+        group.classes.push(classe);
+      }
+    });
+
+    groupedQuestions = Array.from(groups.values());
+
+    groupedQuestions.forEach(group => {
+      group.classes.sort((a, b) =>
+        a.localeCompare(b, "fr-FR", { numeric: true })
+      );
+    });
+  }
+
+  function fillSelect(select, values, firstLabel) {
+    const current = select.value;
+    select.innerHTML = "";
+    const first = document.createElement("option");
+    first.value = "";
+    first.textContent = firstLabel;
+    select.appendChild(first);
+
+    values.forEach(value => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
+    });
+
+    if (values.includes(current)) {
+      select.value = current;
+    }
+  }
+
+  function updateFilterOptions() {
+    const classes = [...new Set(allDocuments.map(x => cleanText(x.data.classe)).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "fr-FR", { numeric: true }));
+
+    const matieres = [...new Set(allDocuments.map(x => cleanText(x.data.matiere)).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "fr-FR"));
+
+    fillSelect(classeFilter, classes, "Toutes les classes");
+    fillSelect(matiereFilter, matieres, "Toutes les matières");
+
+    updateChapterOptions();
+  }
+
+  function updateChapterOptions() {
+    const chapters = [...new Set(
+      allDocuments
+        .filter(item => {
+          const data = item.data;
+          return !classeFilter.value || data.classe === classeFilter.value;
+        })
+        .filter(item => {
+          const data = item.data;
+          return !matiereFilter.value || data.matiere === matiereFilter.value;
+        })
+        .map(item => cleanText(item.data.chapitre))
+        .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, "fr-FR"));
+
+    const current = chapitreFilter.value;
+    fillSelect(chapitreFilter, chapters, "Tous les chapitres");
+
+    if (chapters.includes(current)) {
+      chapitreFilter.value = current;
+    }
+  }
+
+  function getFilteredGroups() {
+    const search = normalize(searchInput.value);
+    const classe = classeFilter.value;
+    const matiere = matiereFilter.value;
+    const chapitre = chapitreFilter.value;
+    const statut = statutFilter.value;
+
+    return groupedQuestions
+      .map(group => {
+        const visibleDocs = allDocuments.filter(item =>
+          group.ids.includes(item.id)
+        );
+
+        let docs = visibleDocs.filter(item => {
+          const data = item.data;
+          if (classe && data.classe !== classe) return false;
+          if (matiere && data.matiere !== matiere) return false;
+          if (chapitre && data.chapitre !== chapitre) return false;
+          if (statut && data.statut !== statut) return false;
+          return true;
+        });
+
+        if (search) {
+          docs = docs.filter(item => {
+            const data = item.data;
+            const haystack = [
+              data.question,
+              data.reponse,
+              data.chapitre,
+              data.matiere,
+              data.classe
+            ].map(normalize).join(" ");
+            return haystack.includes(search);
+          });
+        }
+
+        if (!docs.length) return null;
+
+        const result = {
+          ...group,
+          data: { ...docs[0].data },
+          classes: [...new Set(docs.map(item => item.data.classe).filter(Boolean))]
+        };
+
+        result.classes.sort((a, b) =>
+          a.localeCompare(b, "fr-FR", { numeric: true })
+        );
+
+        return result;
+      })
+      .filter(Boolean);
+  }
+
+  function renderResume(groups) {
+    const totalDocs = allDocuments.length;
+    const totalGroups = groupedQuestions.length;
+    const visibleClasses = new Set();
+
+    groups.forEach(group => group.classes.forEach(c => visibleClasses.add(c)));
+
+    resume.innerHTML = "";
+
+    const badges = [
+      `${groups.length} question${groups.length > 1 ? "s" : ""} affichée${groups.length > 1 ? "s" : ""}`,
+      `${visibleClasses.size} classe${visibleClasses.size > 1 ? "s" : ""}`,
+      `${totalDocs} document${totalDocs > 1 ? "s" : ""} Firestore`
+    ];
+
+    if (totalDocs !== totalGroups) {
+      badges.push(`${totalGroups} question${totalGroups > 1 ? "s" : ""} après regroupement`);
+    }
+
+    badges.forEach(text => {
+      const span = document.createElement("span");
+      span.className = "badge";
+      span.textContent = text;
+      resume.appendChild(span);
+    });
+  }
+
+  function renderQuestions() {
+    const groups = getFilteredGroups();
+    renderResume(groups);
+
+    titreListe.textContent =
+      `${groups.length} question${groups.length > 1 ? "s" : ""}`;
+
+    listeQuestions.innerHTML = "";
+
+    if (!groups.length) {
+      listeQuestions.innerHTML = `
+        <div class="empty">
+          Aucune question ne correspond aux filtres sélectionnés.
+        </div>
+      `;
+      return;
+    }
+
+    groups.sort((a, b) => {
+      const chapterCompare = cleanText(a.data.chapitre)
+        .localeCompare(cleanText(b.data.chapitre), "fr-FR");
+      if (chapterCompare !== 0) return chapterCompare;
+
+      return cleanText(a.data.question)
+        .localeCompare(cleanText(b.data.question), "fr-FR");
+    });
+
+    groups.forEach(group => {
+      const data = group.data;
+      const card = document.createElement("article");
+      card.className = "questionCarte" +
+        (data.statut === "inactive" ? " inactive" : "");
+
+      const meta = document.createElement("div");
+      meta.className = "ligneMeta";
+
+      [
+        data.matiere || "Matière inconnue",
+        data.chapitre || "Sans chapitre"
+      ].forEach(text => {
+        const span = document.createElement("span");
+        span.className = "meta";
+        span.textContent = text;
+        meta.appendChild(span);
+      });
+
+      const status = document.createElement("span");
+      status.className = "meta " +
+        (data.statut === "active" ? "statutActive" : "statutInactive");
+      status.textContent = data.statut === "active" ? "Active" : "Inactive";
+      meta.appendChild(status);
+
+      const question = document.createElement("p");
+      question.className = "questionTexte";
+      question.textContent = data.question || "";
+
+      const answer = document.createElement("div");
+      answer.className = "reponse";
+      answer.textContent = data.reponse || "";
+
+      const classes = document.createElement("p");
+      classes.className = "classes";
+      classes.innerHTML = `<strong>Classes :</strong> ${group.classes.join(" · ")}`;
+
+      const date = document.createElement("div");
+      date.className = "petit";
+      date.textContent = `Créée le ${formatDate(data.date)}`;
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.style.marginTop = "15px";
+
+      const editButton = document.createElement("button");
+      editButton.textContent = "MODIFIER";
+      editButton.addEventListener("click", () => openEditModal(group));
+
+      const toggleButton = document.createElement("button");
+      toggleButton.className = data.statut === "active" ? "secondary" : "success";
+      toggleButton.textContent =
+        data.statut === "active" ? "DÉSACTIVER" : "ACTIVER";
+      toggleButton.addEventListener("click", () => {
+        const nextStatus = data.statut === "active" ? "inactive" : "active";
+        askConfirmation(
+          nextStatus === "active" ? "Activer la question" : "Désactiver la question",
+          `Cette question est actuellement présente pour ${group.classes.length} classe${group.classes.length > 1 ? "s" : ""}. L'action s'appliquera à toutes les classes affichées.`,
+          () => changeStatus(group, nextStatus)
+        );
+      });
+
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "danger";
+      deleteButton.textContent = "SUPPRIMER";
+      deleteButton.addEventListener("click", () => {
+        askConfirmation(
+          "Supprimer la question",
+          `Cette suppression retirera définitivement cette question pour ${group.classes.length} classe${group.classes.length > 1 ? "s" : ""}. Cette action est irréversible.`,
+          () => deleteGroup(group)
+        );
+      });
+
+      actions.append(editButton, toggleButton, deleteButton);
+
+      card.append(meta, question, answer, classes, date, actions);
+      listeQuestions.appendChild(card);
+    });
+  }
+
+  async function loadQuestions() {
+    clearMessage(appMessage);
+    listeQuestions.innerHTML = `<div class="chargement">Chargement des questions...</div>`;
+
+    try {
+      const snapshot = await getDocs(collection(db, "questions"));
+
+      allDocuments = snapshot.docs.map(documentSnapshot => ({
+        id: documentSnapshot.id,
+        data: documentSnapshot.data()
+      }));
+
+      rebuildGroups();
+      updateFilterOptions();
+      renderQuestions();
+
+      dateMiseAJour.textContent =
+        `Dernière lecture : ${new Intl.DateTimeFormat("fr-FR", {
+          dateStyle: "short",
+          timeStyle: "medium"
+        }).format(new Date())}`;
+
+    } catch (error) {
+      console.error(error);
+      listeQuestions.innerHTML = `
+        <div class="empty">
+          Impossible de charger les questions.
+        </div>
+      `;
+      showMessage(
+        appMessage,
+        "Erreur lors du chargement des questions.",
+        "error-message"
+      );
+    }
+  }
+
+  function openEditModal(group) {
+    currentGroup = group;
+
+    editMatiere.innerHTML = "";
+    const allMatieres = [...new Set([
+      ...MATIERES,
+      ...allDocuments.map(x => x.data.matiere).filter(Boolean)
+    ])].sort((a, b) => a.localeCompare(b, "fr-FR"));
+
+    allMatieres.forEach(matiere => {
+      const option = document.createElement("option");
+      option.value = matiere;
+      option.textContent = matiere;
+      editMatiere.appendChild(option);
+    });
+
+    editMatiere.value = group.data.matiere || "";
+    editChapitre.value = group.data.chapitre || "";
+    editQuestion.value = group.data.question || "";
+    editReponse.value = group.data.reponse || "";
+
+    clearMessage(editMessage);
+    modalFond.style.display = "flex";
+    editQuestion.focus();
+  }
+
+  function closeEditModal() {
+    modalFond.style.display = "none";
+    currentGroup = null;
+    clearMessage(editMessage);
+  }
+
+  async function saveEdit() {
+    if (!currentGroup) return;
+
+    const matiere = cleanText(editMatiere.value);
+    const chapitre = cleanText(editChapitre.value);
+    const question = cleanText(editQuestion.value);
+    const reponse = cleanText(editReponse.value);
+
+    if (!matiere || !chapitre || !question || !reponse) {
+      showMessage(
+        editMessage,
+        "Tous les champs doivent être remplis.",
+        "error-message"
+      );
+      return;
+    }
+
+    saveEditButton.disabled = true;
+    saveEditButton.textContent = "ENREGISTREMENT...";
+
+    try {
+      /*
+        Une question regroupée représente plusieurs documents.
+        La modification est donc appliquée à chacun d'eux.
+        Une nouvelle date identique est utilisée pour conserver le regroupement.
+      */
+      const newDate = Timestamp.now();
+
+      for (const id of currentGroup.ids) {
+        await updateDoc(doc(db, "questions", id), {
+          matiere,
+          chapitre,
+          question,
+          reponse,
+          date: newDate
+        });
+      }
+
+      closeEditModal();
+      await loadQuestions();
+      showMessage(
+        appMessage,
+        `Question modifiée pour ${currentGroup ? currentGroup.ids.length : "les"} classe(s).`,
+        "success-message"
+      );
+
+    } catch (error) {
+      console.error(error);
+      showMessage(
+        editMessage,
+        "Impossible d'enregistrer les modifications.",
+        "error-message"
+      );
+    } finally {
+      saveEditButton.disabled = false;
+      saveEditButton.textContent = "ENREGISTRER LES MODIFICATIONS";
+    }
+  }
+
+  async function changeStatus(group, newStatus) {
+    try {
+      const newDate = Timestamp.now();
+
+      for (const id of group.ids) {
+        await updateDoc(doc(db, "questions", id), {
+          statut: newStatus,
+          date: newDate
+        });
+      }
+
+      await loadQuestions();
+
+      showMessage(
+        appMessage,
+        newStatus === "active"
+          ? "Question activée pour les classes concernées."
+          : "Question désactivée pour les classes concernées.",
+        "success-message"
+      );
+    } catch (error) {
+      console.error(error);
+      showMessage(
+        appMessage,
+        "Impossible de modifier le statut de la question.",
+        "error-message"
+      );
+    }
+  }
+
+  async function deleteGroup(group) {
+    try {
+      for (const id of group.ids) {
+        await deleteDoc(doc(db, "questions", id));
+      }
+
+      await loadQuestions();
+
+      showMessage(
+        appMessage,
+        "Question supprimée pour les classes concernées.",
+        "success-message"
+      );
+    } catch (error) {
+      console.error(error);
+      showMessage(
+        appMessage,
+        "Impossible de supprimer la question.",
+        "error-message"
+      );
+    }
+  }
+
+  function askConfirmation(title, text, action) {
+    confirmTitre.textContent = title;
+    confirmTexte.textContent = text;
+    pendingConfirmation = action;
+    confirmFond.style.display = "flex";
+  }
+
+  function closeConfirmation() {
+    confirmFond.style.display = "none";
+    pendingConfirmation = null;
+  }
+
+  loginButton.addEventListener("click", async () => {
+    clearMessage(loginMessage);
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      showMessage(
+        loginMessage,
+        "Indique l'adresse e-mail et le mot de passe.",
+        "error-message"
+      );
+      return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = "CONNEXION...";
+
+    try {
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      if (
+        credential.user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()
+      ) {
+        await signOut(auth);
+        showMessage(
+          loginMessage,
+          "Ce compte n'est pas autorisé pour l'administration.",
+          "error-message"
+        );
+      }
+
+    } catch (error) {
+      console.error(error);
+      showMessage(
+        loginMessage,
+        "Connexion impossible. Vérifie l'adresse e-mail et le mot de passe.",
+        "error-message"
+      );
+    } finally {
+      loginButton.disabled = false;
+      loginButton.textContent = "SE CONNECTER";
+    }
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    await signOut(auth);
+  });
+
+  searchInput.addEventListener("input", renderQuestions);
+
+  classeFilter.addEventListener("change", () => {
+    updateChapterOptions();
+    renderQuestions();
+  });
+
+  matiereFilter.addEventListener("change", () => {
+    updateChapterOptions();
+    renderQuestions();
+  });
+
+  chapitreFilter.addEventListener("change", renderQuestions);
+  statutFilter.addEventListener("change", renderQuestions);
+
+  resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    classeFilter.value = "";
+    matiereFilter.value = "";
+    chapitreFilter.value = "";
+    statutFilter.value = "";
+    updateChapterOptions();
+    renderQuestions();
+  });
+
+  cancelEditButton.addEventListener("click", closeEditModal);
+  saveEditButton.addEventListener("click", saveEdit);
+
+  cancelConfirmButton.addEventListener("click", closeConfirmation);
+
+  confirmActionButton.addEventListener("click", async () => {
+    if (!pendingConfirmation) return;
+
+    const action = pendingConfirmation;
+    closeConfirmation();
+    confirmActionButton.disabled = true;
+
+    try {
+      await action();
+    } finally {
+      confirmActionButton.disabled = false;
+    }
+  });
+
+  modalFond.addEventListener("click", event => {
+    if (event.target === modalFond) closeEditModal();
+  });
+
+  confirmFond.addEventListener("click", event => {
+    if (event.target === confirmFond) closeConfirmation();
+  });
+
+  onAuthStateChanged(auth, async user => {
+    if (user && user.email &&
+        user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+
+      loginCard.style.display = "none";
+      zoneApplication.style.display = "block";
+      clearMessage(loginMessage);
+
+      await loadQuestions();
+
+    } else {
+      loginCard.style.display = "block";
+      zoneApplication.style.display = "none";
+
+      if (user) {
+        await signOut(auth);
+      }
+    }
+  });
+</script>
+</body>
+</html>
