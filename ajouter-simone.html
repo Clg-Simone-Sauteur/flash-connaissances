@@ -487,6 +487,57 @@
   .secondary:hover { background: #666; }
   .success { background: var(--green); }
   .success:hover { background: var(--green2); }
+
+  .difficulte-boutons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .bouton-difficulte {
+    border: 2px solid transparent;
+    box-shadow: none;
+    color: #fff;
+    padding: 14px 12px;
+  }
+
+  #difficulteFacile {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  #difficulteFacile:hover, #difficulteFacile.selectionne {
+    background: var(--green2);
+  }
+
+  #difficulteMoyenne {
+    background: #d18a22;
+    border-color: #d18a22;
+  }
+
+  #difficulteMoyenne:hover, #difficulteMoyenne.selectionne {
+    background: #e2a34a;
+  }
+
+  #difficulteDifficile {
+    background: var(--red);
+    border-color: var(--red);
+  }
+
+  #difficulteDifficile:hover, #difficulteDifficile.selectionne {
+    background: #d9574b;
+  }
+
+  .bouton-difficulte:not(.selectionne) {
+    opacity: .72;
+  }
+
+  .difficulte-aide {
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+  }
   .message {
     margin: 20px 0 0;
     padding: 15px;
@@ -505,6 +556,8 @@
   @media (max-width: 500px) {
     .classes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .chapter-row { grid-template-columns: 1fr; }
+    .difficulte-boutons { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .bouton-difficulte { padding: 13px 6px; font-size: 14px; }
   }
 </style>
 
@@ -639,6 +692,16 @@
             <textarea id="reponse" placeholder="Écrivez la réponse attendue..." required></textarea>
           </div>
 
+          <div class="champ">
+            <label>Niveau de difficulté</label>
+            <div class="difficulte-boutons">
+              <button type="button" id="difficulteFacile" class="bouton-difficulte" data-difficulte="facile">FACILE</button>
+              <button type="button" id="difficulteMoyenne" class="bouton-difficulte" data-difficulte="moyenne">MOYEN</button>
+              <button type="button" id="difficulteDifficile" class="bouton-difficulte" data-difficulte="difficile">DIFFICILE</button>
+            </div>
+            <p class="difficulte-aide">Choisissez le niveau qui correspond à l'effort de réflexion attendu de l'élève.</p>
+          </div>
+
           <div class="actions">
             <button type="submit" id="saveButton" class="success">ENREGISTRER LA QUESTION</button>
           </div>
@@ -727,6 +790,12 @@
     const questionInput = document.getElementById("question");
     const reponseInput = document.getElementById("reponse");
     const saveButton = document.getElementById("saveButton");
+
+    const boutonsDifficulte = Array.from(
+      document.querySelectorAll(".bouton-difficulte")
+    );
+
+    let difficulteSelectionnee = "";
 
 
     // =========================================================
@@ -1041,13 +1110,27 @@
 
 
     // =========================================================
+    // CHOIX DE LA DIFFICULTÉ
+    // =========================================================
+
+    boutonsDifficulte.forEach((bouton) => {
+      bouton.addEventListener("click", () => {
+        difficulteSelectionnee = bouton.dataset.difficulte;
+
+        boutonsDifficulte.forEach((autre) => {
+          autre.classList.toggle("selectionne", autre === bouton);
+        });
+      });
+    });
+
+
+    // =========================================================
     // ENREGISTRER
     // =========================================================
 
-    document.getElementById("questionForm").addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
+    saveButton.addEventListener(
+      "click",
+      async () => {
 
         clearMessage(formMessage);
 
@@ -1148,6 +1231,18 @@
 
         }
 
+        if (!difficulteSelectionnee) {
+
+          showMessage(
+            formMessage,
+            "Choisis le niveau de difficulté.",
+            "error-message"
+          );
+
+          return;
+
+        }
+
 
         // Vérification simple d'un doublon de chapitre
         // parmi les chapitres existants pour les classes sélectionnées.
@@ -1237,6 +1332,7 @@
                 chapitre: chapitre,
                 question: question,
                 reponse: reponse,
+                difficulte: difficulteSelectionnee,
                 date: date,
                 statut: "active"
               }
@@ -1278,6 +1374,11 @@
 
           questionInput.value = "";
           reponseInput.value = "";
+
+          difficulteSelectionnee = "";
+          boutonsDifficulte.forEach((bouton) => {
+            bouton.classList.remove("selectionne");
+          });
 
 
         } catch (error) {
