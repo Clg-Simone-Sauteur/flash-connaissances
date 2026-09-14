@@ -230,7 +230,25 @@ async function chargerQuestions(){
   try{
     const snap=await getDocs(collection(db,"questions"));
     questions=snap.docs.map(d=>({id:d.id,...d.data()})).filter(q=>norm(q.statut)==="active");
-    setOptions($("classSelect"),unique(questions.map(q=>q.classe)),"— Choisir une classe —");
+    // Affichage des classes dans l'ordre pédagogique : 6e, 5e, 4e, 3e.
+    const ordreNiveau = {"6e": 1, "5e": 2, "4e": 3, "3e": 4};
+    const classes = unique(questions.map(q=>q.classe)).sort((a,b)=>{
+      const pa = norm(a).match(/^(6e|5e|4e|3e)\\s*([a-f])$/);
+      const pb = norm(b).match(/^(6e|5e|4e|3e)\\s*([a-f])$/);
+
+      if(pa && pb){
+        const niveauA = ordreNiveau[pa[1]];
+        const niveauB = ordreNiveau[pb[1]];
+        if(niveauA !== niveauB) return niveauA - niveauB;
+        return pa[2].localeCompare(pb[2], "fr");
+      }
+
+      if(pa && !pb) return -1;
+      if(!pa && pb) return 1;
+      return norm(a).localeCompare(norm(b), "fr");
+    });
+
+    setOptions($("classSelect"),classes,"— Choisir une classe —");
     if(!questions.length){$("configMessage").textContent="Aucune question active n'est disponible.";$("configMessage").classList.remove("hidden");}
   }catch(erreur){
     console.error(erreur);
