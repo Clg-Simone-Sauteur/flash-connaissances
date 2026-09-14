@@ -264,6 +264,10 @@
     .statutActive { background: #e7f2e9; color: var(--green); }
     .statutInactive { background: #eee; color: #666; }
 
+    .difficulteFacile { background: #e7f2e9; color: var(--green); }
+    .difficulteMoyenne { background: #fff0d8; color: #9a6412; }
+    .difficulteDifficile { background: #fbe9e7; color: var(--red); }
+
     .questionTexte {
       margin: 0 0 12px;
       font-size: 19px;
@@ -932,6 +936,24 @@
         (data.statut === "active" ? "statutActive" : "statutInactive");
       status.textContent = data.statut === "active" ? "Active" : "Inactive";
       meta.appendChild(status);
+
+      if (data.difficulte) {
+        const difficulte = document.createElement("span");
+        const classeDifficulte = {
+          facile: "difficulteFacile",
+          moyenne: "difficulteMoyenne",
+          difficile: "difficulteDifficile"
+        }[normalize(data.difficulte)] || "";
+
+        difficulte.className = "meta " + classeDifficulte;
+        difficulte.textContent = {
+          facile: "Facile",
+          moyenne: "Moyen",
+          difficile: "Difficile"
+        }[normalize(data.difficulte)] || data.difficulte;
+
+        meta.appendChild(difficulte);
+      }
 
       const question = document.createElement("p");
       question.className = "questionTexte";
