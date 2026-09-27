@@ -89,7 +89,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const firebaseConfig={
   apiKey:"AIzaSyA9qwre5oVVnkadGxnpCSAbYAuBnSBM7y4",
@@ -124,12 +124,41 @@ function showQuiz(){
   $("chapterActions").classList.remove("hidden");
 }
 
-$("classSelect").addEventListener("change",()=>{
+$("classSelect").addEventListener("change",async()=>{
   selectedClass=$("classSelect").value;
   selectedSubject="";selectedChapter="";
-  setOptions($("subjectSelect"),unique(questions.filter(q=>norm(q.classe)===norm(selectedClass)).map(q=>q.matiere)),"— Choisir une matière —");
+  questions=[];
+  setOptions($("subjectSelect"),[],"— Choisir une matière —");
   setOptions($("chapterSelect"),[],"— Choisir un chapitre —");
   hideQuiz();
+  $("configMessage").classList.add("hidden");
+
+  if(!selectedClass)return;
+
+  try{
+    $("configMessage").textContent="Chargement des matières de la classe…";
+    $("configMessage").classList.remove("hidden");
+
+    // IMPORTANT : on ne lit plus toute la collection.
+    // Seuls les documents de la classe choisie sont récupérés.
+    const qClasse=query(collection(db,"questions"),where("classe","==",selectedClass));
+    const snap=await getDocs(qClasse);
+    questions=snap.docs.map(d=>({id:d.id,...d.data()})).filter(q=>norm(q.statut)==="active");
+
+    const matieres=unique(questions.map(q=>q.matiere));
+    setOptions($("subjectSelect"),matieres,"— Choisir une matière —");
+
+    if(!questions.length){
+      $("configMessage").textContent="Aucune question active n'est disponible pour cette classe.";
+      $("configMessage").classList.remove("hidden");
+    }else{
+      $("configMessage").classList.add("hidden");
+    }
+  }catch(erreur){
+    console.error(erreur);
+    $("configMessage").textContent="Impossible de charger les questions de cette classe. Vérifie la connexion à Firebase.";
+    $("configMessage").classList.remove("hidden");
+  }
 });
 
 $("subjectSelect").addEventListener("change",()=>{
@@ -256,36 +285,13 @@ function preparerPDF(){
 $("printButton").addEventListener("click",()=>{preparerPDF();window.print();});
 
 async function chargerQuestions(){
-  try{
-    const snap=await getDocs(collection(db,"questions"));
-    questions=snap.docs.map(d=>({id:d.id,...d.data()})).filter(q=>norm(q.statut)==="active");
-    // Affichage des classes dans l'ordre pédagogique : 6e, 5e, 4e, 3e.
-    const ordreNiveau = {"6e": 1, "5e": 2, "4e": 3, "3e": 4};
-    const classes = unique(questions.map(q=>q.classe)).sort((a,b)=>{
-      const pa = norm(a).match(/^(6e|5e|4e|3e)\\s*([a-f])$/);
-      const pb = norm(b).match(/^(6e|5e|4e|3e)\\s*([a-f])$/);
-
-      if(pa && pb){
-        const niveauA = ordreNiveau[pa[1]];
-        const niveauB = ordreNiveau[pb[1]];
-        if(niveauA !== niveauB) return niveauA - niveauB;
-        return pa[2].localeCompare(pb[2], "fr");
-      }
-
-      if(pa && !pb) return -1;
-      if(!pa && pb) return 1;
-      return norm(a).localeCompare(norm(b), "fr");
-    });
-
-    setOptions($("classSelect"),classes,"— Choisir une classe —");
-    if(!questions.length){$("configMessage").textContent="Aucune question active n'est disponible.";$("configMessage").classList.remove("hidden");}
-  }catch(erreur){
-    console.error(erreur);
-    $("classSelect").innerHTML='<option value="">Erreur de chargement</option>';
-    $("classSelect").disabled=true;
-    $("configMessage").textContent="Impossible de charger les questions. Vérifie la connexion à Firebase.";
-    $("configMessage").classList.remove("hidden");
-  }
+  // Les classes sont connues à l'avance : aucune lecture Firestore
+  // n'est nécessaire lors de l'ouverture de la page.
+  const classes=[];
+  ["6e","5e","4e","3e"].forEach(niveau=>{
+    ["A","B","C","D","E","F"].forEach(lettre=>classes.push(niveau+" "+lettre));
+  });
+  setOptions($("classSelect"),classes,"— Choisir une classe —");
 }
 
 chargerQuestions();
