@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créer mes flashcards - Flash connaissances</title>
+<style>
+:root{--ink:#1a1a2e;--ink2:#2d3561;--gold:#c9a84c;--gold2:#f0d080;--cream:#faf8f2;--paper:#f2ede0;--blue:#1a5fa8;--blue2:#4d8fd4;--green:#4a7c59;--red:#c0392b;--border:#d8cdb4;--shadow:rgba(26,26,46,.18)}
+*{box-sizing:border-box} html{min-height:100%}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#111525,#202952);color:var(--ink);display:flex;justify-content:center;align-items:flex-start;padding:30px}
+.conteneur{width:100%;max-width:1100px;min-height:700px;background:var(--cream);border-radius:24px;box-shadow:0 25px 60px var(--shadow);padding:45px;position:relative;overflow:hidden}
+.conteneur:before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:linear-gradient(90deg,var(--blue),var(--gold),var(--blue))}
+.entete{margin-bottom:35px;padding-bottom:25px;border-bottom:1px solid var(--border)}
+.petitTitre{margin:0 0 8px;font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+h1{margin:0;color:var(--blue);font-size:44px;line-height:1.1} h2{margin:10px 0 0;color:var(--ink2);font-size:24px;font-weight:normal}
+.formulaireCarte{background:var(--paper);border:1px solid var(--border);border-radius:18px;padding:30px;box-shadow:0 8px 20px var(--shadow)}
+.titreSection{margin:0 0 10px;font-size:20px;font-weight:bold;color:var(--ink2)} .aide{margin:0 0 25px;color:#666;font-size:14px;line-height:1.5}
+.flash-item{background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px;margin-top:16px}
+.flash-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.flash-title{font-weight:bold;color:var(--blue);font-size:18px}
+.champ{margin-bottom:18px} label{display:block;margin-bottom:8px;font-weight:bold;color:var(--ink2)}
+textarea{width:100%;min-height:100px;padding:15px 16px;border:2px solid var(--border);border-radius:12px;background:white;color:var(--ink);font-family:"OpenDyslexic","Atkinson Hyperlegible",Arial,sans-serif;font-size:16px;line-height:1.55;outline:none;resize:vertical;transition:border-color .15s ease,box-shadow .15s ease}
+textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,95,168,.12)}
+.actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:28px}
+button{border:none;border-radius:12px;padding:16px 28px;background:var(--blue);color:white;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 6px 15px var(--shadow);transition:transform .15s ease,background .15s ease,box-shadow .15s ease}
+button:hover{background:var(--blue2);transform:translateY(-2px);box-shadow:0 9px 20px var(--shadow)} button:active{transform:translateY(0)}
+.secondary{background:#777}.secondary:hover{background:#666}.danger{background:var(--red);padding:9px 13px;font-size:13px;box-shadow:none}.danger:hover{background:#d9574b}.success{background:var(--green)}.success:hover{background:#6aab79}
+.compteur{text-align:center;margin-top:18px;font-weight:bold;color:var(--blue)}
+.conseil{margin-top:25px;padding:15px;border-radius:12px;background:#e4eef8;color:var(--blue);font-size:14px;line-height:1.55}
+.pied{margin-top:35px;text-align:center;color:#777;font-size:13px}
+#zoneImpression{display:none}
+@media(max-width:820px){body{padding:15px}.conteneur{padding:30px 25px;border-radius:18px}h1{font-size:36px}h2{font-size:21px}.formulaireCarte{padding:25px}}
+@media(max-width:500px){body{padding:10px}.conteneur{padding:25px 18px}h1{font-size:30px}h2{font-size:19px}.formulaireCarte{padding:20px}.actions{flex-direction:column}.actions button{width:100%}.flash-head{align-items:stretch;flex-direction:column}.danger{width:100%}}
+@media print{
+ @page{size:A4 portrait;margin:10mm}
+ body{display:block;background:#fff;padding:0;margin:0}.conteneur{display:none!important}#zoneImpression{display:block!important}
+ .page-flashcards{width:190mm;height:277mm;display:grid;grid-template-columns:95mm 95mm;grid-template-rows:repeat(4,69.25mm);margin:0;padding:0;break-after:page;page-break-after:always}
+ .page-flashcards:last-child{break-after:auto;page-break-after:auto}
+ .print-card{width:95mm;height:69.25mm;border:.35mm dashed #555;display:flex;align-items:center;justify-content:center;text-align:center;padding:8mm;position:relative;overflow:hidden}
+ .print-text{width:100%;font-family:"OpenDyslexic","Atkinson Hyperlegible",Arial,sans-serif;font-size:16pt;line-height:1.55;overflow-wrap:anywhere}
+ .print-kind{position:absolute;top:3mm;left:4mm;font:7pt Arial,sans-serif;color:#777;text-transform:uppercase}.print-num{position:absolute;right:4mm;bottom:3mm;font:7pt Arial,sans-serif;color:#999}
+}
+</style>
+</head>
+<body>
+<div class="conteneur">
+  <div class="entete">
+    <p class="petitTitre">Flash connaissances</p>
+    <h1>Créer mes flashcards</h1>
+    <h2>Créer, imprimer, découper… puis réviser.</h2>
+  </div>
+  <div class="formulaireCarte">
+    <p class="titreSection">Mes cartes de révision</p>
+    <p class="aide">Écris une question et sa réponse pour chaque carte. Tes cartes sont conservées automatiquement sur cet appareil. L'impression prépare 8 cartes par feuille A4 avec les réponses au verso.</p>
+    <div id="listeCartes"></div>
+    <div class="actions">
+      <button type="button" id="ajouter">+ AJOUTER UNE CARTE</button>
+      <button type="button" id="effacer" class="secondary">TOUT EFFACER</button>
+      <button type="button" id="imprimer" class="success">IMPRIMER RECTO-VERSO</button>
+    </div>
+    <div id="compteur" class="compteur"></div>
+    <div class="conseil"><strong>Pour l'impression :</strong> choisis <strong>Recto-verso</strong>, <strong>retourner sur le bord long</strong> et <strong>100 % / taille réelle</strong>. Les pointillés servent de traits de découpe. Fais un premier essai sur 2 cartes pour vérifier le sens de retournement de ton imprimante.</div>
+  </div>
+  <div class="pied">Flash connaissances · Collège Simone Sauteur</div>
+</div>
+<div id="zoneImpression"></div>
+<script>
+const STORAGE_KEY='flashConnaissances_cartesImpression_v1';
+const liste=document.getElementById('listeCartes'), compteur=document.getElementById('compteur'), zone=document.getElementById('zoneImpression');
+function cartesDOM(){return [...document.querySelectorAll('.flash-item')]}
+function donnees(){return cartesDOM().map(c=>({question:c.querySelector('.question').value,reponse:c.querySelector('.reponse').value}))}
+function sauvegarder(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(donnees()))}catch(e){console.warn('Sauvegarde locale indisponible',e)}}
+function renumeroter(){cartesDOM().forEach((c,i)=>c.querySelector('.flash-title').textContent=`Carte ${i+1}`);const n=cartesDOM().length;compteur.textContent=`${n} flashcard${n>1?'s':''} créée${n>1?'s':''}`}
+function ajouterCarte(q='',r='',save=true){const item=document.createElement('div');item.className='flash-item';item.innerHTML=`<div class="flash-head"><div class="flash-title"></div><button type="button" class="danger supprimer">SUPPRIMER</button></div><div class="champ"><label>Question</label><textarea class="question" maxlength="500" placeholder="Écris ta question..."></textarea></div><div class="champ"><label>Réponse</label><textarea class="reponse" maxlength="500" placeholder="Écris la réponse..."></textarea></div>`;item.querySelector('.question').value=q;item.querySelector('.reponse').value=r;item.querySelector('.supprimer').addEventListener('click',()=>{if(cartesDOM().length===1){item.querySelectorAll('textarea').forEach(t=>t.value='')}else item.remove();renumeroter();sauvegarder()});item.querySelectorAll('textarea').forEach(t=>t.addEventListener('input',sauvegarder));liste.appendChild(item);renumeroter();if(save)sauvegarder()}
+function charger(){let data=[];try{data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){} if(!Array.isArray(data)||!data.length) ajouterCarte('', '', false);else data.forEach(c=>ajouterCarte(c.question||'',c.reponse||'',false));renumeroter()}
+function cartePrint(texte,type,num){const c=document.createElement('div');c.className='print-card';const k=document.createElement('div');k.className='print-kind';k.textContent=type;const t=document.createElement('div');t.className='print-text';t.textContent=texte;const n=document.createElement('div');n.className='print-num';n.textContent=num;c.append(k,t,n);return c}
+function page(){const p=document.createElement('div');p.className='page-flashcards';return p}
+function vide(){return cartePrint('','','')}
+function imprimer(){sauvegarder();const cards=donnees().map((c,i)=>({numero:i+1,question:c.question.trim(),reponse:c.reponse.trim()})).filter(c=>c.question||c.reponse);if(!cards.length){alert('Écris au moins une question et une réponse avant d’imprimer.');return}const incompletes=cards.filter(c=>!c.question||!c.reponse);if(incompletes.length&&!confirm('Certaines cartes n’ont pas de question ou de réponse. Veux-tu quand même imprimer ?'))return;zone.innerHTML='';for(let d=0;d<cards.length;d+=8){const g=cards.slice(d,d+8),recto=page(),verso=page();for(let i=0;i<8;i++)recto.appendChild(g[i]?cartePrint(g[i].question||'Question non renseignée','Question',g[i].numero):vide());[1,0,3,2,5,4,7,6].forEach(i=>verso.appendChild(g[i]?cartePrint(g[i].reponse||'Réponse non renseignée','Réponse',g[i].numero):vide()));zone.append(recto,verso)}setTimeout(()=>window.print(),100)}
+document.getElementById('ajouter').addEventListener('click',()=>{ajouterCarte();cartesDOM().at(-1).querySelector('.question').focus()});
+document.getElementById('effacer').addEventListener('click',()=>{if(!confirm('Veux-tu vraiment effacer toutes les cartes ?'))return;liste.innerHTML='';try{localStorage.removeItem(STORAGE_KEY)}catch(e){}ajouterCarte()});
+document.getElementById('imprimer').addEventListener('click',imprimer);charger();
+</script>
+</body>
+</html>
