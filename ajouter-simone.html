@@ -621,13 +621,25 @@
     }
   </style>
 
+  <style>
+    .question-list { margin-top: 22px; display: grid; gap: 12px; }
+    .question-item { background: #fff; border: 2px solid var(--border); border-radius: 12px; padding: 16px; }
+    .question-item-head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:10px; }
+    .question-item-title { font-weight:bold; color:var(--blue); }
+    .question-item p { margin:6px 0; line-height:1.45; }
+    .question-item .remove-question { background:var(--red); padding:8px 12px; font-size:13px; box-shadow:none; }
+    .question-count { margin-top:12px; text-align:center; font-weight:bold; color:var(--blue); }
+    #addQuestionButton { background:var(--blue); }
+    @media (max-width:500px) { .question-item-head { flex-direction:column; align-items:stretch; } }
+  </style>
+
 </head>
 
 <body>
 
   <div class="conteneur">
 
-```
+
 <div class="entete">
   <p class="petitTitre">Flash connaissances</p>
   <h1>Ajouter une question</h1>
@@ -1077,6 +1089,19 @@
 
 
       <!-- ================================================= -->
+      <!-- AJOUTER À LA LISTE -->
+      <!-- ================================================= -->
+
+      <div class="actions">
+        <button type="button" id="addQuestionButton">
+          + AJOUTER UNE QUESTION
+        </button>
+      </div>
+
+      <div id="questionCount" class="question-count">0 question ajoutée sur 20</div>
+      <div id="questionList" class="question-list"></div>
+
+      <!-- ===================================================== -->
       <!-- ENREGISTRER -->
       <!-- ================================================= -->
 
@@ -1087,7 +1112,7 @@
           id="saveButton"
           class="success"
         >
-          ENREGISTRER LA QUESTION
+          ENREGISTRER TOUTES LES QUESTIONS
         </button>
 
       </div>
@@ -1104,7 +1129,6 @@
 <div class="pied">
   Flash connaissances · Banque de questions du collège Simone Sauteur
 </div>
-```
 
   </div>
 
@@ -1239,6 +1263,18 @@
 
     const saveButton =
       document.getElementById("saveButton");
+
+    const addQuestionButton =
+      document.getElementById("addQuestionButton");
+
+    const questionList =
+      document.getElementById("questionList");
+
+    const questionCount =
+      document.getElementById("questionCount");
+
+    const MAX_QUESTIONS = 20;
+    let questionsEnAttente = [];
 
     const boutonsDifficulte =
       Array.from(
@@ -1769,7 +1805,109 @@
 
 
     // =========================================================
-    // ENREGISTRER LA QUESTION
+    // =========================================================
+    // LISTE DES QUESTIONS AVANT ENVOI
+    // =========================================================
+
+    function resetCurrentQuestionFields() {
+      questionInput.value = "";
+      reponseInput.value = "";
+      difficulteSelectionnee = "";
+      boutonsDifficulte.forEach((bouton) => bouton.classList.remove("selectionne"));
+    }
+
+    function renderQuestionList() {
+      questionList.innerHTML = "";
+
+      questionsEnAttente.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "question-item";
+
+        const head = document.createElement("div");
+        head.className = "question-item-head";
+
+        const title = document.createElement("div");
+        title.className = "question-item-title";
+        title.textContent = `Question ${index + 1} · ${item.difficulte}`;
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "remove-question";
+        remove.textContent = "SUPPRIMER";
+        remove.addEventListener("click", () => {
+          questionsEnAttente.splice(index, 1);
+          renderQuestionList();
+          clearMessage(formMessage);
+        });
+
+        head.appendChild(title);
+        head.appendChild(remove);
+
+        const q = document.createElement("p");
+        const qStrong = document.createElement("strong");
+        qStrong.textContent = "Question : ";
+        q.appendChild(qStrong);
+        q.appendChild(document.createTextNode(item.question));
+
+        const r = document.createElement("p");
+        const rStrong = document.createElement("strong");
+        rStrong.textContent = "Réponse : ";
+        r.appendChild(rStrong);
+        r.appendChild(document.createTextNode(item.reponse));
+
+        card.appendChild(head);
+        card.appendChild(q);
+        card.appendChild(r);
+        questionList.appendChild(card);
+      });
+
+      const n = questionsEnAttente.length;
+      questionCount.textContent = `${n} question${n > 1 ? "s" : ""} ajoutée${n > 1 ? "s" : ""} sur ${MAX_QUESTIONS}`;
+      addQuestionButton.disabled = n >= MAX_QUESTIONS;
+      addQuestionButton.textContent = n >= MAX_QUESTIONS
+        ? "LIMITE DE 20 QUESTIONS ATTEINTE"
+        : "+ AJOUTER UNE QUESTION";
+    }
+
+    addQuestionButton.addEventListener("click", () => {
+      clearMessage(formMessage);
+
+      if (questionsEnAttente.length >= MAX_QUESTIONS) return;
+
+      const question = questionInput.value.trim();
+      const reponse = reponseInput.value.trim();
+
+      if (!question) {
+        showMessage(formMessage, "Écris la question avant de l'ajouter.", "error-message");
+        questionInput.focus();
+        return;
+      }
+
+      if (!reponse) {
+        showMessage(formMessage, "Écris la réponse avant de l'ajouter.", "error-message");
+        reponseInput.focus();
+        return;
+      }
+
+      if (!difficulteSelectionnee) {
+        showMessage(formMessage, "Choisis le niveau de difficulté avant d'ajouter la question.", "error-message");
+        return;
+      }
+
+      questionsEnAttente.push({
+        question,
+        reponse,
+        difficulte: difficulteSelectionnee
+      });
+
+      resetCurrentQuestionFields();
+      renderQuestionList();
+      questionInput.focus();
+    });
+
+
+    // =========================================================
+    // ENREGISTRER TOUTES LES QUESTIONS
     //
     // CORRECTION IMPORTANTE :
     // on écoute "submit" sur le formulaire et non "click"
@@ -1835,6 +1973,37 @@
 
         const reponse =
           reponseInput.value.trim();
+
+        const questionsAEnregistrer =
+          questionsEnAttente.map((item) => ({ ...item }));
+
+        const saisieEnCours =
+          question || reponse || difficulteSelectionnee;
+
+        if (saisieEnCours) {
+          if (!question) {
+            showMessage(formMessage, "Écris la question en cours ou efface la saisie avant l'envoi.", "error-message");
+            return;
+          }
+          if (!reponse) {
+            showMessage(formMessage, "Écris la réponse de la question en cours.", "error-message");
+            return;
+          }
+          if (!difficulteSelectionnee) {
+            showMessage(formMessage, "Choisis le niveau de difficulté de la question en cours.", "error-message");
+            return;
+          }
+          if (questionsAEnregistrer.length >= MAX_QUESTIONS) {
+            showMessage(formMessage, "La limite est de 20 questions par enregistrement.", "error-message");
+            return;
+          }
+          questionsAEnregistrer.push({ question, reponse, difficulte: difficulteSelectionnee });
+        }
+
+        if (questionsAEnregistrer.length === 0) {
+          showMessage(formMessage, "Ajoute au moins une question avant l'enregistrement.", "error-message");
+          return;
+        }
 
 
         // -----------------------------------------------------
@@ -1910,58 +2079,6 @@
             newChapter;
 
         }
-
-
-        // -----------------------------------------------------
-        // QUESTION
-        // -----------------------------------------------------
-
-        if (!question) {
-
-          showMessage(
-            formMessage,
-            "Écris la question.",
-            "error-message"
-          );
-
-          return;
-
-        }
-
-
-        // -----------------------------------------------------
-        // RÉPONSE
-        // -----------------------------------------------------
-
-        if (!reponse) {
-
-          showMessage(
-            formMessage,
-            "Écris la réponse.",
-            "error-message"
-          );
-
-          return;
-
-        }
-
-
-        // -----------------------------------------------------
-        // DIFFICULTÉ
-        // -----------------------------------------------------
-
-        if (!difficulteSelectionnee) {
-
-          showMessage(
-            formMessage,
-            "Choisis le niveau de difficulté.",
-            "error-message"
-          );
-
-          return;
-
-        }
-
 
         // -----------------------------------------------------
         // VÉRIFICATION D'UN DOUBLON DE CHAPITRE
@@ -2111,47 +2228,22 @@
           // ENREGISTREMENT FIRESTORE
           // ---------------------------------------------------
 
-          for (
-            const classe of selectedClasses
-          ) {
-
-            await addDoc(
-
-              collection(
-                db,
-                "questions"
-              ),
-
-              {
-
-                classe:
-                  classe,
-
-                matiere:
-                  matiere,
-
-                chapitre:
-                  chapitre,
-
-                question:
-                  question,
-
-                reponse:
-                  reponse,
-
-                difficulte:
-                  difficulteSelectionnee,
-
-                date:
-                  date,
-
-                statut:
-                  "active"
-
-              }
-
-            );
-
+          for (const classe of selectedClasses) {
+            for (const item of questionsAEnregistrer) {
+              await addDoc(
+                collection(db, "questions"),
+                {
+                  classe: classe,
+                  matiere: matiere,
+                  chapitre: chapitre,
+                  question: item.question,
+                  reponse: item.reponse,
+                  difficulte: item.difficulte,
+                  date: date,
+                  statut: "active"
+                }
+              );
+            }
           }
 
 
@@ -2159,22 +2251,14 @@
           // MESSAGE DE SUCCÈS
           // ---------------------------------------------------
 
-          const number =
-            selectedClasses.length;
-
+          const number = selectedClasses.length;
+          const questionNumber = questionsAEnregistrer.length;
+          const total = number * questionNumber;
 
           showMessage(
-
             formMessage,
-
-            number === 1
-
-              ? "Question enregistrée avec succès."
-
-              : `Question enregistrée pour ${number} classes avec succès.`,
-
+            `${questionNumber} question${questionNumber > 1 ? "s" : ""} enregistrée${questionNumber > 1 ? "s" : ""} avec succès pour ${number} classe${number > 1 ? "s" : ""} (${total} entrée${total > 1 ? "s" : ""}).`,
             "success-message"
-
           );
 
 
@@ -2233,6 +2317,9 @@
             }
           );
 
+          questionsEnAttente = [];
+          renderQuestionList();
+
 
         } catch (error) {
 
@@ -2284,12 +2371,14 @@
             false;
 
           saveButton.textContent =
-            "ENREGISTRER LA QUESTION";
+            "ENREGISTRER TOUTES LES QUESTIONS";
 
         }
 
       }
     );
+
+    renderQuestionList();
 
   </script>
 
