@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -35,25 +34,12 @@
     body {
       margin: 0;
       min-height: 100vh;
-
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-      background:
-        linear-gradient(
-          135deg,
-          #111525,
-          #202952
-        );
-
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #111525, #202952);
       color: var(--ink);
-
       display: flex;
       justify-content: center;
       align-items: center;
-
       padding: 30px;
     }
 
@@ -61,98 +47,65 @@
       width: 100%;
       max-width: 1100px;
       min-height: 700px;
-
       background: var(--cream);
-
       border-radius: 24px;
-
-      box-shadow:
-        0 25px 60px var(--shadow);
-
+      box-shadow: 0 25px 60px var(--shadow);
       padding: 45px;
-
       position: relative;
       overflow: hidden;
     }
 
     .conteneur::before {
       content: "";
-
       position: absolute;
-
       top: 0;
       left: 0;
       right: 0;
-
       height: 7px;
-
-      background:
-        linear-gradient(
-          90deg,
-          var(--blue),
-          var(--gold),
-          var(--blue)
-        );
+      background: linear-gradient(90deg, var(--blue), var(--gold), var(--blue));
     }
 
     .entete {
       margin-bottom: 35px;
       padding-bottom: 25px;
-
       border-bottom: 1px solid var(--border);
     }
 
     .petitTitre {
       margin: 0 0 8px 0;
-
       font-size: 14px;
       font-weight: bold;
-
       letter-spacing: 2px;
       text-transform: uppercase;
-
       color: var(--gold);
     }
 
     h1 {
       margin: 0;
-
       color: var(--blue);
-
       font-size: 44px;
-
       line-height: 1.1;
     }
 
     h2 {
       margin: 10px 0 0 0;
-
       color: var(--ink2);
-
       font-size: 24px;
-
       font-weight: normal;
     }
 
     .formulaireCarte {
       background: var(--paper);
-
       border: 1px solid var(--border);
-
       border-radius: 18px;
-
       padding: 30px;
-
-      box-shadow:
-        0 8px 20px var(--shadow);
+      box-shadow: 0 8px 20px var(--shadow);
     }
 
     .titreSection {
       margin: 0 0 25px 0;
-
       font-size: 20px;
       font-weight: bold;
-
       color: var(--ink2);
     }
 
@@ -162,11 +115,8 @@
 
     label {
       display: block;
-
       margin-bottom: 10px;
-
       font-weight: bold;
-
       color: var(--ink2);
     }
 
@@ -174,38 +124,22 @@
     select,
     textarea {
       width: 100%;
-
       padding: 15px 16px;
-
       border: 2px solid var(--border);
-
       border-radius: 12px;
-
       background: white;
-
       color: var(--ink);
-
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 17px;
-
       outline: none;
-
-      transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     input:focus,
     select:focus,
     textarea:focus {
       border-color: var(--blue);
-
-      box-shadow:
-        0 0 0 3px rgba(26, 95, 168, 0.12);
+      box-shadow: 0 0 0 3px rgba(26, 95, 168, 0.12);
     }
 
     select {
@@ -214,7 +148,6 @@
 
     textarea {
       min-height: 120px;
-
       resize: vertical;
     }
 
@@ -228,46 +161,28 @@
 
     .actions {
       display: flex;
-
       align-items: center;
-
       gap: 15px;
-
       margin-top: 28px;
     }
 
     button {
       border: none;
-
       border-radius: 12px;
-
       padding: 16px 28px;
-
       background: var(--blue);
-
       color: white;
-
       font-size: 16px;
       font-weight: bold;
-
       cursor: pointer;
-
-      box-shadow:
-        0 6px 15px var(--shadow);
-
-      transition:
-        transform 0.15s ease,
-        background 0.15s ease,
-        box-shadow 0.15s ease;
+      box-shadow: 0 6px 15px var(--shadow);
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
     }
 
     button:hover {
       background: var(--blue2);
-
       transform: translateY(-2px);
-
-      box-shadow:
-        0 9px 20px var(--shadow);
+      box-shadow: 0 9px 20px var(--shadow);
     }
 
     button:active {
@@ -292,17 +207,11 @@
 
     #message {
       margin: 20px 0 0 0;
-
       padding: 15px;
-
       border-radius: 12px;
-
       background: var(--blue-bg);
-
       color: var(--blue);
-
       font-weight: bold;
-
       text-align: center;
     }
 
@@ -312,27 +221,20 @@
 
     .aide {
       margin: 0 0 25px 0;
-
       color: #666;
-
       font-size: 14px;
-
       line-height: 1.5;
     }
 
     .connexion {
       max-width: 550px;
-
       margin: 0 auto;
     }
 
     .connexionMessage {
       margin: 0 0 25px 0;
-
       color: #666;
-
       font-size: 15px;
-
       line-height: 1.5;
     }
 
@@ -350,112 +252,25 @@
 
     .utilisateurConnecte {
       margin-bottom: 25px;
-
       padding: 12px 15px;
-
       border-radius: 12px;
-
       background: #e7f2e9;
-
       color: var(--green);
-
       font-size: 14px;
-
       font-weight: bold;
-
       display: flex;
-
       justify-content: space-between;
-
       align-items: center;
-
       gap: 15px;
     }
 
     .pied {
       margin-top: 35px;
-
       text-align: center;
-
       color: #777;
-
       font-size: 13px;
     }
 
-    @media (max-width: 820px) {
-
-      body {
-        padding: 15px;
-
-        align-items: flex-start;
-      }
-
-      .conteneur {
-        min-height: auto;
-
-        padding: 30px 25px;
-
-        border-radius: 18px;
-      }
-
-      h1 {
-        font-size: 36px;
-      }
-
-      h2 {
-        font-size: 21px;
-      }
-
-      .formulaireCarte {
-        padding: 25px;
-      }
-    }
-
-    @media (max-width: 500px) {
-
-      body {
-        padding: 10px;
-      }
-
-      .conteneur {
-        padding: 25px 18px;
-      }
-
-      h1 {
-        font-size: 30px;
-      }
-
-      h2 {
-        font-size: 19px;
-      }
-
-      .formulaireCarte {
-        padding: 20px;
-      }
-
-      input,
-      select,
-      textarea {
-        font-size: 16px;
-      }
-
-      .actions {
-        flex-direction: column;
-      }
-
-      button {
-        width: 100%;
-      }
-
-      .utilisateurConnecte {
-        flex-direction: column;
-
-        align-items: stretch;
-      }
-    }
-  </style>
-
-  <style>
     .classes {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -594,13 +409,124 @@
       color: var(--red);
     }
 
+    .question-list {
+      margin-top: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .question-item {
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .question-item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .question-item-title {
+      font-weight: bold;
+      color: var(--blue);
+    }
+
+    .question-item p {
+      margin: 6px 0;
+      line-height: 1.45;
+    }
+
+    .question-item .remove-question {
+      background: var(--red);
+      padding: 8px 12px;
+      font-size: 13px;
+      box-shadow: none;
+    }
+
+    .question-count {
+      margin-top: 12px;
+      text-align: center;
+      font-weight: bold;
+      color: var(--blue);
+    }
+
+    #addQuestionButton {
+      background: var(--blue);
+    }
+
     @media (max-width: 820px) {
+      body {
+        padding: 15px;
+        align-items: flex-start;
+      }
+
+      .conteneur {
+        min-height: auto;
+        padding: 30px 25px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      h2 {
+        font-size: 21px;
+      }
+
+      .formulaireCarte {
+        padding: 25px;
+      }
+
       .classes {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 500px) {
+      body {
+        padding: 10px;
+      }
+
+      .conteneur {
+        padding: 25px 18px;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      h2 {
+        font-size: 19px;
+      }
+
+      .formulaireCarte {
+        padding: 20px;
+      }
+
+      input,
+      select,
+      textarea {
+        font-size: 16px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .utilisateurConnecte {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
       .classes {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -618,879 +544,1111 @@
         padding: 13px 6px;
         font-size: 14px;
       }
+
+      .question-item-head {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
   </style>
-
-  <style>
-    .question-list { margin-top: 22px; display: grid; gap: 12px; }
-    .question-item { background: #fff; border: 2px solid var(--border); border-radius: 12px; padding: 16px; }
-    .question-item-head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:10px; }
-    .question-item-title { font-weight:bold; color:var(--blue); }
-    .question-item p { margin:6px 0; line-height:1.45; }
-    .question-item .remove-question { background:var(--red); padding:8px 12px; font-size:13px; box-shadow:none; }
-    .question-count { margin-top:12px; text-align:center; font-weight:bold; color:var(--blue); }
-    #addQuestionButton { background:var(--blue); }
-    @media (max-width:500px) { .question-item-head { flex-direction:column; align-items:stretch; } }
-  </style>
-
 </head>
 
 <body>
 
-  <div class="conteneur">
+<div class="conteneur">
 
-
-<div class="entete">
-  <p class="petitTitre">Flash connaissances</p>
-  <h1>Ajouter une question</h1>
-  <h2>Enrichir la banque de connaissances.</h2>
-</div>
-
-<!-- ===================================================== -->
-<!-- CONNEXION -->
-<!-- ===================================================== -->
-
-<div id="loginCard" class="formulaireCarte connexion">
-
-  <p class="titreSection">Accès enseignants</p>
-
-  <p class="connexionMessage">
-    Connectez-vous avec le compte commun des enseignants
-    pour accéder à la banque de questions.
-  </p>
-
-  <div class="champ">
-    <label for="email">Adresse e-mail</label>
-
-    <input
-      id="email"
-      type="email"
-      value="profs.simone.sauteur@gmail.com"
-      autocomplete="username"
-      required
-    >
+  <div class="entete">
+    <p class="petitTitre">Flash connaissances</p>
+    <h1>Ajouter une question</h1>
+    <h2>Enrichir la banque de connaissances.</h2>
   </div>
 
-  <div class="champ">
-    <label for="password">Mot de passe</label>
+  <!-- ===================================================== -->
+  <!-- CONNEXION -->
+  <!-- ===================================================== -->
 
-    <input
-      id="password"
-      type="password"
-      autocomplete="current-password"
-      required
-    >
-  </div>
+  <div id="loginCard" class="formulaireCarte connexion">
 
-  <div class="actions">
-    <button type="button" id="loginButton">
-      SE CONNECTER
-    </button>
-  </div>
+    <p class="titreSection">Accès enseignants</p>
 
-  <div id="loginMessage" class="message"></div>
-
-</div>
-
-
-<!-- ===================================================== -->
-<!-- FORMULAIRE -->
-<!-- ===================================================== -->
-
-<div id="formCard" class="hidden">
-
-  <div class="utilisateurConnecte">
-
-    <span>
-      Connecté en tant qu'enseignant
-    </span>
-
-    <button type="button" id="logoutButton">
-      SE DÉCONNECTER
-    </button>
-
-  </div>
-
-  <div class="formulaireCarte">
-
-    <p class="titreSection">
-      Nouvelle question
+    <p class="connexionMessage">
+      Connectez-vous avec le compte commun des enseignants
+      pour accéder à la banque de questions.
     </p>
 
-    <p class="aide">
-      Choisissez la classe et la matière, puis saisissez
-      la question et sa réponse.
-    </p>
+    <div class="champ">
+      <label for="email">Adresse e-mail</label>
+
+      <input
+        id="email"
+        type="email"
+        value="profs.simone.sauteur@gmail.com"
+        autocomplete="username"
+        required
+      >
+    </div>
+
+    <div class="champ">
+      <label for="password">Mot de passe</label>
+
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
+    </div>
+
+    <div class="actions">
+      <button type="button" id="loginButton">
+        SE CONNECTER
+      </button>
+    </div>
+
+    <div id="loginMessage" class="message"></div>
+
+  </div>
 
 
-    <form id="questionForm">
+  <!-- ===================================================== -->
+  <!-- FORMULAIRE -->
+  <!-- ===================================================== -->
 
-      <!-- ================================================= -->
-      <!-- CLASSES -->
-      <!-- ================================================= -->
+  <div id="formCard" class="hidden">
 
-      <div class="champ">
+    <div class="utilisateurConnecte">
 
-        <label>
-          Classe(s)
-        </label>
+      <span>
+        Connecté en tant qu'enseignant
+      </span>
 
-        <div id="classesContainer" class="classes">
+      <button type="button" id="logoutButton">
+        SE DÉCONNECTER
+      </button>
 
-          <label class="class-item">
-            <input type="checkbox" value="6e A">
-            6e A
+    </div>
+
+    <div class="formulaireCarte">
+
+      <p class="titreSection">
+        Nouvelle question
+      </p>
+
+      <p class="aide">
+        Choisissez la classe et la matière, puis saisissez
+        la question et sa réponse.
+      </p>
+
+      <form id="questionForm">
+
+        <!-- ================================================= -->
+        <!-- CLASSES -->
+        <!-- ================================================= -->
+
+        <div class="champ">
+
+          <label>
+            Classe(s)
           </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="6e B">
-            6e B
-          </label>
+          <div id="classesContainer" class="classes">
 
-          <label class="class-item">
-            <input type="checkbox" value="6e C">
-            6e C
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="6e A">
+              6e A
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="6e D">
-            6e D
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="6e B">
+              6e B
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="6e E">
-            6e E
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="6e C">
+              6e C
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="6e F">
-            6e F
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="6e D">
+              6e D
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="5e A">
-            5e A
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="6e E">
+              6e E
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="5e B">
-            5e B
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="6e F">
+              6e F
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="5e C">
-            5e C
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="5e A">
+              5e A
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="5e D">
-            5e D
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="5e B">
+              5e B
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="5e E">
-            5e E
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="5e C">
+              5e C
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="5e F">
-            5e F
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="5e D">
+              5e D
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="4e A">
-            4e A
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="5e E">
+              5e E
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="4e B">
-            4e B
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="5e F">
+              5e F
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="4e C">
-            4e C
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="4e A">
+              4e A
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="4e D">
-            4e D
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="4e B">
+              4e B
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="4e E">
-            4e E
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="4e C">
+              4e C
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="4e F">
-            4e F
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="4e D">
+              4e D
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="3e A">
-            3e A
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="4e E">
+              4e E
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="3e B">
-            3e B
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="4e F">
+              4e F
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="3e C">
-            3e C
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="3e A">
+              3e A
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="3e D">
-            3e D
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="3e B">
+              3e B
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="3e E">
-            3e E
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="3e C">
+              3e C
+            </label>
 
-          <label class="class-item">
-            <input type="checkbox" value="3e F">
-            3e F
-          </label>
+            <label class="class-item">
+              <input type="checkbox" value="3e D">
+              3e D
+            </label>
+
+            <label class="class-item">
+              <input type="checkbox" value="3e E">
+              3e E
+            </label>
+
+            <label class="class-item">
+              <input type="checkbox" value="3e F">
+              3e F
+            </label>
+
+          </div>
+
+          <p class="help">
+            Tu peux sélectionner plusieurs classes :
+            la même question sera enregistrée pour chacune.
+          </p>
 
         </div>
 
-        <p class="help">
-          Tu peux sélectionner plusieurs classes :
-          la même question sera enregistrée pour chacune.
-        </p>
 
-      </div>
+        <!-- ================================================= -->
+        <!-- MATIÈRE -->
+        <!-- ================================================= -->
 
+        <div class="champ">
 
-      <!-- ================================================= -->
-      <!-- MATIÈRE -->
-      <!-- ================================================= -->
-
-      <div class="champ">
-
-        <label for="matiere">
-          Matière
-        </label>
-
-        <select id="matiere" required>
-
-          <option value="">
-            -- Choisir une matière --
-          </option>
-
-          <option value="Mathématiques">
-            Mathématiques
-          </option>
-
-          <option value="Français">
-            Français
-          </option>
-
-          <option value="Histoire, géographie et Emc">
-            Histoire, géographie et Emc
-          </option>
-
-          <option value="Anglais">
-            Anglais
-          </option>
-
-          <option value="Espagnol">
-            Espagnol
-          </option>
-
-          <option value="Allemand">
-            Allemand
-          </option>
-
-          <option value="Physique-chimie">
-            Physique-chimie
-          </option>
-
-          <option value="SVT">
-            SVT
-          </option>
-
-          <option value="Technologie">
-            Technologie
-          </option>
-
-          <option value="EPS">
-            EPS
-          </option>
-
-          <option value="Arts plastiques">
-            Arts plastiques
-          </option>
-
-          <option value="Éducation musicale">
-            Éducation musicale
-          </option>
-
-          <option value="Latin">
-            Latin
-          </option>
-
-          <option value="Enseignement professionnel">
-            Enseignement professionnel
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- ================================================= -->
-      <!-- CHAPITRE -->
-      <!-- ================================================= -->
-
-      <div class="champ">
-
-        <div class="chapter-row">
-
-          <label for="chapitre">
-            Chapitre
+          <label for="matiere">
+            Matière
           </label>
 
-          <select id="chapitre">
+          <select id="matiere" required>
 
             <option value="">
-              -- Choisir d'abord une classe et une matière --
+              -- Choisir une matière --
+            </option>
+
+            <option value="Mathématiques">
+              Mathématiques
+            </option>
+
+            <option value="Français">
+              Français
+            </option>
+
+            <option value="Histoire, géographie et Emc">
+              Histoire, géographie et Emc
+            </option>
+
+            <option value="Anglais">
+              Anglais
+            </option>
+
+            <option value="Espagnol">
+              Espagnol
+            </option>
+
+            <option value="Allemand">
+              Allemand
+            </option>
+
+            <option value="Physique-chimie">
+              Physique-chimie
+            </option>
+
+            <option value="SVT">
+              SVT
+            </option>
+
+            <option value="Technologie">
+              Technologie
+            </option>
+
+            <option value="EPS">
+              EPS
+            </option>
+
+            <option value="Arts plastiques">
+              Arts plastiques
+            </option>
+
+            <option value="Éducation musicale">
+              Éducation musicale
+            </option>
+
+            <option value="Latin">
+              Latin
+            </option>
+
+            <option value="Enseignement professionnel">
+              Enseignement professionnel
             </option>
 
           </select>
 
-          <button
-            id="newChapterButton"
-            class="secondary"
-            type="button"
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- CHAPITRE -->
+        <!-- ================================================= -->
+
+        <div class="champ">
+
+          <div class="chapter-row">
+
+            <label for="chapitre">
+              Chapitre
+            </label>
+
+            <select id="chapitre">
+
+              <option value="">
+                -- Choisir d'abord une classe et une matière --
+              </option>
+
+            </select>
+
+            <button
+              id="newChapterButton"
+              class="secondary"
+              type="button"
+            >
+              + NOUVEAU CHAPITRE
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- NOUVEAU CHAPITRE -->
+        <!-- ================================================= -->
+
+        <div id="newChapterArea" class="champ hidden">
+
+          <label for="newChapter">
+            Nouveau chapitre
+          </label>
+
+          <input
+            id="newChapter"
+            type="text"
+            placeholder="Nom du chapitre"
+            maxlength="150"
           >
-            + NOUVEAU CHAPITRE
+
+          <p class="help">
+            Le nouveau chapitre sera disponible immédiatement
+            pour les prochaines questions et dans la page de révision.
+          </p>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- QUESTION -->
+        <!-- ================================================= -->
+
+        <div class="champ">
+
+          <label for="question">
+            Question
+          </label>
+
+          <textarea
+            id="question"
+            placeholder="Écrivez la question..."
+            required
+          ></textarea>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- RÉPONSE -->
+        <!-- ================================================= -->
+
+        <div class="champ">
+
+          <label for="reponse">
+            Réponse
+          </label>
+
+          <textarea
+            id="reponse"
+            placeholder="Écrivez la réponse attendue..."
+            required
+          ></textarea>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- DIFFICULTÉ -->
+        <!-- ================================================= -->
+
+        <div class="champ">
+
+          <label>
+            Niveau de difficulté
+          </label>
+
+          <div class="difficulte-boutons">
+
+            <button
+              type="button"
+              id="difficulteFacile"
+              class="bouton-difficulte"
+              data-difficulte="facile"
+            >
+              FACILE
+            </button>
+
+            <button
+              type="button"
+              id="difficulteMoyenne"
+              class="bouton-difficulte"
+              data-difficulte="moyenne"
+            >
+              MOYENNE
+            </button>
+
+            <button
+              type="button"
+              id="difficulteDifficile"
+              class="bouton-difficulte"
+              data-difficulte="difficile"
+            >
+              DIFFICILE
+            </button>
+
+          </div>
+
+          <p class="difficulte-aide">
+            Choisissez le niveau qui correspond à l'effort
+            de réflexion attendu de l'élève.
+          </p>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- AJOUTER À LA LISTE -->
+        <!-- ================================================= -->
+
+        <div class="actions">
+
+          <button
+            type="button"
+            id="addQuestionButton"
+          >
+            + AJOUTER UNE QUESTION
           </button>
 
         </div>
 
-      </div>
+        <div id="questionCount" class="question-count">
+          0 question ajoutée sur 20
+        </div>
+
+        <div id="questionList" class="question-list"></div>
 
 
-      <!-- ================================================= -->
-      <!-- NOUVEAU CHAPITRE -->
-      <!-- ================================================= -->
+        <!-- ================================================= -->
+        <!-- ENREGISTRER -->
+        <!-- ================================================= -->
 
-      <div id="newChapterArea" class="champ hidden">
-
-        <label for="newChapter">
-          Nouveau chapitre
-        </label>
-
-        <input
-          id="newChapter"
-          type="text"
-          placeholder="Nom du chapitre"
-          maxlength="150"
-        >
-
-        <p class="help">
-          Le nouveau chapitre sera disponible pour les prochaines questions.
-        </p>
-
-      </div>
-
-
-      <!-- ================================================= -->
-      <!-- QUESTION -->
-      <!-- ================================================= -->
-
-      <div class="champ">
-
-        <label for="question">
-          Question
-        </label>
-
-        <textarea
-          id="question"
-          placeholder="Écrivez la question..."
-          required
-        ></textarea>
-
-      </div>
-
-
-      <!-- ================================================= -->
-      <!-- RÉPONSE -->
-      <!-- ================================================= -->
-
-      <div class="champ">
-
-        <label for="reponse">
-          Réponse
-        </label>
-
-        <textarea
-          id="reponse"
-          placeholder="Écrivez la réponse attendue..."
-          required
-        ></textarea>
-
-      </div>
-
-
-      <!-- ================================================= -->
-      <!-- DIFFICULTÉ -->
-      <!-- ================================================= -->
-
-      <div class="champ">
-
-        <label>
-          Niveau de difficulté
-        </label>
-
-        <div class="difficulte-boutons">
+        <div class="actions">
 
           <button
-            type="button"
-            id="difficulteFacile"
-            class="bouton-difficulte"
-            data-difficulte="facile"
+            type="submit"
+            id="saveButton"
+            class="success"
           >
-            FACILE
-          </button>
-
-          <button
-            type="button"
-            id="difficulteMoyenne"
-            class="bouton-difficulte"
-            data-difficulte="moyenne"
-          >
-            MOYENNE
-          </button>
-
-          <button
-            type="button"
-            id="difficulteDifficile"
-            class="bouton-difficulte"
-            data-difficulte="difficile"
-          >
-            DIFFICILE
+            ENREGISTRER TOUTES LES QUESTIONS
           </button>
 
         </div>
 
-        <p class="difficulte-aide">
-          Choisissez le niveau qui correspond à l'effort
-          de réflexion attendu de l'élève.
-        </p>
+        <div id="formMessage" class="message"></div>
 
-      </div>
+      </form>
+
+    </div>
+
+  </div>
 
 
-      <!-- ================================================= -->
-      <!-- AJOUTER À LA LISTE -->
-      <!-- ================================================= -->
-
-      <div class="actions">
-        <button type="button" id="addQuestionButton">
-          + AJOUTER UNE QUESTION
-        </button>
-      </div>
-
-      <div id="questionCount" class="question-count">0 question ajoutée sur 20</div>
-      <div id="questionList" class="question-list"></div>
-
-      <!-- ===================================================== -->
-      <!-- ENREGISTRER -->
-      <!-- ================================================= -->
-
-      <div class="actions">
-
-        <button
-          type="submit"
-          id="saveButton"
-          class="success"
-        >
-          ENREGISTRER TOUTES LES QUESTIONS
-        </button>
-
-      </div>
-
-      <div id="formMessage" class="message"></div>
-
-    </form>
-
+  <div class="pied">
+    Flash connaissances · Banque de questions du collège Simone Sauteur
   </div>
 
 </div>
 
 
-<div class="pied">
-  Flash connaissances · Banque de questions du collège Simone Sauteur
-</div>
+<!-- ========================================================= -->
+<!-- FIREBASE -->
+<!-- ========================================================= -->
 
-  </div>
+<script type="module">
 
-  <!-- ========================================================= -->
-
-  <!-- FIREBASE -->
-
-  <!-- ========================================================= -->
-
-  <script type="module">
-
-    import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      getDocs,
-      query,
-      where,
-      Timestamp
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    where,
+    Timestamp,
+    doc,
+    writeBatch,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-    // =========================================================
-    // CONFIGURATION FIREBASE
-    // =========================================================
+  // =========================================================
+  // CONFIGURATION FIREBASE
+  // =========================================================
 
-    const firebaseConfig = {
+  const firebaseConfig = {
 
-      apiKey:
-        "AIzaSyDr6UgkWn-BFCEpAqi4f0AmMkoOE3q3EQg",
+    apiKey:
+      "AIzaSyDr6UgkWn-BFCEpAqi4f0AmMkoOE3q3EQg",
 
-      authDomain:
-        "flash-connaissances-simone.firebaseapp.com",
+    authDomain:
+      "flash-connaissances-simone.firebaseapp.com",
 
-      projectId:
-        "flash-connaissances-simone",
+    projectId:
+      "flash-connaissances-simone",
 
-      storageBucket:
-        "flash-connaissances-simone.firebasestorage.app",
+    storageBucket:
+      "flash-connaissances-simone.firebasestorage.app",
 
-      messagingSenderId:
-        "268185082285",
+    messagingSenderId:
+      "268185082285",
 
-      appId:
-        "1:268185082285:web:a8dbafcf0500a892206924"
+    appId:
+      "1:268185082285:web:a8dbafcf0500a892206924"
 
-    };
-
-
-    const app =
-      initializeApp(firebaseConfig);
-
-    const auth =
-      getAuth(app);
-
-    const db =
-      getFirestore(app);
+  };
 
 
-    // =========================================================
-    // COMPTE ENSEIGNANT AUTORISÉ
-    // =========================================================
+  const app =
+    initializeApp(firebaseConfig);
 
-    const TEACHER_EMAIL =
-      "profs.simone.sauteur@gmail.com";
+  const auth =
+    getAuth(app);
 
-
-    // =========================================================
-    // ÉLÉMENTS DE LA PAGE
-    // =========================================================
-
-    const loginCard =
-      document.getElementById("loginCard");
-
-    const formCard =
-      document.getElementById("formCard");
-
-    const emailInput =
-      document.getElementById("email");
-
-    const passwordInput =
-      document.getElementById("password");
-
-    const loginButton =
-      document.getElementById("loginButton");
-
-    const logoutButton =
-      document.getElementById("logoutButton");
-
-    const loginMessage =
-      document.getElementById("loginMessage");
-
-    const formMessage =
-      document.getElementById("formMessage");
-
-    const questionForm =
-      document.getElementById("questionForm");
-
-    const matiereSelect =
-      document.getElementById("matiere");
-
-    const chapitreSelect =
-      document.getElementById("chapitre");
-
-    const newChapterButton =
-      document.getElementById("newChapterButton");
-
-    const newChapterArea =
-      document.getElementById("newChapterArea");
-
-    const newChapterInput =
-      document.getElementById("newChapter");
-
-    const questionInput =
-      document.getElementById("question");
-
-    const reponseInput =
-      document.getElementById("reponse");
-
-    const saveButton =
-      document.getElementById("saveButton");
-
-    const addQuestionButton =
-      document.getElementById("addQuestionButton");
-
-    const questionList =
-      document.getElementById("questionList");
-
-    const questionCount =
-      document.getElementById("questionCount");
-
-    const MAX_QUESTIONS = 20;
-    let questionsEnAttente = [];
-
-    const boutonsDifficulte =
-      Array.from(
-        document.querySelectorAll(
-          ".bouton-difficulte"
-        )
-      );
+  const db =
+    getFirestore(app);
 
 
-    let difficulteSelectionnee = "";
+  // =========================================================
+  // COMPTE ENSEIGNANT AUTORISÉ
+  // =========================================================
+
+  const TEACHER_EMAIL =
+    "profs.simone.sauteur@gmail.com";
 
 
-    // =========================================================
-    // MESSAGES
-    // =========================================================
+  // =========================================================
+  // ÉLÉMENTS DE LA PAGE
+  // =========================================================
 
-    function showMessage(
-      element,
-      text,
-      type
+  const loginCard =
+    document.getElementById("loginCard");
+
+  const formCard =
+    document.getElementById("formCard");
+
+  const emailInput =
+    document.getElementById("email");
+
+  const passwordInput =
+    document.getElementById("password");
+
+  const loginButton =
+    document.getElementById("loginButton");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
+
+  const loginMessage =
+    document.getElementById("loginMessage");
+
+  const formMessage =
+    document.getElementById("formMessage");
+
+  const questionForm =
+    document.getElementById("questionForm");
+
+  const matiereSelect =
+    document.getElementById("matiere");
+
+  const chapitreSelect =
+    document.getElementById("chapitre");
+
+  const newChapterButton =
+    document.getElementById("newChapterButton");
+
+  const newChapterArea =
+    document.getElementById("newChapterArea");
+
+  const newChapterInput =
+    document.getElementById("newChapter");
+
+  const questionInput =
+    document.getElementById("question");
+
+  const reponseInput =
+    document.getElementById("reponse");
+
+  const saveButton =
+    document.getElementById("saveButton");
+
+  const addQuestionButton =
+    document.getElementById("addQuestionButton");
+
+  const questionList =
+    document.getElementById("questionList");
+
+  const questionCount =
+    document.getElementById("questionCount");
+
+  const MAX_QUESTIONS = 20;
+
+  let questionsEnAttente = [];
+
+
+  const boutonsDifficulte =
+    Array.from(
+      document.querySelectorAll(
+        ".bouton-difficulte"
+      )
+    );
+
+
+  let difficulteSelectionnee = "";
+
+
+  // =========================================================
+  // OUTIL : IDENTIFIANT NAVIGATION
+  //
+  // Même principe que creation-index-navigation-corrige.html
+  // =========================================================
+
+  function safeNavigationPart(value) {
+
+    return encodeURIComponent(
+      value
+        .trim()
+        .replace(/\s+/g, " ")
+    )
+      .replace(/%/g, "_")
+      .replace(/\./g, "_");
+
+  }
+
+
+  function getNavigationId(
+    classe,
+    matiere,
+    chapitre
+  ) {
+
+    return (
+      safeNavigationPart(classe) +
+      "__" +
+      safeNavigationPart(matiere) +
+      "__" +
+      safeNavigationPart(chapitre)
+    );
+
+  }
+
+
+  // =========================================================
+  // MESSAGES
+  // =========================================================
+
+  function showMessage(
+    element,
+    text,
+    type
+  ) {
+
+    element.textContent =
+      text;
+
+    element.className =
+      "message " + type;
+
+  }
+
+
+  function clearMessage(element) {
+
+    element.textContent =
+      "";
+
+    element.className =
+      "message";
+
+  }
+
+
+  // =========================================================
+  // CLASSES SÉLECTIONNÉES
+  // =========================================================
+
+  function getSelectedClasses() {
+
+    return Array.from(
+
+      document.querySelectorAll(
+        '#classesContainer input[type="checkbox"]:checked'
+      )
+
+    ).map(
+
+      (checkbox) =>
+        checkbox.value
+
+    );
+
+  }
+
+
+  // =========================================================
+  // NORMALISATION
+  // =========================================================
+
+  function normalizeText(value) {
+
+    return value
+      .trim()
+      .replace(/\s+/g, " ");
+
+  }
+
+
+  function normalizeChapter(value) {
+
+    return normalizeText(value)
+      .toLocaleLowerCase("fr-FR");
+
+  }
+
+
+  // =========================================================
+  // CHARGER LES CHAPITRES DEPUIS NAVIGATION
+  // =========================================================
+
+  async function loadChapters() {
+
+    clearMessage(formMessage);
+
+    chapitreSelect.innerHTML =
+      '<option value="">-- Choisir un chapitre --</option>';
+
+
+    const selectedClasses =
+      getSelectedClasses();
+
+    const matiere =
+      matiereSelect.value;
+
+
+    if (
+      selectedClasses.length === 0 ||
+      !matiere
     ) {
 
-      element.textContent = text;
-
-      element.className =
-        "message " + type;
-
-    }
-
-
-    function clearMessage(element) {
-
-      element.textContent = "";
-
-      element.className =
-        "message";
-
-    }
-
-
-    // =========================================================
-    // CLASSES SÉLECTIONNÉES
-    // =========================================================
-
-    function getSelectedClasses() {
-
-      return Array.from(
-
-        document.querySelectorAll(
-          '#classesContainer input[type="checkbox"]:checked'
-        )
-
-      ).map(
-
-        (checkbox) =>
-          checkbox.value
-
-      );
-
-    }
-
-
-    // =========================================================
-    // CHARGER LES CHAPITRES EXISTANTS
-    // =========================================================
-
-    async function loadChapters() {
-
-      clearMessage(formMessage);
-
       chapitreSelect.innerHTML =
-        '<option value="">-- Choisir un chapitre --</option>';
+        '<option value="">-- Choisir d\'abord les classes et la matière --</option>';
+
+      return;
+
+    }
 
 
-      const selectedClasses =
-        getSelectedClasses();
+    try {
 
-      const matiere =
-        matiereSelect.value;
+      const chapters =
+        new Map();
+
+
+      // -------------------------------------------------------
+      // IMPORTANT :
+      // On lit navigation et non questions.
+      //
+      // Pour plusieurs classes, on rassemble les chapitres
+      // disponibles dans chacune.
+      // -------------------------------------------------------
+
+      for (
+        const classe of selectedClasses
+      ) {
+
+        const navigationQuery =
+          query(
+
+            collection(
+              db,
+              "navigation"
+            ),
+
+            where(
+              "classe",
+              "==",
+              classe
+            ),
+
+            where(
+              "matiere",
+              "==",
+              matiere
+            )
+
+          );
+
+
+        const result =
+          await getDocs(
+            navigationQuery
+          );
+
+
+        result.docs.forEach(
+          (document) => {
+
+            const data =
+              document.data();
+
+
+            if (
+              typeof data.chapitre === "string" &&
+              data.chapitre.trim() !== ""
+            ) {
+
+              const cleanChapter =
+                normalizeText(
+                  data.chapitre
+                );
+
+
+              const normalized =
+                normalizeChapter(
+                  cleanChapter
+                );
+
+
+              if (
+                !chapters.has(
+                  normalized
+                )
+              ) {
+
+                chapters.set(
+                  normalized,
+                  cleanChapter
+                );
+
+              }
+
+            }
+
+          }
+        );
+
+      }
+
+
+      const sortedChapters =
+        Array.from(
+          chapters.values()
+        ).sort(
+          (a, b) =>
+            a.localeCompare(
+              b,
+              "fr-FR"
+            )
+        );
+
+
+      sortedChapters.forEach(
+        (chapter) => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            chapter;
+
+          option.textContent =
+            chapter;
+
+          chapitreSelect.appendChild(
+            option
+          );
+
+        }
+      );
 
 
       if (
-        selectedClasses.length === 0 ||
-        !matiere
+        sortedChapters.length === 0
       ) {
 
         chapitreSelect.innerHTML =
-          '<option value="">-- Choisir d\'abord les classes et la matière --</option>';
+          '<option value="">-- Aucun chapitre existant --</option>';
+
+      }
+
+
+    } catch (error) {
+
+      console.error(
+        "Erreur lors du chargement des chapitres depuis navigation :",
+        error
+      );
+
+
+      chapitreSelect.innerHTML =
+        '<option value="">Erreur lors du chargement</option>';
+
+
+      showMessage(
+        formMessage,
+        "Impossible de charger les chapitres depuis l'index.",
+        "error-message"
+      );
+
+    }
+
+  }
+
+
+  // =========================================================
+  // OUVRIR / FERMER LA CRÉATION D'UN CHAPITRE
+  // =========================================================
+
+  newChapterButton.addEventListener(
+    "click",
+    () => {
+
+      clearMessage(formMessage);
+
+
+      const ouverture =
+        newChapterArea.classList.contains(
+          "hidden"
+        );
+
+
+      newChapterArea.classList.toggle(
+        "hidden"
+      );
+
+
+      if (ouverture) {
+
+        newChapterInput.focus();
+
+      } else {
+
+        newChapterInput.value = "";
+
+      }
+
+    }
+  );
+
+
+  // =========================================================
+  // CHANGEMENTS DE CLASSES
+  // =========================================================
+
+  document
+    .querySelectorAll(
+      '#classesContainer input[type="checkbox"]'
+    )
+    .forEach(
+      (checkbox) => {
+
+        checkbox.addEventListener(
+          "change",
+          loadChapters
+        );
+
+      }
+    );
+
+
+  // =========================================================
+  // CHANGEMENT DE MATIÈRE
+  // =========================================================
+
+  matiereSelect.addEventListener(
+    "change",
+    loadChapters
+  );
+
+
+  // =========================================================
+  // CONNEXION
+  // =========================================================
+
+  loginButton.addEventListener(
+    "click",
+    async () => {
+
+      clearMessage(
+        loginMessage
+      );
+
+
+      const email =
+        emailInput.value.trim();
+
+      const password =
+        passwordInput.value;
+
+
+      if (
+        !email ||
+        !password
+      ) {
+
+        showMessage(
+          loginMessage,
+          "Indique l'adresse e-mail et le mot de passe.",
+          "error-message"
+        );
 
         return;
 
       }
 
 
+      loginButton.disabled =
+        true;
+
+      loginButton.textContent =
+        "Connexion...";
+
+
       try {
 
-        const chapters =
-          new Map();
-
-
-        for (
-          const classe of selectedClasses
-        ) {
-
-          const chaptersQuery =
-            query(
-
-              collection(
-                db,
-                "questions"
-              ),
-
-              where(
-                "classe",
-                "==",
-                classe
-              ),
-
-              where(
-                "matiere",
-                "==",
-                matiere
-              )
-
-            );
-
-
-          const result =
-            await getDocs(
-              chaptersQuery
-            );
-
-
-          result.docs.forEach(
-            (document) => {
-
-              const data =
-                document.data();
-
-
-              if (
-                typeof data.chapitre === "string" &&
-                data.chapitre.trim() !== ""
-              ) {
-
-                const cleanChapter =
-                  data.chapitre.trim();
-
-
-                const normalized =
-                  cleanChapter.toLocaleLowerCase(
-                    "fr-FR"
-                  );
-
-
-                if (
-                  !chapters.has(
-                    normalized
-                  )
-                ) {
-
-                  chapters.set(
-                    normalized,
-                    cleanChapter
-                  );
-
-                }
-
-              }
-
-            }
+        const credential =
+          await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
           );
-
-        }
-
-
-        const sortedChapters =
-          Array.from(
-            chapters.values()
-          ).sort(
-            (a, b) =>
-              a.localeCompare(
-                b,
-                "fr-FR"
-              )
-          );
-
-
-        sortedChapters.forEach(
-          (chapter) => {
-
-            const option =
-              document.createElement(
-                "option"
-              );
-
-            option.value =
-              chapter;
-
-            option.textContent =
-              chapter;
-
-            chapitreSelect.appendChild(
-              option
-            );
-
-          }
-        );
 
 
         if (
-          sortedChapters.length === 0
+          !credential.user.email ||
+          credential.user.email.toLowerCase() !==
+          TEACHER_EMAIL.toLowerCase()
         ) {
 
-          chapitreSelect.innerHTML =
-            '<option value="">-- Aucun chapitre existant --</option>';
+          await signOut(auth);
+
+
+          showMessage(
+            loginMessage,
+            "Ce compte n'est pas autorisé pour l'ajout de questions.",
+            "error-message"
+          );
 
         }
 
@@ -1498,300 +1656,229 @@
       } catch (error) {
 
         console.error(
-          "Erreur lors du chargement des chapitres :",
+          "Erreur de connexion :",
           error
         );
 
 
-        chapitreSelect.innerHTML =
-          '<option value="">Erreur lors du chargement</option>';
-
-
         showMessage(
-          formMessage,
-          "Impossible de charger les chapitres.",
+          loginMessage,
+          "Connexion impossible. Vérifie l'adresse e-mail et le mot de passe.",
           "error-message"
         );
 
+
+      } finally {
+
+        loginButton.disabled =
+          false;
+
+        loginButton.textContent =
+          "SE CONNECTER";
+
       }
 
     }
+  );
 
 
-    // =========================================================
-    // NORMALISATION D'UN CHAPITRE
-    // =========================================================
+  // =========================================================
+  // DÉCONNEXION
+  // =========================================================
 
-    function normalizeChapter(value) {
+  logoutButton.addEventListener(
+    "click",
+    async () => {
 
-      return value
-        .trim()
-        .replace(/\s+/g, " ")
-        .toLocaleLowerCase("fr-FR");
+      try {
+
+        await signOut(auth);
+
+      } catch (error) {
+
+        console.error(
+          "Erreur de déconnexion :",
+          error
+        );
+
+      }
 
     }
+  );
 
 
-    // =========================================================
-    // OUVRIR / FERMER LA CRÉATION D'UN CHAPITRE
-    // =========================================================
+  // =========================================================
+  // ÉTAT DE CONNEXION
+  // =========================================================
 
-    newChapterButton.addEventListener(
-      "click",
-      () => {
+  onAuthStateChanged(
+    auth,
+    (user) => {
 
-        clearMessage(formMessage);
+      if (
+        user &&
+        user.email &&
+        user.email.toLowerCase() ===
+        TEACHER_EMAIL.toLowerCase()
+      ) {
 
-
-        const ouverture =
-          newChapterArea.classList.contains(
-            "hidden"
-          );
-
-
-        newChapterArea.classList.toggle(
+        loginCard.classList.add(
           "hidden"
         );
 
-
-        if (ouverture) {
-
-          newChapterInput.focus();
-
-        } else {
-
-          newChapterInput.value = "";
-
-        }
-
-      }
-    );
-
-
-    // =========================================================
-    // CHANGEMENTS DE CLASSES
-    // =========================================================
-
-    document
-      .querySelectorAll(
-        '#classesContainer input[type="checkbox"]'
-      )
-      .forEach(
-        (checkbox) => {
-
-          checkbox.addEventListener(
-            "change",
-            loadChapters
-          );
-
-        }
-      );
-
-
-    // =========================================================
-    // CHANGEMENT DE MATIÈRE
-    // =========================================================
-
-    matiereSelect.addEventListener(
-      "change",
-      loadChapters
-    );
-
-
-    // =========================================================
-    // CONNEXION
-    // =========================================================
-
-    loginButton.addEventListener(
-      "click",
-      async () => {
+        formCard.classList.remove(
+          "hidden"
+        );
 
         clearMessage(
           loginMessage
         );
 
 
-        const email =
-          emailInput.value.trim();
+      } else {
 
-        const password =
-          passwordInput.value;
+        loginCard.classList.remove(
+          "hidden"
+        );
 
-
-        if (
-          !email ||
-          !password
-        ) {
-
-          showMessage(
-            loginMessage,
-            "Indique l'adresse e-mail et le mot de passe.",
-            "error-message"
-          );
-
-          return;
-
-        }
-
-
-        loginButton.disabled =
-          true;
-
-        loginButton.textContent =
-          "Connexion...";
-
-
-        try {
-
-          const credential =
-            await signInWithEmailAndPassword(
-              auth,
-              email,
-              password
-            );
-
-
-          if (
-            !credential.user.email ||
-            credential.user.email.toLowerCase() !==
-            TEACHER_EMAIL.toLowerCase()
-          ) {
-
-            await signOut(auth);
-
-
-            showMessage(
-              loginMessage,
-              "Ce compte n'est pas autorisé pour l'ajout de questions.",
-              "error-message"
-            );
-
-          }
-
-
-        } catch (error) {
-
-          console.error(
-            "Erreur de connexion :",
-            error
-          );
-
-
-          showMessage(
-            loginMessage,
-            "Connexion impossible. Vérifie l'adresse e-mail et le mot de passe.",
-            "error-message"
-          );
-
-
-        } finally {
-
-          loginButton.disabled =
-            false;
-
-          loginButton.textContent =
-            "SE CONNECTER";
-
-        }
+        formCard.classList.add(
+          "hidden"
+        );
 
       }
-    );
+
+    }
+  );
 
 
-    // =========================================================
-    // DÉCONNEXION
-    // =========================================================
+  // =========================================================
+  // CHOIX DE LA DIFFICULTÉ
+  // =========================================================
 
-    logoutButton.addEventListener(
-      "click",
-      async () => {
+  boutonsDifficulte.forEach(
+    (bouton) => {
 
-        try {
+      bouton.addEventListener(
+        "click",
+        () => {
 
-          await signOut(auth);
-
-        } catch (error) {
-
-          console.error(
-            "Erreur de déconnexion :",
-            error
-          );
-
-        }
-
-      }
-    );
+          difficulteSelectionnee =
+            bouton.dataset.difficulte;
 
 
-    // =========================================================
-    // ÉTAT DE CONNEXION
-    // =========================================================
+          boutonsDifficulte.forEach(
+            (autre) => {
 
-    onAuthStateChanged(
-      auth,
-      (user) => {
+              autre.classList.toggle(
+                "selectionne",
+                autre === bouton
+              );
 
-        if (
-          user &&
-          user.email &&
-          user.email.toLowerCase() ===
-          TEACHER_EMAIL.toLowerCase()
-        ) {
-
-          loginCard.classList.add(
-            "hidden"
-          );
-
-          formCard.classList.remove(
-            "hidden"
+            }
           );
 
           clearMessage(
-            loginMessage
-          );
-
-
-        } else {
-
-          loginCard.classList.remove(
-            "hidden"
-          );
-
-          formCard.classList.add(
-            "hidden"
+            formMessage
           );
 
         }
+      );
 
-      }
-    );
+    }
+  );
 
 
-    // =========================================================
-    // CHOIX DE LA DIFFICULTÉ
-    // =========================================================
+  // =========================================================
+  // LISTE DES QUESTIONS AVANT ENVOI
+  // =========================================================
+
+  function resetCurrentQuestionFields() {
+
+    questionInput.value =
+      "";
+
+    reponseInput.value =
+      "";
+
+    difficulteSelectionnee =
+      "";
+
 
     boutonsDifficulte.forEach(
-      (bouton) => {
+      (bouton) =>
+        bouton.classList.remove(
+          "selectionne"
+        )
+    );
 
-        bouton.addEventListener(
+  }
+
+
+  function renderQuestionList() {
+
+    questionList.innerHTML =
+      "";
+
+
+    questionsEnAttente.forEach(
+      (item, index) => {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+        card.className =
+          "question-item";
+
+
+        const head =
+          document.createElement(
+            "div"
+          );
+
+        head.className =
+          "question-item-head";
+
+
+        const title =
+          document.createElement(
+            "div"
+          );
+
+        title.className =
+          "question-item-title";
+
+
+        title.textContent =
+          `Question ${index + 1} · ${item.difficulte}`;
+
+
+        const remove =
+          document.createElement(
+            "button"
+          );
+
+        remove.type =
+          "button";
+
+        remove.className =
+          "remove-question";
+
+        remove.textContent =
+          "SUPPRIMER";
+
+
+        remove.addEventListener(
           "click",
           () => {
 
-            difficulteSelectionnee =
-              bouton.dataset.difficulte;
-
-
-            boutonsDifficulte.forEach(
-              (autre) => {
-
-                autre.classList.toggle(
-                  "selectionne",
-                  autre === bouton
-                );
-
-              }
+            questionsEnAttente.splice(
+              index,
+              1
             );
+
+            renderQuestionList();
 
             clearMessage(
               formMessage
@@ -1800,587 +1887,896 @@
           }
         );
 
-      }
-    );
 
+        head.appendChild(
+          title
+        );
 
-    // =========================================================
-    // =========================================================
-    // LISTE DES QUESTIONS AVANT ENVOI
-    // =========================================================
-
-    function resetCurrentQuestionFields() {
-      questionInput.value = "";
-      reponseInput.value = "";
-      difficulteSelectionnee = "";
-      boutonsDifficulte.forEach((bouton) => bouton.classList.remove("selectionne"));
-    }
-
-    function renderQuestionList() {
-      questionList.innerHTML = "";
-
-      questionsEnAttente.forEach((item, index) => {
-        const card = document.createElement("div");
-        card.className = "question-item";
-
-        const head = document.createElement("div");
-        head.className = "question-item-head";
-
-        const title = document.createElement("div");
-        title.className = "question-item-title";
-        title.textContent = `Question ${index + 1} · ${item.difficulte}`;
-
-        const remove = document.createElement("button");
-        remove.type = "button";
-        remove.className = "remove-question";
-        remove.textContent = "SUPPRIMER";
-        remove.addEventListener("click", () => {
-          questionsEnAttente.splice(index, 1);
-          renderQuestionList();
-          clearMessage(formMessage);
-        });
-
-        head.appendChild(title);
-        head.appendChild(remove);
-
-        const q = document.createElement("p");
-        const qStrong = document.createElement("strong");
-        qStrong.textContent = "Question : ";
-        q.appendChild(qStrong);
-        q.appendChild(document.createTextNode(item.question));
-
-        const r = document.createElement("p");
-        const rStrong = document.createElement("strong");
-        rStrong.textContent = "Réponse : ";
-        r.appendChild(rStrong);
-        r.appendChild(document.createTextNode(item.reponse));
-
-        card.appendChild(head);
-        card.appendChild(q);
-        card.appendChild(r);
-        questionList.appendChild(card);
-      });
-
-      const n = questionsEnAttente.length;
-      questionCount.textContent = `${n} question${n > 1 ? "s" : ""} ajoutée${n > 1 ? "s" : ""} sur ${MAX_QUESTIONS}`;
-      addQuestionButton.disabled = n >= MAX_QUESTIONS;
-      addQuestionButton.textContent = n >= MAX_QUESTIONS
-        ? "LIMITE DE 20 QUESTIONS ATTEINTE"
-        : "+ AJOUTER UNE QUESTION";
-    }
-
-    addQuestionButton.addEventListener("click", () => {
-      clearMessage(formMessage);
-
-      if (questionsEnAttente.length >= MAX_QUESTIONS) return;
-
-      const question = questionInput.value.trim();
-      const reponse = reponseInput.value.trim();
-
-      if (!question) {
-        showMessage(formMessage, "Écris la question avant de l'ajouter.", "error-message");
-        questionInput.focus();
-        return;
-      }
-
-      if (!reponse) {
-        showMessage(formMessage, "Écris la réponse avant de l'ajouter.", "error-message");
-        reponseInput.focus();
-        return;
-      }
-
-      if (!difficulteSelectionnee) {
-        showMessage(formMessage, "Choisis le niveau de difficulté avant d'ajouter la question.", "error-message");
-        return;
-      }
-
-      questionsEnAttente.push({
-        question,
-        reponse,
-        difficulte: difficulteSelectionnee
-      });
-
-      resetCurrentQuestionFields();
-      renderQuestionList();
-      questionInput.focus();
-    });
-
-
-    // =========================================================
-    // ENREGISTRER TOUTES LES QUESTIONS
-    //
-    // CORRECTION IMPORTANTE :
-    // on écoute "submit" sur le formulaire et non "click"
-    // sur le bouton.
-    //
-    // event.preventDefault() empêche le navigateur de
-    // recharger la page avant la fin de Firebase.
-    // =========================================================
-
-    questionForm.addEventListener(
-      "submit",
-      async (event) => {
-
-        // EMPÊCHE LE RECHARGEMENT DE LA PAGE
-        event.preventDefault();
-
-        clearMessage(
-          formMessage
+        head.appendChild(
+          remove
         );
 
 
-        // -----------------------------------------------------
-        // VÉRIFICATION DE LA CONNEXION
-        // -----------------------------------------------------
-
-        const user =
-          auth.currentUser;
-
-
-        if (
-          !user ||
-          !user.email ||
-          user.email.toLowerCase() !==
-          TEACHER_EMAIL.toLowerCase()
-        ) {
-
-          showMessage(
-            formMessage,
-            "Tu dois être connecté avec le compte enseignant.",
-            "error-message"
+        const q =
+          document.createElement(
+            "p"
           );
 
-          return;
-
-        }
-
-
-        // -----------------------------------------------------
-        // RÉCUPÉRATION DES DONNÉES
-        // -----------------------------------------------------
-
-        const selectedClasses =
-          getSelectedClasses();
-
-        const matiere =
-          matiereSelect.value;
-
-        let chapitre =
-          chapitreSelect.value.trim();
-
-        const question =
-          questionInput.value.trim();
-
-        const reponse =
-          reponseInput.value.trim();
-
-        const questionsAEnregistrer =
-          questionsEnAttente.map((item) => ({ ...item }));
-
-        const saisieEnCours =
-          question || reponse || difficulteSelectionnee;
-
-        if (saisieEnCours) {
-          if (!question) {
-            showMessage(formMessage, "Écris la question en cours ou efface la saisie avant l'envoi.", "error-message");
-            return;
-          }
-          if (!reponse) {
-            showMessage(formMessage, "Écris la réponse de la question en cours.", "error-message");
-            return;
-          }
-          if (!difficulteSelectionnee) {
-            showMessage(formMessage, "Choisis le niveau de difficulté de la question en cours.", "error-message");
-            return;
-          }
-          if (questionsAEnregistrer.length >= MAX_QUESTIONS) {
-            showMessage(formMessage, "La limite est de 20 questions par enregistrement.", "error-message");
-            return;
-          }
-          questionsAEnregistrer.push({ question, reponse, difficulte: difficulteSelectionnee });
-        }
-
-        if (questionsAEnregistrer.length === 0) {
-          showMessage(formMessage, "Ajoute au moins une question avant l'enregistrement.", "error-message");
-          return;
-        }
-
-
-        // -----------------------------------------------------
-        // CLASSE
-        // -----------------------------------------------------
-
-        if (
-          selectedClasses.length === 0
-        ) {
-
-          showMessage(
-            formMessage,
-            "Sélectionne au moins une classe.",
-            "error-message"
+        const qStrong =
+          document.createElement(
+            "strong"
           );
 
-          return;
+        qStrong.textContent =
+          "Question : ";
 
-        }
+
+        q.appendChild(
+          qStrong
+        );
+
+        q.appendChild(
+          document.createTextNode(
+            item.question
+          )
+        );
 
 
-        // -----------------------------------------------------
-        // MATIÈRE
-        // -----------------------------------------------------
-
-        if (!matiere) {
-
-          showMessage(
-            formMessage,
-            "Choisis une matière.",
-            "error-message"
+        const r =
+          document.createElement(
+            "p"
           );
 
-          return;
-
-        }
-
-
-        // -----------------------------------------------------
-        // CHAPITRE
-        //
-        // Si le select ne contient aucun chapitre,
-        // on utilise le champ "Nouveau chapitre".
-        // -----------------------------------------------------
-
-        const newChapter =
-          newChapterInput.value
-            .replace(/\s+/g, " ")
-            .trim();
-
-
-        if (
-          !chapitre &&
-          !newChapter
-        ) {
-
-          showMessage(
-            formMessage,
-            "Choisis un chapitre ou crée un nouveau chapitre.",
-            "error-message"
+        const rStrong =
+          document.createElement(
+            "strong"
           );
 
-          return;
+        rStrong.textContent =
+          "Réponse : ";
 
-        }
 
+        r.appendChild(
+          rStrong
+        );
 
-        // Si un nouveau chapitre est renseigné,
-        // il devient prioritaire.
-        if (newChapter) {
+        r.appendChild(
+          document.createTextNode(
+            item.reponse
+          )
+        );
 
-          chapitre =
-            newChapter;
 
-        }
+        card.appendChild(
+          head
+        );
 
-        // -----------------------------------------------------
-        // VÉRIFICATION D'UN DOUBLON DE CHAPITRE
-        //
-        // Cette vérification fonctionne également lorsque
-        // la combinaison classe + matière n'existe encore
-        // dans Firestore.
-        // -----------------------------------------------------
+        card.appendChild(
+          q
+        );
 
-        const normalizedNewChapter =
-          normalizeChapter(
-            chapitre
-          );
+        card.appendChild(
+          r
+        );
 
-
-        if (newChapter) {
-
-          try {
-
-            let equivalentFound =
-              null;
-
-
-            for (
-              const classe of selectedClasses
-            ) {
-
-              const chaptersQuery =
-                query(
-
-                  collection(
-                    db,
-                    "questions"
-                  ),
-
-                  where(
-                    "classe",
-                    "==",
-                    classe
-                  ),
-
-                  where(
-                    "matiere",
-                    "==",
-                    matiere
-                  )
-
-                );
-
-
-              const result =
-                await getDocs(
-                  chaptersQuery
-                );
-
-
-              for (
-                const document of result.docs
-              ) {
-
-                const data =
-                  document.data();
-
-
-                if (
-                  typeof data.chapitre === "string" &&
-                  normalizeChapter(
-                    data.chapitre
-                  ) ===
-                  normalizedNewChapter
-                ) {
-
-                  equivalentFound =
-                    data.chapitre.trim();
-
-                  break;
-
-                }
-
-              }
-
-
-              if (
-                equivalentFound
-              ) {
-
-                break;
-
-              }
-
-            }
-
-
-            if (
-              equivalentFound
-            ) {
-
-              chapitre =
-                equivalentFound;
-
-            }
-
-
-          } catch (error) {
-
-            console.error(
-              "Erreur lors de la vérification du chapitre :",
-              error
-            );
-
-
-            showMessage(
-              formMessage,
-              "Impossible de vérifier le chapitre.",
-              "error-message"
-            );
-
-            return;
-
-          }
-
-        }
-
-
-        // -----------------------------------------------------
-        // PROTECTION CONTRE LES DOUBLE-CLICS
-        // -----------------------------------------------------
-
-        saveButton.disabled =
-          true;
-
-        saveButton.textContent =
-          "ENREGISTREMENT...";
-
-
-        try {
-
-          // ---------------------------------------------------
-          // DATE COMMUNE POUR TOUTES LES CLASSES
-          // ---------------------------------------------------
-
-          const date =
-            Timestamp.now();
-
-
-          // ---------------------------------------------------
-          // ENREGISTREMENT FIRESTORE
-          // ---------------------------------------------------
-
-          for (const classe of selectedClasses) {
-            for (const item of questionsAEnregistrer) {
-              await addDoc(
-                collection(db, "questions"),
-                {
-                  classe: classe,
-                  matiere: matiere,
-                  chapitre: chapitre,
-                  question: item.question,
-                  reponse: item.reponse,
-                  difficulte: item.difficulte,
-                  date: date,
-                  statut: "active"
-                }
-              );
-            }
-          }
-
-
-          // ---------------------------------------------------
-          // MESSAGE DE SUCCÈS
-          // ---------------------------------------------------
-
-          const number = selectedClasses.length;
-          const questionNumber = questionsAEnregistrer.length;
-          const total = number * questionNumber;
-
-          showMessage(
-            formMessage,
-            `${questionNumber} question${questionNumber > 1 ? "s" : ""} enregistrée${questionNumber > 1 ? "s" : ""} avec succès pour ${number} classe${number > 1 ? "s" : ""} (${total} entrée${total > 1 ? "s" : ""}).`,
-            "success-message"
-          );
-
-
-          // ---------------------------------------------------
-          // RESET DU FORMULAIRE
-          // ---------------------------------------------------
-
-          document
-            .querySelectorAll(
-              '#classesContainer input[type="checkbox"]'
-            )
-            .forEach(
-              (checkbox) => {
-
-                checkbox.checked =
-                  false;
-
-              }
-            );
-
-
-          matiereSelect.value =
-            "";
-
-
-          chapitreSelect.innerHTML =
-            '<option value="">-- Choisir d\'abord les classes et la matière --</option>';
-
-
-          newChapterInput.value =
-            "";
-
-          newChapterArea.classList.add(
-            "hidden"
-          );
-
-
-          questionInput.value =
-            "";
-
-          reponseInput.value =
-            "";
-
-
-          difficulteSelectionnee =
-            "";
-
-
-          boutonsDifficulte.forEach(
-            (bouton) => {
-
-              bouton.classList.remove(
-                "selectionne"
-              );
-
-            }
-          );
-
-          questionsEnAttente = [];
-          renderQuestionList();
-
-
-        } catch (error) {
-
-          // ---------------------------------------------------
-          // ERREUR FIRESTORE
-          // ---------------------------------------------------
-
-          console.error(
-            "Erreur complète lors de l'enregistrement :",
-            error
-          );
-
-
-          let message =
-            "Une erreur est survenue pendant l'enregistrement.";
-
-
-          if (
-            error &&
-            error.code ===
-            "permission-denied"
-          ) {
-
-            message =
-              "Enregistrement refusé par Firebase. Vérifie les règles de sécurité Firestore.";
-
-          } else if (
-            error &&
-            error.message
-          ) {
-
-            message +=
-              " " +
-              error.message;
-
-          }
-
-
-          showMessage(
-            formMessage,
-            message,
-            "error-message"
-          );
-
-
-        } finally {
-
-          saveButton.disabled =
-            false;
-
-          saveButton.textContent =
-            "ENREGISTRER TOUTES LES QUESTIONS";
-
-        }
+        questionList.appendChild(
+          card
+        );
 
       }
     );
 
-    renderQuestionList();
 
-  </script>
+    const n =
+      questionsEnAttente.length;
+
+
+    questionCount.textContent =
+      `${n} question${n > 1 ? "s" : ""} ajoutée${n > 1 ? "s" : ""} sur ${MAX_QUESTIONS}`;
+
+
+    addQuestionButton.disabled =
+      n >= MAX_QUESTIONS;
+
+
+    addQuestionButton.textContent =
+      n >= MAX_QUESTIONS
+        ? "LIMITE DE 20 QUESTIONS ATTEINTE"
+        : "+ AJOUTER UNE QUESTION";
+
+  }
+
+
+  // =========================================================
+  // AJOUTER UNE QUESTION À LA LISTE
+  // =========================================================
+
+  addQuestionButton.addEventListener(
+    "click",
+    () => {
+
+      clearMessage(formMessage);
+
+
+      if (
+        questionsEnAttente.length >=
+        MAX_QUESTIONS
+      ) {
+
+        return;
+
+      }
+
+
+      const question =
+        questionInput.value.trim();
+
+      const reponse =
+        reponseInput.value.trim();
+
+
+      if (!question) {
+
+        showMessage(
+          formMessage,
+          "Écris la question avant de l'ajouter.",
+          "error-message"
+        );
+
+        questionInput.focus();
+
+        return;
+
+      }
+
+
+      if (!reponse) {
+
+        showMessage(
+          formMessage,
+          "Écris la réponse avant de l'ajouter.",
+          "error-message"
+        );
+
+        reponseInput.focus();
+
+        return;
+
+      }
+
+
+      if (!difficulteSelectionnee) {
+
+        showMessage(
+          formMessage,
+          "Choisis le niveau de difficulté avant d'ajouter la question.",
+          "error-message"
+        );
+
+        return;
+
+      }
+
+
+      questionsEnAttente.push({
+
+        question,
+        reponse,
+        difficulte:
+          difficulteSelectionnee
+
+      });
+
+
+      resetCurrentQuestionFields();
+
+      renderQuestionList();
+
+      questionInput.focus();
+
+    }
+  );
+
+
+  // =========================================================
+  // VÉRIFIER SI UN CHAPITRE EXISTE DÉJÀ DANS NAVIGATION
+  //
+  // Cette fonction ne modifie rien.
+  // =========================================================
+
+  async function findExistingChapterInNavigation(
+    classe,
+    matiere,
+    chapitre
+  ) {
+
+    const normalizedTarget =
+      normalizeChapter(
+        chapitre
+      );
+
+
+    const navigationQuery =
+      query(
+
+        collection(
+          db,
+          "navigation"
+        ),
+
+        where(
+          "classe",
+          "==",
+          classe
+        ),
+
+        where(
+          "matiere",
+          "==",
+          matiere
+        )
+
+      );
+
+
+    const result =
+      await getDocs(
+        navigationQuery
+      );
+
+
+    for (
+      const document of result.docs
+    ) {
+
+      const data =
+        document.data();
+
+
+      if (
+        typeof data.chapitre === "string" &&
+        normalizeChapter(
+          data.chapitre
+        ) ===
+        normalizedTarget
+      ) {
+
+        return data.chapitre.trim();
+
+      }
+
+    }
+
+
+    return null;
+
+  }
+
+
+  // =========================================================
+  // ENREGISTRER TOUTES LES QUESTIONS
+  //
+  // MODIFICATION IMPORTANTE :
+  //
+  // 1. Les questions sont écrites dans questions.
+  // 2. Les entrées navigation sont créées / mises à jour.
+  // 3. Tout est envoyé dans un même writeBatch.
+  //
+  // Cela évite d'avoir seulement une partie des écritures
+  // si une règle Firebase refuse l'opération.
+  // =========================================================
+
+  questionForm.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+      clearMessage(
+        formMessage
+      );
+
+
+      // -----------------------------------------------------
+      // VÉRIFICATION DE LA CONNEXION
+      // -----------------------------------------------------
+
+      const user =
+        auth.currentUser;
+
+
+      if (
+        !user ||
+        !user.email ||
+        user.email.toLowerCase() !==
+        TEACHER_EMAIL.toLowerCase()
+      ) {
+
+        showMessage(
+          formMessage,
+          "Tu dois être connecté avec le compte enseignant.",
+          "error-message"
+        );
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------------
+      // RÉCUPÉRATION DES DONNÉES
+      // -----------------------------------------------------
+
+      const selectedClasses =
+        getSelectedClasses();
+
+
+      const matiere =
+        matiereSelect.value;
+
+
+      let chapitre =
+        chapitreSelect.value.trim();
+
+
+      const question =
+        questionInput.value.trim();
+
+
+      const reponse =
+        reponseInput.value.trim();
+
+
+      const questionsAEnregistrer =
+        questionsEnAttente.map(
+          (item) => ({
+            ...item
+          })
+        );
+
+
+      const saisieEnCours =
+        question ||
+        reponse ||
+        difficulteSelectionnee;
+
+
+      if (saisieEnCours) {
+
+        if (!question) {
+
+          showMessage(
+            formMessage,
+            "Écris la question en cours ou efface la saisie avant l'envoi.",
+            "error-message"
+          );
+
+          return;
+
+        }
+
+
+        if (!reponse) {
+
+          showMessage(
+            formMessage,
+            "Écris la réponse de la question en cours.",
+            "error-message"
+          );
+
+          return;
+
+        }
+
+
+        if (!difficulteSelectionnee) {
+
+          showMessage(
+            formMessage,
+            "Choisis le niveau de difficulté de la question en cours.",
+            "error-message"
+          );
+
+          return;
+
+        }
+
+
+        if (
+          questionsAEnregistrer.length >=
+          MAX_QUESTIONS
+        ) {
+
+          showMessage(
+            formMessage,
+            "La limite est de 20 questions par enregistrement.",
+            "error-message"
+          );
+
+          return;
+
+        }
+
+
+        questionsAEnregistrer.push({
+
+          question,
+          reponse,
+          difficulte:
+            difficulteSelectionnee
+
+        });
+
+      }
+
+
+      if (
+        questionsAEnregistrer.length === 0
+      ) {
+
+        showMessage(
+          formMessage,
+          "Ajoute au moins une question avant l'enregistrement.",
+          "error-message"
+        );
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------------
+      // CLASSES
+      // -----------------------------------------------------
+
+      if (
+        selectedClasses.length === 0
+      ) {
+
+        showMessage(
+          formMessage,
+          "Sélectionne au moins une classe.",
+          "error-message"
+        );
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------------
+      // MATIÈRE
+      // -----------------------------------------------------
+
+      if (!matiere) {
+
+        showMessage(
+          formMessage,
+          "Choisis une matière.",
+          "error-message"
+        );
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------------
+      // CHAPITRE
+      // -----------------------------------------------------
+
+      const newChapter =
+        normalizeText(
+          newChapterInput.value
+        );
+
+
+      if (
+        !chapitre &&
+        !newChapter
+      ) {
+
+        showMessage(
+          formMessage,
+          "Choisis un chapitre ou crée un nouveau chapitre.",
+          "error-message"
+        );
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------------
+      // NOUVEAU CHAPITRE PRIORITAIRE
+      // -----------------------------------------------------
+
+      if (newChapter) {
+
+        chapitre =
+          newChapter;
+
+      }
+
+
+      // -----------------------------------------------------
+      // VÉRIFICATION DU CHAPITRE DANS NAVIGATION
+      //
+      // Si un chapitre identique existe déjà pour une des
+      // classes, on reprend son écriture exacte.
+      // -----------------------------------------------------
+
+      try {
+
+        if (newChapter) {
+
+          for (
+            const classe of selectedClasses
+          ) {
+
+            const existingChapter =
+              await findExistingChapterInNavigation(
+                classe,
+                matiere,
+                chapitre
+              );
+
+
+            if (
+              existingChapter
+            ) {
+
+              chapitre =
+                existingChapter;
+
+              break;
+
+            }
+
+          }
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Erreur lors de la vérification du chapitre dans navigation :",
+          error
+        );
+
+
+        showMessage(
+          formMessage,
+          "Impossible de vérifier le chapitre dans l'index.",
+          "error-message"
+        );
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------------
+      // PROTECTION CONTRE LES DOUBLE-CLICS
+      // -----------------------------------------------------
+
+      saveButton.disabled =
+        true;
+
+      addQuestionButton.disabled =
+        true;
+
+      saveButton.textContent =
+        "ENREGISTREMENT...";
+
+
+      try {
+
+        // ---------------------------------------------------
+        // DATE COMMUNE
+        // ---------------------------------------------------
+
+        const date =
+          Timestamp.now();
+
+
+        // ---------------------------------------------------
+        // BATCH FIRESTORE
+        // ---------------------------------------------------
+
+        const batch =
+          writeBatch(db);
+
+
+        // ---------------------------------------------------
+        // 1. QUESTIONS
+        // ---------------------------------------------------
+
+        for (
+          const classe of selectedClasses
+        ) {
+
+          for (
+            const item of questionsAEnregistrer
+          ) {
+
+            const questionRef =
+              doc(
+                collection(
+                  db,
+                  "questions"
+                )
+              );
+
+
+            batch.set(
+              questionRef,
+              {
+
+                classe:
+                  classe,
+
+                matiere:
+                  matiere,
+
+                chapitre:
+                  chapitre,
+
+                question:
+                  item.question,
+
+                reponse:
+                  item.reponse,
+
+                difficulte:
+                  item.difficulte,
+
+                date:
+                  date,
+
+                statut:
+                  "active"
+
+              }
+            );
+
+          }
+
+        }
+
+
+        // ---------------------------------------------------
+        // 2. NAVIGATION
+        //
+        // Une entrée par classe + matière + chapitre.
+        //
+        // set(..., {merge:true}) évite de supprimer une
+        // éventuelle information déjà présente dans le document.
+        // ---------------------------------------------------
+
+        for (
+          const classe of selectedClasses
+        ) {
+
+          const navigationId =
+            getNavigationId(
+              classe,
+              matiere,
+              chapitre
+            );
+
+
+          const navigationRef =
+            doc(
+              db,
+              "navigation",
+              navigationId
+            );
+
+
+          batch.set(
+            navigationRef,
+            {
+
+              classe:
+                classe,
+
+              matiere:
+                matiere,
+
+              chapitre:
+                chapitre,
+
+              updatedAt:
+                serverTimestamp()
+
+            },
+            {
+              merge:
+                true
+            }
+          );
+
+        }
+
+
+        // ---------------------------------------------------
+        // 3. ENVOI ATOMIQUE
+        // ---------------------------------------------------
+
+        await batch.commit();
+
+
+        // ---------------------------------------------------
+        // MESSAGE DE SUCCÈS
+        // ---------------------------------------------------
+
+        const number =
+          selectedClasses.length;
+
+
+        const questionNumber =
+          questionsAEnregistrer.length;
+
+
+        const total =
+          number *
+          questionNumber;
+
+
+        showMessage(
+          formMessage,
+
+          `${questionNumber} question${questionNumber > 1 ? "s" : ""} enregistrée${questionNumber > 1 ? "s" : ""} avec succès pour ${number} classe${number > 1 ? "s" : ""} (${total} entrée${total > 1 ? "s" : ""}). Le chapitre est maintenant disponible dans l'index.`,
+
+          "success-message"
+        );
+
+
+        // ---------------------------------------------------
+        // RESET DU FORMULAIRE
+        // ---------------------------------------------------
+
+        document
+          .querySelectorAll(
+            '#classesContainer input[type="checkbox"]'
+          )
+          .forEach(
+            (checkbox) => {
+
+              checkbox.checked =
+                false;
+
+            }
+          );
+
+
+        matiereSelect.value =
+          "";
+
+
+        chapitreSelect.innerHTML =
+          '<option value="">-- Choisir d\'abord une classe et une matière --</option>';
+
+
+        newChapterInput.value =
+          "";
+
+
+        newChapterArea.classList.add(
+          "hidden"
+        );
+
+
+        questionInput.value =
+          "";
+
+
+        reponseInput.value =
+          "";
+
+
+        difficulteSelectionnee =
+          "";
+
+
+        boutonsDifficulte.forEach(
+          (bouton) => {
+
+            bouton.classList.remove(
+              "selectionne"
+            );
+
+          }
+        );
+
+
+        questionsEnAttente =
+          [];
+
+
+        renderQuestionList();
+
+
+      } catch (error) {
+
+        // ---------------------------------------------------
+        // ERREUR FIRESTORE
+        // ---------------------------------------------------
+
+        console.error(
+          "Erreur complète lors de l'enregistrement :",
+          error
+        );
+
+
+        let message =
+          "Une erreur est survenue pendant l'enregistrement.";
+
+
+        if (
+          error &&
+          error.code ===
+          "permission-denied"
+        ) {
+
+          message =
+            "Enregistrement refusé par Firebase. Vérifie les règles de sécurité Firestore pour questions et navigation.";
+
+        } else if (
+          error &&
+          error.code ===
+          "failed-precondition"
+        ) {
+
+          message =
+            "Firebase ne peut pas effectuer l'enregistrement. Vérifie les règles Firestore et la configuration du projet.";
+
+        } else if (
+          error &&
+          error.message
+        ) {
+
+          message +=
+            " " +
+            error.message;
+
+        }
+
+
+        showMessage(
+          formMessage,
+          message,
+          "error-message"
+        );
+
+
+      } finally {
+
+        saveButton.disabled =
+          false;
+
+
+        saveButton.textContent =
+          "ENREGISTRER TOUTES LES QUESTIONS";
+
+
+        addQuestionButton.disabled =
+          questionsEnAttente.length >=
+          MAX_QUESTIONS;
+
+      }
+
+    });
+
+
+  // =========================================================
+  // AFFICHAGE INITIAL
+  // =========================================================
+
+  renderQuestionList();
+
+</script>
 
 </body>
 </html>
