@@ -29,7 +29,7 @@ async function enregistrerTelechargement(classe,nombreQuestions){
 }
 
 const CLASSES=["6e A","6e B","6e C","6e D","6e E","6e F","5e A","5e B","5e C","5e D","5e E","5e F","4e A","4e B","4e C","4e D","4e E","4e F","3e A","3e B","3e C","3e D","3e E","3e F"];
-const MATIERES=["Mathématiques","Français","Histoire, géographie et Emc","Anglais","Espagnol","Allemand","Physique-chimie","SVT","Technologie","EPS","Arts plastiques","Éducation musicale","Latin","Enseignement professionnel"];
+const MATIERES=["Mathématiques","Français","Histoire, géographie et Emc","Anglais","Espagnol","Allemand","Physique-chimie","SVT","Technologie","EPS","Arts plastiques","Éducation musicale","EMI","Latin","Enseignement professionnel"];
 const $=id=>document.getElementById(id);function norm(value){return String(value??"").trim().replace(/\s+/g," ").toLowerCase()}function unique(values){const seen=new Set();return values.filter(value=>{const key=norm(value);if(!key||seen.has(key))return false;seen.add(key);return true})}function setOptions(select,values,placeholder){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);values.forEach(value=>{const option=document.createElement("option");option.value=value;option.textContent=value;select.appendChild(option)});select.disabled=values.length===0}
 let questionsChapitre=[],indexQuestion=0,questionActuelle=null;let selectedClass="",selectedSubject="",selectedChapter="";
 function hideQuiz(){$("quizSection").classList.add("hidden");$("chapterActions").classList.add("hidden")}function showQuiz(){$("quizSection").classList.remove("hidden");$("chapterActions").classList.remove("hidden")}
