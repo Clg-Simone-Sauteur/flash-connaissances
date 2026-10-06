@@ -9,11 +9,12 @@
 <div class="conteneur"><div class="entete"><p class="petitTitre">Flash connaissances</p><h1>Révision</h1><h2>Une question, une réflexion, une réponse.</h2></div><section class="configuration screen-only"><p class="titreSection">Préparer la révision</p><div class="choix"><label for="classSelect">1. Choisir une classe</label><select id="classSelect"><option value="">— Choisir une classe —</option></select></div><div class="choix"><label for="subjectSelect">2. Choisir une matière</label><select id="subjectSelect" disabled><option value="">— Choisir une matière —</option></select></div><div class="choix"><label for="chapterSelect">3. Choisir un chapitre</label><select id="chapterSelect" disabled><option value="">— Choisir un chapitre —</option></select></div><div id="configMessage" class="message hidden"></div><div id="chapterActions" class="actions hidden"><button id="backChapter" type="button" class="secondary">← CHOISIR UN AUTRE CHAPITRE</button><button id="printButton" type="button" class="pdf">🖨️ PDF / IMPRIMER LES FLASH CARDS</button></div></section><section id="quizSection" class="zoneQuiz hidden"><div class="screen-only"><div class="barreQuiz"><span class="etiquette">Flash card</span><span id="compteur" class="compteur"></span></div><p id="question"><span id="questionText">La question apparaîtra ici.</span></p><div class="actions"><button id="voirReponse" type="button">VOIR LA RÉPONSE</button><button id="suivante" type="button" class="hidden">QUESTION SUIVANTE</button></div><p id="texteReponse" class="reponse hidden"></p><div id="autoEvaluation" class="auto-evaluation hidden"><button id="jeSavais" type="button">JE SAVAIS</button><button id="jeNeSavaisPas" type="button">JE NE SAVAIS PAS</button></div></div><div id="printCards" class="print-only print-card-list"></div></section><div class="pied screen-only">Flash connaissances · Révision du collège Simone Sauteur</div></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import {getFirestore,collection,getDocs,query,where,doc,updateDoc,increment,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import {getFirestore,collection,getDocs,query,where,doc,updateDoc,setDoc,increment,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyDr6UgkWn-BFCEpAqi4f0AmMkoOE3q3EQg",authDomain:"flash-connaissances-simone.firebaseapp.com",projectId:"flash-connaissances-simone",storageBucket:"flash-connaissances-simone.firebasestorage.app",messagingSenderId:"268185082285",appId:"1:268185082285:web:a8dbafcf0500a892206924"};
 const app=initializeApp(firebaseConfig);const db=getFirestore(app);
 
-/* STATISTIQUES : aucune lecture statistique sur cette page. Une écriture par téléchargement réussi. */
+/* STATISTIQUES : aucune lecture statistique sur cette page. Deux écritures par chargement réussi
+   (compteurs cumulés + compteurs du jour pour la classe). */
 function safeStatKey(value){return String(value??"").trim().replace(/\s+/g,"_").replace(/[.~*\/\[\]]/g,"_")}
 async function enregistrerTelechargement(classe,nombreQuestions){
  if(!classe||!Number.isFinite(nombreQuestions)||nombreQuestions<=0)return;
@@ -28,6 +29,27 @@ async function enregistrerTelechargement(classe,nombreQuestions){
  }catch(erreur){console.warn("Statistiques non enregistrées :",erreur)}
 }
 
+/* ACTIVITÉ PAR JOUR : un document par jour et par classe (activite/2026-10-06_6e_A) contenant des compteurs
+   par matière et par chapitre. Utilisé par le tableau de bord de l'administration. */
+function jourLocal(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+async function enregistrerActivite(classe,matiere,chapitre,nombreQuestions){
+ if(!classe||!matiere||!chapitre||!Number.isFinite(nombreQuestions)||nombreQuestions<=0)return;
+ const jour=jourLocal();
+ const cle=safeStatKey(matiere)+"§"+safeStatKey(chapitre);
+ try{
+  await setDoc(doc(db,"activite",jour+"_"+safeStatKey(classe)),{
+   jour,classe,
+   visites:increment(1),questions:increment(nombreQuestions),
+   details:{[cle]:{v:increment(1),q:increment(nombreQuestions)}}
+  },{merge:true});
+ }catch(erreur){console.warn("Activité non enregistrée :",erreur)}
+}
+
+/* CACHE LOCAL : limite les lectures Firestore (listes de chapitres et questions), durée 6 h. */
+const TTL=6*60*60*1000;
+function cacheGet(k){try{const o=JSON.parse(localStorage.getItem("fc:"+k));if(o&&Date.now()-o.t<TTL)return o.v}catch{}return null}
+function cacheSet(k,v){try{localStorage.setItem("fc:"+k,JSON.stringify({t:Date.now(),v}))}catch{}}
+
 const CLASSES=["6e A","6e B","6e C","6e D","6e E","6e F","5e A","5e B","5e C","5e D","5e E","5e F","4e A","4e B","4e C","4e D","4e E","4e F","3e A","3e B","3e C","3e D","3e E","3e F"];
 const MATIERES=["Mathématiques","Français","Histoire, géographie et Emc","Anglais","Espagnol","Allemand","Physique-chimie","SVT","Technologie","EPS","Arts plastiques","Éducation musicale","EMI","Latin","Enseignement professionnel"];
 const $=id=>document.getElementById(id);function norm(value){return String(value??"").trim().replace(/\s+/g," ").toLowerCase()}function unique(values){const seen=new Set();return values.filter(value=>{const key=norm(value);if(!key||seen.has(key))return false;seen.add(key);return true})}function setOptions(select,values,placeholder){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);values.forEach(value=>{const option=document.createElement("option");option.value=value;option.textContent=value;select.appendChild(option)});select.disabled=values.length===0}
@@ -36,12 +58,45 @@ function hideQuiz(){$("quizSection").classList.add("hidden");$("chapterActions")
 function initialiserMenus(){setOptions($("classSelect"),CLASSES,"— Choisir une classe —");setOptions($("subjectSelect"),[],"— Choisir une matière —");setOptions($("chapterSelect"),[],"— Choisir un chapitre —")}
 $("classSelect").addEventListener("change",()=>{selectedClass=$("classSelect").value;selectedSubject="";selectedChapter="";questionsChapitre=[];questionActuelle=null;indexQuestion=0;setOptions($("subjectSelect"),[],"— Choisir une matière —");setOptions($("chapterSelect"),[],"— Choisir un chapitre —");hideQuiz();$("configMessage").classList.add("hidden");if(!selectedClass)return;setOptions($("subjectSelect"),MATIERES,"— Choisir une matière —")});
 $("subjectSelect").addEventListener("change",async()=>{selectedSubject=$("subjectSelect").value;selectedChapter="";questionsChapitre=[];questionActuelle=null;indexQuestion=0;setOptions($("chapterSelect"),[],"— Choisir un chapitre —");hideQuiz();$("configMessage").classList.add("hidden");if(!selectedClass||!selectedSubject)return;await chargerChapitres()});
-async function chargerChapitres(){$("configMessage").textContent="Chargement des chapitres disponibles…";$("configMessage").classList.remove("hidden");try{const q=query(collection(db,"navigation"),where("classe","==",selectedClass),where("matiere","==",selectedSubject));const snapshot=await getDocs(q);const chapitres=unique(snapshot.docs.map(doc=>doc.data().chapitre).filter(v=>String(v??"").trim()));setOptions($("chapterSelect"),chapitres,"— Choisir un chapitre —");if(!chapitres.length){$("configMessage").textContent="Aucun chapitre n'est disponible pour cette classe et cette matière.";$("configMessage").classList.remove("hidden")}else{$("configMessage").classList.add("hidden")}}catch(erreur){console.error("Erreur lors du chargement des chapitres :",erreur);$("configMessage").textContent="Impossible de charger les chapitres. Vérifie la connexion à Firebase.";$("configMessage").classList.remove("hidden")}}
+
+async function chargerChapitres(){
+ $("configMessage").textContent="Chargement des chapitres disponibles…";$("configMessage").classList.remove("hidden");
+ try{
+  const cleCh="ch|"+selectedClass+"|"+selectedSubject;
+  let chapitres=cacheGet(cleCh);
+  if(!chapitres){
+   const q=query(collection(db,"navigation"),where("classe","==",selectedClass),where("matiere","==",selectedSubject));
+   const snapshot=await getDocs(q);
+   chapitres=unique(snapshot.docs.map(d=>d.data().chapitre).filter(v=>String(v??"").trim()));
+   if(chapitres.length)cacheSet(cleCh,chapitres);
+  }
+  setOptions($("chapterSelect"),chapitres,"— Choisir un chapitre —");
+  if(!chapitres.length){$("configMessage").textContent="Aucun chapitre n'est disponible pour cette classe et cette matière.";$("configMessage").classList.remove("hidden")}else{$("configMessage").classList.add("hidden")}
+ }catch(erreur){console.error("Erreur lors du chargement des chapitres :",erreur);$("configMessage").textContent="Impossible de charger les chapitres. Vérifie la connexion à Firebase.";$("configMessage").classList.remove("hidden")}
+}
+
 $("chapterSelect").addEventListener("change",async()=>{selectedChapter=$("chapterSelect").value;if(selectedChapter)await startChapter();else hideQuiz()});
-async function startChapter(){questionsChapitre=[];questionActuelle=null;indexQuestion=0;$("configMessage").textContent="Chargement des questions…";$("configMessage").classList.remove("hidden");try{const q=query(collection(db,"questions"),where("classe","==",selectedClass),where("matiere","==",selectedSubject),where("chapitre","==",selectedChapter));const snapshot=await getDocs(q);questionsChapitre=snapshot.docs.map(doc=>({id:doc.id,...doc.data()})).filter(question=>norm(question.statut)==="active");if(!questionsChapitre.length){$("configMessage").textContent="Aucune question active disponible dans ce chapitre.";$("configMessage").classList.remove("hidden");hideQuiz();return}
- /* L'écriture statistique ne bloque pas le quiz et ne lit pas questions une seconde fois. */
- enregistrerTelechargement(selectedClass,questionsChapitre.length);
- $("configMessage").classList.add("hidden");showQuiz();afficherQuestion();preparerPDF()}catch(erreur){console.error("Erreur lors du chargement des questions :",erreur);$("configMessage").textContent="Impossible de charger les questions de ce chapitre. Vérifie la connexion à Firebase.";$("configMessage").classList.remove("hidden");hideQuiz()}}
+
+async function startChapter(){
+ questionsChapitre=[];questionActuelle=null;indexQuestion=0;
+ $("configMessage").textContent="Chargement des questions…";$("configMessage").classList.remove("hidden");
+ try{
+  const cleQ="q|"+selectedClass+"|"+selectedSubject+"|"+selectedChapter;
+  questionsChapitre=cacheGet(cleQ);
+  if(!questionsChapitre){
+   const q=query(collection(db,"questions"),where("classe","==",selectedClass),where("matiere","==",selectedSubject),where("chapitre","==",selectedChapter),where("statut","==","active"));
+   const snapshot=await getDocs(q);
+   questionsChapitre=snapshot.docs.map(d=>{const x=d.data();return{id:d.id,question:x.question,reponse:x.reponse,statut:x.statut}}).filter(question=>norm(question.statut)==="active");
+   if(questionsChapitre.length)cacheSet(cleQ,questionsChapitre);
+  }
+  if(!questionsChapitre.length){$("configMessage").textContent="Aucune question active disponible dans ce chapitre.";$("configMessage").classList.remove("hidden");hideQuiz();return}
+  /* Les écritures statistiques ne bloquent pas le quiz (et ne relisent pas la collection questions). */
+  enregistrerTelechargement(selectedClass,questionsChapitre.length);
+  enregistrerActivite(selectedClass,selectedSubject,selectedChapter,questionsChapitre.length);
+  $("configMessage").classList.add("hidden");showQuiz();afficherQuestion();preparerPDF()
+ }catch(erreur){console.error("Erreur lors du chargement des questions :",erreur);$("configMessage").textContent="Impossible de charger les questions de ce chapitre. Vérifie la connexion à Firebase.";$("configMessage").classList.remove("hidden");hideQuiz()}
+}
+
 function afficherQuestion(){if(indexQuestion>=questionsChapitre.length){$("questionText").textContent="Toutes les questions de ce chapitre ont été parcourues.";$("compteur").textContent=questionsChapitre.length+" / "+questionsChapitre.length;$("voirReponse").classList.add("hidden");$("suivante").classList.add("hidden");$("texteReponse").classList.add("hidden");$("autoEvaluation").classList.add("hidden");return}questionActuelle=questionsChapitre[indexQuestion];$("compteur").textContent=(indexQuestion+1)+" / "+questionsChapitre.length;$("questionText").textContent=questionActuelle.question||"Question sans texte";$("texteReponse").textContent="";$("texteReponse").classList.add("hidden");$("voirReponse").classList.remove("hidden");$("suivante").classList.add("hidden");$("autoEvaluation").classList.add("hidden")}
 $("voirReponse").addEventListener("click",()=>{if(!questionActuelle)return;$("texteReponse").textContent=questionActuelle.reponse||"Aucune réponse renseignée.";$("texteReponse").classList.remove("hidden");$("voirReponse").classList.add("hidden");$("suivante").classList.remove("hidden");$("autoEvaluation").classList.remove("hidden")});function passerQuestion(){indexQuestion++;afficherQuestion()}$("jeSavais").addEventListener("click",passerQuestion);$("jeNeSavaisPas").addEventListener("click",()=>{if(!questionActuelle)return;questionsChapitre.push(questionActuelle);passerQuestion()});$("suivante").addEventListener("click",passerQuestion);
 $("backChapter").addEventListener("click",()=>{hideQuiz();$("chapterSelect").value="";selectedChapter="";questionsChapitre=[];questionActuelle=null;indexQuestion=0;window.scrollTo({top:0,behavior:"smooth"})});
