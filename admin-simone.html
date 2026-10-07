@@ -75,9 +75,10 @@ button:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .barreFond{height:10px;border-radius:999px;background:var(--blue-bg);overflow:hidden}
 .barre{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:999px}
 .periodeSelect{width:auto;padding:11px 14px}
+.exportGrille{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;align-items:end}
 .pied{margin-top:30px;text-align:center;color:#777;font-size:13px}
 @media(max-width:900px){body{padding:15px}.conteneur{padding:30px 25px}.filtres,.statsGrille{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.conteneur{padding:25px 18px}h1{font-size:32px}h2{font-size:20px}.filtres,.statsGrille,.matieresGrille{grid-template-columns:1fr}.navigation,.utilisateurConnecte{flex-direction:column;align-items:stretch}button{width:100%}.actions{flex-direction:column;align-items:stretch}.activiteLigne{grid-template-columns:1fr auto}.barreFond{grid-column:1/-1}.periodeSelect{width:100%}}
+@media(max-width:600px){.conteneur{padding:25px 18px}h1{font-size:32px}h2{font-size:20px}.filtres,.statsGrille,.matieresGrille,.exportGrille{grid-template-columns:1fr}.navigation,.utilisateurConnecte{flex-direction:column;align-items:stretch}button{width:100%}.actions{flex-direction:column;align-items:stretch}.activiteLigne{grid-template-columns:1fr auto}.barreFond{grid-column:1/-1}.periodeSelect{width:100%}}
 </style>
 </head>
 <body>
@@ -138,6 +139,17 @@ button:disabled{opacity:.55;cursor:not-allowed;transform:none}
       <div class="fil" id="activiteFil"></div>
       <div id="activiteListe" class="statsClasses"></div>
       <div id="activiteMessage" class="message"></div>
+    </div>
+
+    <div class="carte">
+      <div class="navigation"><h3>Export PDF pour les conseils de classe</h3></div>
+      <p class="aide">Un seul PDF pour toutes les classes : une fiche par classe, avec le nombre de téléchargements par matière. Chaque classe commence sur un recto (impression recto verso sans mélange).</p>
+      <div class="exportGrille">
+        <div><label for="exportDu">Du</label><input id="exportDu" type="date"></div>
+        <div><label for="exportAu">Au</label><input id="exportAu" type="date"></div>
+        <div><button type="button" id="exportPdfButton" class="success">EXPORTER EN PDF</button></div>
+      </div>
+      <div id="exportMessage" class="message"></div>
     </div>
 
     <div id="zoneChoixMatiere" class="carte">
@@ -381,6 +393,149 @@ function renderActivite() {
     if (champ === "matiere") ligne.addEventListener("click", () => { drill.matiere = nom; renderActivite(); });
     liste.appendChild(ligne);
   });
+}
+
+/* ---------- Export PDF pour les conseils de classe ---------- */
+const CLASSES_ATTENDUES = [];     // ex. ["6e A","6e B"] : ces classes figurent même sans activité
+const INCLURE_CHAPITRES = true;   // false = seulement les matières, sans le détail des chapitres
+let jsPdfPromise = null;
+function chargerJsPdf() {
+  if (!jsPdfPromise) jsPdfPromise = new Promise((resolve, reject) => {
+    if (window.jspdf) return resolve(window.jspdf.jsPDF);
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload = () => resolve(window.jspdf.jsPDF);
+    s.onerror = () => { jsPdfPromise = null; reject(new Error("jsPDF indisponible")); };
+    document.head.appendChild(s);
+  });
+  return jsPdfPromise;
+}
+const pdfNb = n => nombre(n).replace(/[\u202f\u00a0]/g, " ");
+const dateFr = iso => iso.split("-").reverse().join("/");
+
+function agregerParClasse(docs) {
+  const classes = new Map();
+  const get = c => { if (!classes.has(c)) classes.set(c, { v: 0, q: 0, mat: new Map() }); return classes.get(c); };
+  docs.forEach(d => {
+    if (!d.classe) return;
+    const cl = get(d.classe);
+    cl.v += Number(d.visites || 0); cl.q += Number(d.questions || 0);
+    Object.entries(d.details || {}).forEach(([cle, val]) => {
+      const [mat, chap] = cle.split("§");
+      if (!cl.mat.has(mat)) cl.mat.set(mat, { v: 0, q: 0, chap: new Map() });
+      const m = cl.mat.get(mat), v = Number(val.v || 0), q = Number(val.q || 0);
+      m.v += v; m.q += q;
+      const ch = m.chap.get(chap) || { v: 0, q: 0 };
+      ch.v += v; ch.q += q; m.chap.set(chap, ch);
+    });
+  });
+  CLASSES_ATTENDUES.forEach(get);
+  return classes;
+}
+
+function dessinerPdf(JsPDF, classes, du, au) {
+  const pdf = new JsPDF({ unit: "mm", format: "a4" });
+  const L = 18, R = 192, BAS = 280;
+  const edite = new Date().toLocaleDateString("fr-FR");
+  let y = 0, premiere = true;
+  const noms = [...classes.keys()].sort((a, b) => classSortKey(a).localeCompare(classSortKey(b), "fr"));
+
+  const tronquer = (t, w) => {
+    let s = t;
+    while (s.length > 3 && pdf.getTextWidth(s) > w) s = s.slice(0, -2);
+    return s === t ? t : s.trimEnd() + "...";
+  };
+  const entete = (classe, suite) => {
+    pdf.setFillColor(26, 95, 168); pdf.rect(0, 0, 210, 6, "F");
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(10); pdf.setTextColor(201, 168, 76);
+    pdf.text("FLASH CONNAISSANCES", L, 17);
+    pdf.setFontSize(24); pdf.setTextColor(26, 95, 168);
+    pdf.text("Classe " + classe + (suite ? " (suite)" : ""), L, 28);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(10); pdf.setTextColor(90, 90, 90);
+    pdf.text(`Période : du ${dateFr(du)} au ${dateFr(au)}  -  édité le ${edite}`, L, 35);
+    pdf.setDrawColor(216, 205, 180); pdf.line(L, 39, R, 39);
+    y = 47;
+  };
+  const titresColonnes = () => {
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(9); pdf.setTextColor(45, 53, 97);
+    pdf.text("MATIÈRE", L, y);
+    pdf.text("TÉLÉCHARGEMENTS", 128, y, { align: "right" });
+    pdf.text("PART", 150, y, { align: "right" });
+    pdf.text("QUESTIONS", R, y, { align: "right" });
+    pdf.setDrawColor(26, 95, 168); pdf.line(L, y + 2, R, y + 2);
+    y += 9;
+  };
+
+  noms.forEach(classe => {
+    const c = classes.get(classe);
+    if (!premiere) {
+      if (pdf.getNumberOfPages() % 2 === 1) pdf.addPage();   // verso laissé blanc : la classe suivante démarre sur un recto
+      pdf.addPage();
+    }
+    premiere = false;
+    entete(classe, false);
+
+    pdf.setFillColor(228, 238, 248); pdf.roundedRect(L, y - 5, R - L, 24, 3, 3, "F");
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(20); pdf.setTextColor(26, 95, 168);
+    pdf.text(pdfNb(c.v), L + 6, y + 8);
+    pdf.text(pdfNb(c.q), 110, y + 8);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(9); pdf.setTextColor(45, 53, 97);
+    pdf.text("téléchargements (chapitres chargés)", L + 6, y + 14);
+    pdf.text("questions chargées", 110, y + 14);
+    y += 32;
+
+    if (!c.mat.size) {
+      pdf.setFontSize(11); pdf.setTextColor(90, 90, 90);
+      pdf.text("Aucune activité enregistrée sur cette période.", L, y);
+      return;
+    }
+    titresColonnes();
+    const mats = [...c.mat.entries()].sort((a, b) => b[1].v - a[1].v || a[0].localeCompare(b[0], "fr"));
+    mats.forEach(([nom, m]) => {
+      const besoin = INCLURE_CHAPITRES ? Math.min(2, m.chap.size) * 5.5 + 8 : 8;
+      if (y + besoin > BAS) { pdf.addPage(); entete(classe, true); titresColonnes(); }
+      pdf.setFont("helvetica", "bold"); pdf.setFontSize(11); pdf.setTextColor(26, 26, 46);
+      pdf.text(tronquer(libelle(nom), 95), L, y);
+      pdf.text(pdfNb(m.v), 128, y, { align: "right" });
+      pdf.text(c.v ? Math.round(m.v / c.v * 100) + " %" : "-", 150, y, { align: "right" });
+      pdf.text(pdfNb(m.q), R, y, { align: "right" });
+      y += 6;
+      if (INCLURE_CHAPITRES) {
+        [...m.chap.entries()].sort((a, b) => b[1].v - a[1].v).forEach(([chap, v]) => {
+          if (y + 5.5 > BAS) { pdf.addPage(); entete(classe, true); titresColonnes(); }
+          pdf.setFont("helvetica", "normal"); pdf.setFontSize(9); pdf.setTextColor(100, 100, 100);
+          pdf.text(tronquer(libelle(chap), 100), L + 5, y);
+          pdf.text(pdfNb(v.v), 128, y, { align: "right" });
+          pdf.text(pdfNb(v.q), R, y, { align: "right" });
+          y += 5.5;
+        });
+      }
+      y += 3;
+    });
+  });
+  return pdf;
+}
+
+async function exportPdfClasses() {
+  const msg = $("exportMessage"), btn = $("exportPdfButton");
+  clearMessage(msg);
+  const du = $("exportDu").value, au = $("exportAu").value;
+  if (!du || !au) return showMessage(msg, "Choisis une date de début et une date de fin.", "error-message");
+  if (au < du) return showMessage(msg, "La date de fin ne peut pas précéder la date de début.", "error-message");
+  btn.disabled = true; btn.textContent = "GÉNÉRATION...";
+  try {
+    const [JsPDF, snap] = await Promise.all([
+      chargerJsPdf(),
+      getDocs(query(collection(db, "activite"), where("jour", ">=", du), where("jour", "<=", au)))
+    ]);
+    const classes = agregerParClasse(snap.docs.map(d => d.data()));
+    if (!classes.size) { showMessage(msg, "Aucune activité sur cette période.", "info-message"); return; }
+    dessinerPdf(JsPDF, classes, du, au).save(`flash-connaissances-classes-${du}_${au}.pdf`);
+    showMessage(msg, `PDF généré : ${pluriel(classes.size, "classe")} (${pluriel(snap.size, "document")} lu${snap.size > 1 ? "s" : ""} dans Firestore).`, "success-message");
+  } catch (e) {
+    console.error(e);
+    showMessage(msg, "Impossible de générer le PDF.", "error-message");
+  } finally { btn.disabled = false; btn.textContent = "EXPORTER EN PDF"; }
 }
 
 /* ---------- Comptage et export CSV par matière ---------- */
@@ -751,6 +906,7 @@ $("refreshStatsButton").addEventListener("click", loadStats);
 $("refreshCountsButton").addEventListener("click", loadSubjectCounts);
 $("refreshActiviteButton").addEventListener("click", () => loadActivite(true));
 $("periodeSelect").addEventListener("change", () => loadActivite(false));
+$("exportPdfButton").addEventListener("click", exportPdfClasses);
 $("backToSubjectsButton").addEventListener("click", backToSubjects);
 
 $("cancelEditButton").addEventListener("click", closeEditModal);
@@ -773,6 +929,8 @@ onAuthStateChanged(auth, async user => {
     clearMessage($("loginMessage"));
     $("zoneChoixMatiere").style.display = "block";
     $("zoneGestionQuestions").style.display = "none";
+    $("exportDu").value = plageActivite("annee").debut;
+    $("exportAu").value = jourLocal(new Date());
     await Promise.all([loadStats(), loadSubjectCounts(), loadActivite()]);
   } else {
     $("loginCard").style.display = "block";
