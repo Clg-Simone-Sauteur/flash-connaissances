@@ -690,10 +690,15 @@
       QUESTION SUIVANTE
     </button>
 
+    <button id="arreter" type="button" hidden style="background:#777;color:white">
+      ARRÊTER LA SESSION
+    </button>
+
   </div>
 
 
   <p id="texteReponse" hidden></p>
+  <p id="etatChargement" role="status" aria-live="polite" style="color:#666;font-size:14px;margin-top:14px"></p>
 
 </div>
 
@@ -718,7 +723,10 @@
       collection,
       getDocs,
       query,
-      where
+      where,
+      orderBy,
+      limit,
+      startAfter
     } from
       "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -797,822 +805,291 @@
       document.getElementById("chronometre");
 
 
-    /*
-      ==========================================
-      VARIABLES DE SESSION
-      ==========================================
-    */
+    /* =========================================================
+       RÉVISION PAR LOTS — 2 QUESTIONS PAR MATIÈRE ET PAR TOUR
+       ========================================================= */
+
+    // Libellés identiques à ceux d'ajouter-simone.html.
+    const MATIERES = [
+      "Mathématiques", "Français", "Histoire, géographie et Emc",
+      "Anglais", "Espagnol", "Allemand", "Physique-chimie",
+      "SVT", "Technologie", "EPS", "Arts plastiques",
+      "Éducation musicale", "EMI", "Latin", "Enseignement professionnel"
+    ];
+    const TAILLE_LOT = 30;
+    const SEUIL_PRECHARGEMENT = 5;
+    const boutonArreter = document.getElementById("arreter");
+    const etatChargement = document.getElementById("etatChargement");
 
     let questions = [];
-
     let questionActuelle = null;
-
     let numeroQuestion = 0;
-
-    const nombreQuestionsSession = 6;
-
-
-    /*
-      ==========================================
-      CHRONOMÈTRE
-      ==========================================
-    */
-
+    let classeSession = "";
+    let etatsMatieres = new Map();
+    let identifiantsRecus = new Set();
+    let chargementEnCours = null;
+    let toutEpuise = false;
+    let generationSession = 0;
     let tempsDebut = null;
-
     let chronometre = null;
 
-
-    /*
-      ==========================================
-      MISE À JOUR DU CHRONOMÈTRE
-      ==========================================
-    */
-
     function mettreAJourChronometre() {
-
-      if (!tempsDebut) {
-        return;
-      }
-
-      const maintenant =
-        Date.now();
-
-      const secondesEcoulees =
-        Math.floor(
-          (maintenant - tempsDebut) / 1000
-        );
-
-
-      const minutes =
-        Math.floor(
-          secondesEcoulees / 60
-        );
-
-
-      const secondes =
-        secondesEcoulees % 60;
-
-
+      if (!tempsDebut) return;
+      const ecoulees = Math.floor((Date.now() - tempsDebut) / 1000);
       zoneChronometre.textContent =
-        String(minutes).padStart(2, "0")
-        + ":"
-        + String(secondes).padStart(2, "0");
-
+        String(Math.floor(ecoulees / 60)).padStart(2, "0") + ":" +
+        String(ecoulees % 60).padStart(2, "0");
     }
-
-
-    /*
-      ==========================================
-      MELANGE ALÉATOIRE
-      ==========================================
-    */
 
     function melanger(tableau) {
-
-      const copie =
-        [...tableau];
-
-
-      for (
-        let i = copie.length - 1;
-        i > 0;
-        i--
-      ) {
-
-        const j =
-          Math.floor(
-            Math.random() * (i + 1)
-          );
-
-
-        [
-          copie[i],
-          copie[j]
-        ] = [
-          copie[j],
-          copie[i]
-        ];
-
+      const copie = [...tableau];
+      for (let i = copie.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copie[i], copie[j]] = [copie[j], copie[i]];
       }
-
-
       return copie;
-
     }
 
-
-    /*
-      ==========================================
-      DATE DE LA QUESTION
-      ==========================================
-    */
-
-    function obtenirTempsDate(question) {
-
-      if (!question.date) {
-        return 0;
-      }
-
-
-      if (
-        typeof question.date.toMillis ===
-        "function"
-      ) {
-
-        return question.date.toMillis();
-
-      }
-
-
-      if (question.date.seconds) {
-
-        return question.date.seconds * 1000;
-
-      }
-
-
-      return 0;
-
+    function obtenirTempsDate(q) {
+      if (q.date && typeof q.date.toMillis === "function") return q.date.toMillis();
+      return q.date && q.date.seconds ? q.date.seconds * 1000 : 0;
     }
 
-
-    /*
-      ==========================================
-      TIRAGE PONDÉRÉ EN FAVEUR DES QUESTIONS
-      LES PLUS RÉCENTES
-      ==========================================
-
-      La liste reçue est triée de la plus
-      récente à la plus ancienne.
-
-      Toutes les questions restent disponibles.
-
-      Les plus récentes ont simplement davantage
-      de chances d'être choisies.
-
-      Exemple avec 5 questions :
-
-        plus récente  → poids 5
-        2e            → poids 4
-        3e            → poids 3
-        4e            → poids 2
-        plus ancienne → poids 1
-
-      Le tirage se fait sans remise.
-    */
-
-    function tirerQuestionsRecentes(
-      liste,
-      nombre
-    ) {
-
-      const disponibles =
-        [...liste];
-
-
-      const selection =
-        [];
-
-
-      for (
-        let i = 0;
-        i < nombre;
-        i++
-      ) {
-
-        let poidsTotal = 0;
-
-
-        for (
-          let j = 0;
-          j < disponibles.length;
-          j++
-        ) {
-
-          poidsTotal +=
-            disponibles.length - j;
-
+    // Mélange équilibré : 2 faciles, 2 moyennes et 2 difficiles dans
+    // les six premières, si le contenu du lot le permet.
+    // Les autres questions sont également alternées entre matières.
+    function organiserLot(lot, matierePrecedente = "") {
+      const reste = [...lot];
+      const ordre = [];
+      const quotas = { facile: 2, moyenne: 2, difficile: 2 };
+      let precedente = matierePrecedente;
+      while (reste.length) {
+        let candidats = reste.filter(q => q.matiere !== precedente);
+        if (!candidats.length) candidats = reste;
+        if (ordre.length < 6) {
+          const niveaux = Object.keys(quotas).filter(n => quotas[n] > 0);
+          const possibles = candidats.filter(q => niveaux.includes(q.difficulte));
+          if (possibles.length) candidats = possibles;
         }
-
-
-        let tirage =
-          Math.random() * poidsTotal;
-
-
-        let indexChoisi = 0;
-
-
-        for (
-          let j = 0;
-          j < disponibles.length;
-          j++
-        ) {
-
-          tirage -=
-            disponibles.length - j;
-
-
-          if (tirage <= 0) {
-
-            indexChoisi = j;
-
-            break;
-
-          }
-
-        }
-
-
-        selection.push(
-          disponibles[indexChoisi]
-        );
-
-
-        disponibles.splice(
-          indexChoisi,
-          1
-        );
-
+        // À égalité, favoriser les matières encore les plus représentées
+        // pour réduire les répétitions en fin de lot.
+        const effectifs = new Map();
+        for (const q of reste) effectifs.set(q.matiere, (effectifs.get(q.matiere) || 0) + 1);
+        const maximum = Math.max(...candidats.map(q => effectifs.get(q.matiere)));
+        candidats = candidats.filter(q => effectifs.get(q.matiere) === maximum);
+        // Petit tirage aléatoire parmi les candidats pour varier les séances.
+        const choix = candidats[Math.floor(Math.random() * candidats.length)];
+        ordre.push(choix);
+        reste.splice(reste.indexOf(choix), 1);
+        if (ordre.length <= 6 && quotas[choix.difficulte] > 0) quotas[choix.difficulte]--;
+        precedente = choix.matiere;
       }
-
-
-      return selection;
-
+      return ordre;
     }
 
-
-    /*
-      ==========================================
-      CONSTRUIRE LES 6 QUESTIONS DE LA SESSION
-      ==========================================
-
-      2 faciles
-      2 moyennes
-      2 difficiles
-
-      Puis mélange complet des 6 questions.
-    */
-
-    function construireSession(
-      toutesLesQuestions
-    ) {
-
-      const faciles =
-        toutesLesQuestions.filter(
-          (question) =>
-            question.difficulte === "facile"
-        );
-
-
-      const moyennes =
-        toutesLesQuestions.filter(
-          (question) =>
-            question.difficulte === "moyenne"
-        );
-
-
-      const difficiles =
-        toutesLesQuestions.filter(
-          (question) =>
-            question.difficulte === "difficile"
-        );
-
-
-      /*
-        Les 6 premières questions constituent
-        la session équilibrée :
-          2 faciles
-          2 moyennes
-          2 difficiles
-
-        On vérifie le nombre TOTAL de questions
-        disponibles dans chaque difficulté.
-      */
-
-      if (faciles.length < 2) {
-
-        throw new Error(
-          "Il n'y a pas assez de questions faciles pour commencer la session. ("
-          + faciles.length
-          + "/2 disponibles)"
-        );
-
-      }
-
-
-      if (moyennes.length < 2) {
-
-        throw new Error(
-          "Il n'y a pas assez de questions de difficulté moyenne pour commencer la session. ("
-          + moyennes.length
-          + "/2 disponibles)"
-        );
-
-      }
-
-
-      if (difficiles.length < 2) {
-
-        throw new Error(
-          "Il n'y a pas assez de questions difficiles pour commencer la session. ("
-          + difficiles.length
-          + "/2 disponibles)"
-        );
-
-      }
-
-
-      /*
-        Tirage des 6 premières questions.
-
-        Les listes étant triées de la plus récente
-        à la plus ancienne, les questions récentes
-        sont favorisées sans exclure les anciennes.
-      */
-
-      const selectionFaciles =
-        tirerQuestionsRecentes(
-          faciles,
-          2
-        );
-
-
-      const selectionMoyennes =
-        tirerQuestionsRecentes(
-          moyennes,
-          2
-        );
-
-
-      const selectionDifficiles =
-        tirerQuestionsRecentes(
-          difficiles,
-          2
-        );
-
-
-      /*
-        Les 6 premières sont mélangées pour
-        mélanger également les niveaux de difficulté.
-      */
-
-      let premiereSerie = melanger([
-        ...selectionFaciles,
-        ...selectionMoyennes,
-        ...selectionDifficiles
-      ]);
-
-
-      /*
-        On retire les 6 questions déjà utilisées.
-        Les questions restantes serviront ensuite
-        automatiquement à poursuivre la révision.
-
-        Elles restent classées de la plus récente
-        à la plus ancienne : l'élève continue donc
-        avec des questions progressivement plus anciennes,
-        jusqu'à épuisement de toute la base de la classe.
-      */
-
-      const idsDejaUtilises =
-        new Set(
-          premiereSerie.map(
-            (question) => question.id
-          )
-        );
-
-
-      const questionsRestantes =
-        toutesLesQuestions
-          .filter(
-            (question) =>
-              !idsDejaUtilises.has(question.id)
-          )
-          .sort(
-            (a, b) =>
-              obtenirTempsDate(b)
-              -
-              obtenirTempsDate(a)
-          );
-
-
-      /*
-        La session complète contient donc :
-          1. les 6 premières questions équilibrées ;
-          2. toutes les autres questions actives
-             de la classe, sans répétition.
-      */
-
-      return [
-        ...premiereSerie,
-        ...questionsRestantes
+    // Une requête Firestore ne récupère jamais plus de deux documents
+    // pour une matière à un passage donné.
+    async function recupererPourMatiere(matiere, nombre, generation) {
+      const etat = etatsMatieres.get(matiere);
+      if (!etat || etat.epuise || nombre <= 0) return [];
+      const contraintes = [
+        where("classe", "==", classeSession),
+        where("statut", "==", "active"),
+        where("matiere", "==", matiere),
+        orderBy("date", "desc"),
+        limit(nombre)
       ];
-
+      if (etat.curseur) contraintes.push(startAfter(etat.curseur));
+      const resultat = await getDocs(query(collection(db, "questions"), ...contraintes));
+      if (generation !== generationSession) return [];
+      if (resultat.docs.length) etat.curseur = resultat.docs[resultat.docs.length - 1];
+      if (resultat.docs.length < nombre) etat.epuise = true;
+      return resultat.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-
-    /*
-      ==========================================
-      DÉMARRAGE DE LA SESSION
-      ==========================================
-    */
-
-    boutonLancer.addEventListener(
-      "click",
-      async () => {
-
-        const classeChoisie =
-          selectClasse.value;
-
-
-        if (!classeChoisie) {
-
-          zoneQuestion.textContent =
-            "Veuillez choisir une classe.";
-
-          boutonReponse.hidden = true;
-
-          boutonSuivante.hidden = true;
-
-          zoneReponse.hidden = true;
-
-          zoneMatiere.hidden = true;
-
-          return;
-
+    async function chargerLot(generation) {
+      const lot = [];
+      // Deux questions par matière et par passage, puis nouveau passage
+      // si moins de quinze matières disposent de questions.
+      while (lot.length < TAILLE_LOT) {
+        if (generation !== generationSession) return [];
+        const matieresDisponibles = melanger(MATIERES.filter(m => !etatsMatieres.get(m).epuise));
+        if (!matieresDisponibles.length) break;
+        let nouveaux = 0;
+        // Les requêtes d'un passage sont indépendantes et exécutées en parallèle.
+        const demandes = [];
+        let places = TAILLE_LOT - lot.length;
+        for (const matiere of matieresDisponibles) {
+          if (!places) break;
+          const nombre = Math.min(2, places);
+          demandes.push(recupererPourMatiere(matiere, nombre, generation));
+          places -= nombre;
         }
-
-
-        /*
-          Réinitialisation du chronomètre.
-        */
-
-        clearInterval(
-          chronometre
-        );
-
-
-        tempsDebut =
-          Date.now();
-
-
-        zoneChronometre.textContent =
-          "00:00";
-
-
-        chronometre =
-          setInterval(
-            mettreAJourChronometre,
-            1000
-          );
-
-
-        /*
-          On indique que les données sont
-          en cours de chargement.
-        */
-
-        boutonLancer.disabled = true;
-
-
-        zoneQuestion.textContent =
-          "Chargement des questions...";
-
-
-        boutonReponse.hidden = true;
-
-        boutonSuivante.hidden = true;
-
-        zoneReponse.hidden = true;
-
-        zoneMatiere.hidden = true;
-
-
-        try {
-
-          /*
-            Recherche de TOUTES les questions
-            de la classe choisie.
-
-            Les questions inactives seront
-            ensuite retirées.
-          */
-
-          const requete =
-            query(
-              collection(
-                db,
-                "questions"
-              ),
-              where(
-                "classe",
-                "==",
-                classeChoisie
-              )
-            );
-
-
-          const resultat =
-            await getDocs(
-              requete
-            );
-
-
-          /*
-            Récupération uniquement des questions
-            actives.
-          */
-
-          questions =
-            resultat.docs
-              .map(
-                (document) => ({
-
-                  id: document.id,
-
-                  ...document.data()
-
-                })
-              )
-              .filter(
-                (question) =>
-                  question.statut === "active"
-              );
-
-
-          /*
-            Tri de la plus récente à la plus
-            ancienne.
-          */
-
-          questions.sort(
-            (a, b) => {
-
-              return (
-                obtenirTempsDate(b)
-                -
-                obtenirTempsDate(a)
-              );
-
-            }
-          );
-
-
-          /*
-            Construction de la session :
-              2 faciles
-              2 moyennes
-              2 difficiles
-            puis mélange.
-          */
-
-          questions =
-            construireSession(
-              questions
-            );
-
-
-          /*
-            Première question.
-          */
-
-          numeroQuestion = 0;
-
-
-          afficherQuestion();
-
-
+        const resultats = await Promise.all(demandes);
+        if (generation !== generationSession) return [];
+        for (const resultat of resultats) {
+          for (const question of resultat) {
+            if (identifiantsRecus.has(question.id)) continue;
+            identifiantsRecus.add(question.id);
+            lot.push(question);
+            nouveaux++;
+          }
         }
-
-        catch (erreur) {
-
-          console.error(
-            "Erreur lors du chargement de la session :",
-            erreur
-          );
-
-
-          clearInterval(
-            chronometre
-          );
-
-
-          zoneQuestion.textContent =
-            erreur.message ||
-            "Une erreur est survenue lors du chargement des questions.";
-
-
-          boutonReponse.hidden = true;
-
-          boutonSuivante.hidden = true;
-
-          zoneReponse.hidden = true;
-
-          zoneMatiere.hidden = true;
-
-        }
-
-        finally {
-
-          boutonLancer.disabled = false;
-
-        }
-
+        if (!nouveaux) break;
       }
-    );
+      toutEpuise = MATIERES.every(m => etatsMatieres.get(m).epuise);
+      const precedente = questions.length ? questions[questions.length - 1].matiere : "";
+      return organiserLot(lot, precedente);
+    }
 
+    function preparerLotSuivant() {
+      if (chargementEnCours || toutEpuise || !classeSession) return chargementEnCours;
+      const generation = generationSession;
+      etatChargement.textContent = "Préparation des prochaines questions…";
+      const promesse = chargerLot(generation)
+        .then(lot => {
+          if (generation !== generationSession) return;
+          questions.push(...lot);
+          if (!lot.length) toutEpuise = true;
+          etatChargement.textContent = lot.length
+            ? `${questions.length} questions préparées pour cette séance.`
+            : "Toutes les questions disponibles ont été chargées.";
+        })
+        .catch(erreur => {
+          if (generation !== generationSession) return;
+          console.error("Erreur de pagination Firebase :", erreur);
+          etatChargement.textContent = "Chargement interrompu. Réessayez avec QUESTION SUIVANTE. " + (erreur.message || "");
+          throw erreur;
+        })
+        .finally(() => {
+          if (generation === generationSession) chargementEnCours = null;
+        });
+      chargementEnCours = promesse;
+      return promesse;
+    }
 
-    /*
-      ==========================================
-      AFFICHER LA QUESTION COURANTE
-      ==========================================
-    */
+    function terminerSession(message = "Session terminée !") {
+      generationSession++;
+      clearInterval(chronometre);
+      chronometre = null;
+      tempsDebut = null;
+      classeSession = "";
+      chargementEnCours = null;
+      questionActuelle = null;
+      zoneChronometre.textContent = "TERMINÉ";
+      zoneQuestion.textContent = message;
+      zoneMatiere.hidden = true;
+      zoneReponse.hidden = true;
+      boutonReponse.hidden = true;
+      boutonSuivante.hidden = true;
+      boutonArreter.hidden = true;
+      boutonLancer.disabled = false;
+      etatChargement.textContent = "";
+    }
 
     function afficherQuestion() {
-
-      if (
-        numeroQuestion >=
-        questions.length
-      ) {
-
-        terminerSession();
-
-        return;
-
-      }
-
-
-      questionActuelle =
-        questions[numeroQuestion];
-
-
-      /*
-        Affichage de la matière.
-      */
-
-      zoneMatiere.textContent =
-        questionActuelle.matiere ||
-        "";
-
-
-      zoneMatiere.hidden = false;
-
-
-      /*
-        Affichage de la question.
-      */
-
-      zoneQuestion.textContent =
-        questionActuelle.question ||
-        "Question non renseignée";
-
-
-      /*
-        Réinitialisation de la réponse.
-      */
-
-      zoneReponse.textContent =
-        "";
-
-
-      zoneReponse.hidden = true;
-
-
-      /*
-        Bouton réponse visible.
-      */
-
-      boutonReponse.hidden = false;
-
-
-      /*
-        Le bouton suivant reste caché tant
-        que l'élève n'a pas demandé la réponse.
-      */
-
-      boutonSuivante.hidden = true;
-
-
-      /*
-        Dernière question :
-        le bouton indiquera "TERMINER".
-      */
-
-      if (
-        numeroQuestion ===
-        5
-      ) {
-
-        boutonSuivante.textContent =
-          "TERMINER LA SESSION";
-
-      }
-
-      else {
-
-        boutonSuivante.textContent =
-          "QUESTION SUIVANTE";
-
-      }
-
-    }
-
-
-    /*
-      ==========================================
-      AFFICHER LA RÉPONSE
-      ==========================================
-    */
-
-    boutonReponse.addEventListener(
-      "click",
-      () => {
-
-        if (!questionActuelle) {
-
-          return;
-
+      if (numeroQuestion >= questions.length) {
+        if (toutEpuise) {
+          terminerSession("Session terminée ! Toutes les questions disponibles ont été parcourues.");
         }
-
-
-        zoneReponse.textContent =
-          questionActuelle.reponse ||
-          "Réponse non renseignée";
-
-
-        zoneReponse.hidden = false;
-
-
-        boutonReponse.hidden = true;
-
-
-        boutonSuivante.hidden = false;
-
+        return;
       }
-    );
-
-
-    /*
-      ==========================================
-      QUESTION SUIVANTE
-      ==========================================
-    */
-
-    boutonSuivante.addEventListener(
-      "click",
-      () => {
-
-        numeroQuestion++;
-
-
-        afficherQuestion();
-
-      }
-    );
-
-
-    /*
-      ==========================================
-      FIN DE SESSION
-      ==========================================
-    */
-
-    function terminerSession() {
-
-      clearInterval(
-        chronometre
-      );
-
-
-      questionActuelle =
-        null;
-
-
-      zoneChronometre.textContent =
-        "TERMINÉ";
-
-
-      zoneQuestion.textContent =
-        "Bravo ! Vous avez épuisé toutes les questions disponibles pour cette classe.";
-
-
-      zoneMatiere.hidden = true;
-
-
+      questionActuelle = questions[numeroQuestion];
+      zoneMatiere.textContent = questionActuelle.matiere || "";
+      zoneMatiere.hidden = false;
+      zoneQuestion.textContent = questionActuelle.question || "Question non renseignée";
+      zoneReponse.textContent = "";
       zoneReponse.hidden = true;
-
-
-      boutonReponse.hidden = true;
-
-
+      boutonReponse.hidden = false;
       boutonSuivante.hidden = true;
-
-
-      boutonLancer.disabled = false;
-
+      boutonSuivante.textContent = "QUESTION SUIVANTE";
+      if (questions.length - numeroQuestion - 1 <= SEUIL_PRECHARGEMENT && !toutEpuise) {
+        // Ne bloque pas la question affichée : chargement en arrière-plan.
+        preparerLotSuivant()?.catch(() => {});
+      }
     }
 
+    boutonLancer.addEventListener("click", async () => {
+      const classe = selectClasse.value;
+      if (!classe) {
+        zoneQuestion.textContent = "Veuillez choisir une classe.";
+        return;
+      }
+      // Invalide les chargements d'une éventuelle séance précédente.
+      generationSession++;
+      const generation = generationSession;
+      clearInterval(chronometre);
+      tempsDebut = null;
+      zoneChronometre.textContent = "00:00";
+      questions = [];
+      questionActuelle = null;
+      numeroQuestion = 0;
+      classeSession = classe;
+      identifiantsRecus = new Set();
+      etatsMatieres = new Map(MATIERES.map(m => [m, { curseur: null, epuise: false }]));
+      toutEpuise = false;
+      chargementEnCours = null;
+      boutonLancer.disabled = true;
+      boutonReponse.hidden = true;
+      boutonSuivante.hidden = true;
+      boutonArreter.hidden = false;
+      zoneReponse.hidden = true;
+      zoneMatiere.hidden = true;
+      zoneQuestion.textContent = "Chargement des 30 premières questions…";
+      try {
+        await preparerLotSuivant();
+        if (generation !== generationSession) return;
+        if (!questions.length) {
+          terminerSession("Aucune question active disponible pour cette classe.");
+          return;
+        }
+        tempsDebut = Date.now();
+        chronometre = setInterval(mettreAJourChronometre, 1000);
+        afficherQuestion();
+      } catch (erreur) {
+        if (generation !== generationSession) return;
+        console.error("Erreur lors du démarrage :", erreur);
+        terminerSession("Impossible de charger les questions. Vérifiez les index et les règles Firebase.");
+        etatChargement.textContent = erreur.message || "Erreur Firebase";
+      }
+    });
+
+    boutonReponse.addEventListener("click", () => {
+      if (!questionActuelle) return;
+      zoneReponse.textContent = questionActuelle.reponse || "Réponse non renseignée";
+      zoneReponse.hidden = false;
+      boutonReponse.hidden = true;
+      boutonSuivante.hidden = false;
+    });
+
+    boutonSuivante.addEventListener("click", async () => {
+      if (!questionActuelle) return;
+      boutonSuivante.disabled = true;
+      try {
+        if (numeroQuestion + 1 >= questions.length && !toutEpuise) {
+          zoneQuestion.textContent = "Chargement des questions suivantes…";
+          await (chargementEnCours || preparerLotSuivant());
+        }
+        if (!classeSession) return;
+        if (numeroQuestion + 1 >= questions.length) {
+          terminerSession("Session terminée ! Toutes les questions disponibles ont été parcourues.");
+          return;
+        }
+        numeroQuestion++;
+        afficherQuestion();
+      } catch (erreur) {
+        if (classeSession) {
+          zoneQuestion.textContent = "Chargement impossible. Cliquez sur QUESTION SUIVANTE pour réessayer.";
+          boutonSuivante.hidden = false;
+        }
+      } finally {
+        boutonSuivante.disabled = false;
+      }
+    });
+
+    boutonArreter.addEventListener("click", () => {
+      terminerSession(`Session terminée ! ${questionActuelle ? numeroQuestion + 1 : 0} question(s) parcourue(s).`);
+    });
 
   </script>
 
