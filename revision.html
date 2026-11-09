@@ -701,6 +701,39 @@ async function startChapter(){
 /*
  * AFFICHAGE DES QUESTIONS
  */
+// Transforme uniquement les adresses HTTP(S) en liens sûrs.
+// Le reste du contenu demeure du texte, jamais du HTML interprété.
+function afficherTexteAvecLiens(element, valeur){
+  const texte=String(valeur??"");
+  element.replaceChildren();
+  const motif=/https?:\/\/[^\s<>"']+/gi;
+  let debut=0;
+  for(const correspondance of texte.matchAll(motif)){
+    const position=correspondance.index;
+    element.append(document.createTextNode(texte.slice(debut,position)));
+    const brut=correspondance[0];
+    const url=brut.replace(/[.,;:!?)}\]]+$/g,"");
+    const ponctuation=brut.slice(url.length);
+    try{
+      const adresse=new URL(url);
+      if(adresse.protocol!=="http:"&&adresse.protocol!=="https:")throw new Error("Protocole non autorisé");
+      const lien=document.createElement("a");
+      lien.href=adresse.href;
+      lien.target="_blank";
+      lien.rel="noopener noreferrer";
+      lien.textContent=url;
+      lien.style.color="var(--blue)";
+      lien.style.textDecoration="underline";
+      element.append(lien);
+    }catch(_){
+      element.append(document.createTextNode(url));
+    }
+    element.append(document.createTextNode(ponctuation));
+    debut=position+brut.length;
+  }
+  element.append(document.createTextNode(texte.slice(debut)));
+}
+
 function afficherQuestion(){
   if(indexQuestion>=questionsChapitre.length){
     $("questionText").textContent=
@@ -722,8 +755,9 @@ function afficherQuestion(){
   $("compteur").textContent=
     (indexQuestion+1)+" / "+questionsChapitre.length;
 
-  $("questionText").textContent=
-    questionActuelle.question||"Question sans texte";
+  afficherTexteAvecLiens(
+    $("questionText"),questionActuelle.question||"Question sans texte"
+  );
 
   $("texteReponse").textContent="";
   $("texteReponse").classList.add("hidden");
@@ -735,8 +769,9 @@ function afficherQuestion(){
 $("voirReponse").addEventListener("click",()=>{
   if(!questionActuelle)return;
 
-  $("texteReponse").textContent=
-    questionActuelle.reponse||"Aucune réponse renseignée.";
+  afficherTexteAvecLiens(
+    $("texteReponse"),questionActuelle.reponse||"Aucune réponse renseignée."
+  );
 
   $("texteReponse").classList.remove("hidden");
   $("voirReponse").classList.add("hidden");
