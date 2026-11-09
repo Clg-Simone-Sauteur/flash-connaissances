@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyberharcèlement — Simulateur de conversations</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b1224;
+    --surface: #141e35;
+    --light: #eaf3ff;
+    --dim: #9baac6;
+    --accent: #8ca5ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--light); font-family: Inter, "Segoe UI", Arial, sans-serif; }
+  button { font: inherit; }
+  button:focus-visible { outline: 3px solid #fff6ae; outline-offset: 3px; }
+  .backdrop { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; background:
+    radial-gradient(ellipse 45% 75% at 74% 45%, #283d80b3 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 9% 86%, #13375980 0%, transparent 75%),
+    linear-gradient(130deg, #0b1224, #0d162c 60%, #090f20); }
+  .backdrop::before { content:""; position:absolute; inset:0; background-image: radial-gradient(#b1c4ff23 1px,transparent 1px); background-size: 28px 28px; mask-image: linear-gradient(90deg,transparent 20%,#000 100%); }
+  .topbar { position:absolute; top:0; left:0; z-index:2; height:68px; width:60%; padding:0 max(24px,calc((100vw - 1430px)/2)); display:flex; justify-content:flex-start; align-items:center; gap:20px; }
+  .brand { display:flex; align-items:center; gap: 12px; font-size: 14px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+  .brandmark { width: 40px; height: 40px; display:grid; place-items:center; border-radius: 13px; color:#fff; background: linear-gradient(135deg,#5d7cec,#9e77e9); box-shadow:0 8px 24px #586cde35; }
+  .brandmark svg { width: 23px; height: 23px; }
+  .course-tag { display:none; }
+  .layout { max-width:1500px; margin:auto; padding:16px 34px; min-height:100vh; min-height:100dvh; display:grid; grid-template-columns:minmax(360px,1fr) minmax(365px,545px); gap:clamp(24px,4vw,80px); align-items:center; }
+  .info { max-width:650px; align-self:center; padding-top:42px; }
+  .eyebrow { color:#9ab3ff; text-transform:uppercase; font-weight:800; letter-spacing:.19em; font-size:12px; display:flex; gap:11px; align-items:center; margin-bottom:20px; }
+  .eyebrow::before { content:""; display:inline-block; width:28px; height:2px; border-radius:2px; background:#9ab3ff; }
+  .info h1 { font-size:clamp(36px,4.3vw,68px); line-height:1.08; letter-spacing:-.055em; margin:0 0 24px; max-width:670px; }
+  .info h1 em { font-style:normal; background:linear-gradient(105deg,#e7edff,#8ea7ff); background-clip:text; color:transparent; }
+  .description { color:#b1bfd9; font-size:clamp(16px,1.35vw,19px); line-height:1.65; margin:0 0 34px; max-width:530px; }
+  .statuspanel { background:linear-gradient(130deg,#ffffff0d,#ffffff06); border:1px solid #ffffff24; border-radius:20px; padding:19px 22px; max-width:530px; box-shadow:0 12px 36px #00000017; }
+  .statusrow { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; font-weight:700; color:#dce6ff; }
+  .statusrow .dim { color:#a6b5ce; font-weight:500; }
+  .track { margin:14px 0 12px; height:6px; border-radius:8px; background:#ffffff24; overflow:hidden; }
+  .track-fill { height:100%; width:0%; border-radius:8px; background:linear-gradient(90deg,#6789ff,#b3a4ff); transition:width .28s ease; }
+  .playstate { color:#91a6ca; font-size:12px; min-height:18px; }
+  .controls { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; max-width:550px; }
+  .btn { display:inline-flex; justify-content:center; align-items:center; gap:8px; min-height:45px; border-radius:12px; border:1px solid #ffffff2c; padding:10px 16px; cursor:pointer; color:#ecf2ff; background:#ffffff12; font-weight:700; font-size:14px; transition:background .15s, transform .15s; }
+  .btn:hover:not(:disabled) { background:#ffffff22; transform:translateY(-1px); }
+  .btn:disabled { opacity:.37; cursor:not-allowed; }
+  .btn.primary { background:#91a7ff; color:#101933; border-color:#b2c0ff; }
+  .btn.primary:hover:not(:disabled) { background:#b5c3ff; }
+  .btn svg { width:17px; height:17px; flex:0 0 17px; }
+  .subnav { margin-top:24px; display:flex; align-items:center; gap:12px; }
+  .subnav .btn { min-width:118px; }
+  .slide-number { min-width:65px; color:#c8d4ee; font-size:14px; font-weight:700; text-align:center; font-variant-numeric:tabular-nums; }
+  .hint { margin-top:23px; font-size:13px; color:#8295b7; line-height:1.6; }
+  .phone-area { display:grid; place-items:center; min-width:0; }
+  .phone { width:min(100%,calc((100dvh - 32px) * .51),535px); height:calc(100dvh - 32px); min-height:0; padding:8px; border-radius:48px; background:linear-gradient(126deg,#8291ad 0%,#222c41 13%,#060d1b 45%,#63738d 88%,#192136 100%); border:2px solid #6c7891; box-shadow: 0 0 0 2px #07101f, 0 0 0 5px #5d6d8c55, 0 22px 50px #030612a6, 0 46px 100px #02040c7a; position:relative; }
+  .phone::before { content:""; position:absolute; top:120px; left:-5px; width:4px; height:64px; background:#3c4965; border-radius:3px 0 0 3px; box-shadow:0 78px #3c4965; }
+  .phone::after { content:""; position:absolute; top:150px; right:-5px; width:4px; height:83px; background:#3c4965; border-radius:0 3px 3px 0; }
+  .screen { height:100%; border-radius:39px; overflow:hidden; display:flex; flex-direction:column; position:relative; color:#25314b; background:#f0f4fc; }
+  .screen::after { content:""; position:absolute; inset:0; pointer-events:none; border:1px solid #ffffff68; border-radius:39px; z-index:10; }
+  .sysbar { background:#ffffff; height:38px; flex:0 0 38px; display:flex; align-items:center; justify-content:space-between; padding:0 23px; position:relative; font-size:12px; font-weight:800; color:#19243a; }
+  .island { position:absolute; top:0; left:50%; transform:translateX(-50%); width:110px; height:26px; background:#070d18; border-radius:0 0 17px 17px; }
+  .island::after { content:""; position:absolute; top:9px; right:18px; width:7px; height:7px; border-radius:50%; background:#263d6c; box-shadow:inset 0 0 2px #bcd1ff; }
+  .signals { display:flex; align-items:center; gap:5px; }
+  .signals svg { width:17px; height:13px; }
+  .chatheader { background:#fff; min-height:70px; padding:10px 12px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #e3e8f2; z-index:1; }
+  .back { font-size:33px; font-weight:300; color:#5c74e1; line-height:1; margin-top:-3px; }
+  .groupavatar { flex:0 0 43px; height:43px; width:43px; border-radius:50%; background:linear-gradient(135deg,#6786e5,#ad82dd); display:grid;place-items:center; font-size:20px; color:#fff; box-shadow:0 3px 8px #516cc247; }
+  .groupname { min-width:0; flex:1; }
+  .groupname strong { font-size:clamp(14px,1.75dvh,19px); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .groupname span { display:block; color:#8a96aa; font-size:clamp(11px,1.25dvh,14px); margin-top:3px; }
+  .more { color:#657ce4; font-weight:900; font-size:22px; letter-spacing:2px; }
+  .chatbody { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:14px 12px 18px; background:
+    radial-gradient(circle at 25% 20%,#fff8 0%,transparent 40%),
+    linear-gradient(165deg,#eaf2fc,#f5f6fd 48%,#e8eff9); scrollbar-width:thin; scrollbar-color:#bdc9df transparent; }
+  .day { color:#8897ad; text-align:center; font-size:11px; font-weight:700; background:#ffffff98; border-radius:99px; padding:5px 12px; width:max-content; max-width:90%; margin:0 auto 17px; }
+  .message { display:flex; gap:7px; align-items:flex-end; max-width:100%; margin:9px 0; animation:pop .35s cubic-bezier(.18,.9,.3,1.15) both; }
+  .message.right { justify-content:flex-end; }
+  .miniavatar { width:23px; height:23px; display:grid; place-items:center; border-radius:50%; background:#cdd9f7; color:#4963a4; font-size:10px; font-weight:800; flex:0 0 23px; }
+  .balloon { max-width:83%; min-width:54px; padding:clamp(9px,1.3dvh,14px) clamp(11px,1.3dvh,15px); border-radius:16px 16px 16px 4px; background:#fff; box-shadow:0 2px 5px #1b33560a; font-size:clamp(14px,1.85dvh,20px); line-height:1.4; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .message.right .balloon { background:#cbd9ff; border-radius:16px 16px 4px 16px; }
+  .sender { font-size:clamp(10px,1.25dvh,14px); font-weight:800; color:#667eab; margin-bottom:4px; }
+  .message.right .sender { color:#526fbd; }
+  .typing-label { color:#7286a8; font-size:10px; font-weight:700; margin:0 0 5px 31px; }
+  .typingdots { display:flex; gap:4px; align-items:center; width:max-content; background:#fff; padding:12px 14px; border-radius:16px 16px 16px 4px; margin-left:31px; box-shadow:0 2px 7px #14213d10; }
+  .typingdots i { height:6px; width:6px; border-radius:50%; background:#8da1c7; animation:dot 1.1s ease-in-out infinite; }
+  .typingdots i:nth-child(2) { animation-delay:.17s; }
+  .typingdots i:nth-child(3) { animation-delay:.34s; }
+  .typing { margin:14px 0 8px; }
+  .compose { background:#fff; display:flex; align-items:center; gap:9px; padding:10px 12px 8px; border-top:1px solid #e3e9f2; }
+  .plus { border:1px solid #8ea1ca; color:#667fae; display:grid;place-items:center; height:25px;width:25px;flex:0 0 25px;border-radius:50%;font-size:20px;line-height:1; }
+  .inputfake { height:34px; min-width:0; flex:1; display:flex;align-items:center; padding:0 12px; border:1px solid #d7e0ee; border-radius:18px; color:#9aa6b8; font-size:13px; }
+  .send { background:#7a96ed; color:#fff; height:30px;width:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:50%;font-size:18px; }
+  .homebase { height:20px; flex:0 0 20px; background:white; display:grid;place-items:center; }
+  .homebase::before { content:""; width:112px; height:4px; border-radius:4px; background:#141b29; }
+  @keyframes pop { from{opacity:0; transform:translateY(12px) scale(.96)} to{opacity:1; transform:translateY(0) scale(1)} }
+  @keyframes dot { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
+  @media (max-width:880px) {
+    .topbar {position:relative; width:auto; height:70px; padding:0 20px;} .course-tag {display:none;}
+    .layout { min-height:0; grid-template-columns:1fr; gap:32px; padding:28px 18px 48px; }
+    .info { max-width:650px; margin:auto; width:100%; padding-top:0; } .info h1 {font-size:clamp(34px,7vw,56px);margin-bottom:14px;} .description{margin-bottom:20px;}
+    .phone {width:min(100%,calc((100dvh - 36px)*.51),440px); height:min(760px,calc(100dvh - 36px)); min-height:500px;}
+    .phone-area {margin:0 auto;width:100%;} .controls{margin-top:18px;} .hint{margin-top:15px;}
+  }
+  @media (max-width:450px) {
+    .topbar {height:65px;} .brand {font-size:11px;letter-spacing:.07em;} .brandmark {width:36px;height:36px;}
+    .layout {padding:23px 12px 35px;gap:25px;} .info h1{font-size:36px;} .description{font-size:15px;}
+    .statuspanel{padding:15px;} .btn{padding:9px 12px;font-size:13px;min-height:42px;} .subnav{gap:6px;} .subnav .btn{min-width:96px;}
+    .phone {width:min(100%,358px); min-height:510px;height:600px;}
+  }
+  @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }
+  @media print {body{background:white;color:black}.backdrop,.topbar,.controls,.subnav,.hint{display:none}.layout{display:block;padding:0}.info{display:none}.phone{box-shadow:none;border:3px solid #444;height:660px;margin:0 auto}.chatbody{overflow:visible}}
+</style>
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+<header class="topbar">
+  <div class="brand">
+    <div class="brandmark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3H13a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
+    </div>
+    Cyberharcèlement <span style="opacity:.4;font-weight:400">/</span> Conversations
+  </div>
+  <div class="course-tag">Support de projection · Situations fictives</div>
+</header>
+<main class="layout">
+  <section class="info" aria-label="Commandes de présentation">
+    <div class="eyebrow" id="situationLabel">Situation 01</div>
+    <h1 id="scenarioTitle">Les messages <em>racontent une histoire.</em></h1>
+    <p class="description">Les messages apparaissent un par un, comme dans une véritable conversation. Chaque nouvel échange arrive après <strong>3 secondes</strong>.</p>
+    <div class="statuspanel">
+      <div class="statusrow"><span>Déroulement de la conversation</span><span class="dim" id="messageCount">0 / 0 messages</span></div>
+      <div class="track" role="progressbar" aria-label="Progression des messages" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><div class="track-fill" id="progressFill"></div></div>
+      <div class="playstate" id="playState" role="status" aria-live="polite">Préparation de la conversation…</div>
+    </div>
+    <div class="controls">
+      <button type="button" class="btn primary" id="replayBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a9 9 0 1 1 2.6 6.4"/><path d="M3 4v7h7"/></svg>
+        Rejouer
+      </button>
+      <button type="button" class="btn" id="pauseBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5v14M16 5v14"/></svg>
+        <span id="pauseText">Pause</span>
+      </button>
+      <button type="button" class="btn" id="allBtn">Tout afficher</button>
+    </div>
+    <div class="subnav" aria-label="Navigation entre les situations">
+      <button type="button" class="btn" id="prevBtn">← Précédente</button>
+      <span class="slide-number" id="situationCount">01 / 02</span>
+      <button type="button" class="btn" id="nextBtn">Suivante →</button>
+    </div>
+    <p class="hint">Les situations sont ajoutées directement dans le code HTML, dans la section <strong>« SITUATIONS À MODIFIER »</strong>. Aucun compte, serveur ou connexion Internet n'est nécessaire.</p>
+  </section>
+
+  <section class="phone-area" aria-label="Simulation d'une messagerie sur smartphone">
+    <div class="phone">
+      <div class="screen">
+        <div class="sysbar"><span>9:41</span><div class="island" aria-hidden="true"></div><div class="signals" aria-hidden="true">
+          <svg viewBox="0 0 20 14"><path d="M2 11V8M6 11V6M10 11V4M14 11V2" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 20 14"><path d="M1 5q9-8 18 0M4 8q6-5 12 0M8 11q2-2 4 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 24 14"><rect x="1" y="1.5" width="19" height="11" rx="3" stroke="currentColor" fill="none" stroke-width="1.5"/><rect x="3" y="3.5" width="14" height="7" rx="1.3" fill="currentColor"/><path d="M22 5v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div></div>
+        <div class="chatheader">
+          <span class="back" aria-hidden="true">‹</span><div class="groupavatar" id="groupAvatar" aria-hidden="true">✦</div>
+          <div class="groupname"><strong id="groupName">Groupe de classe</strong><span id="participantCount">Messagerie · simulation</span></div>
+          <span class="more" aria-hidden="true">···</span>
+        </div>
+        <div class="chatbody" id="chatBody" aria-label="Messages de la conversation" aria-live="off">
+          <div class="day">Aujourd'hui</div>
+          <div id="messages"></div>
+          <div id="typingArea"></div>
+        </div>
+        <div class="compose" aria-hidden="true"><span class="plus">+</span><div class="inputfake">Message…</div><span class="send">↑</span></div>
+        <div class="homebase" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+"use strict";
+
+// ================================================================
+// SITUATIONS À MODIFIER : C'EST LA SEULE PARTIE À CHANGER.
+//
+// Chaque situation comprend :
+//   titre   : le titre affiché à gauche du smartphone
+//   groupe  : le nom de la conversation sur le smartphone
+//   messages: les messages affichés dans l'ordre
+//
+// Chaque message est écrit ainsi :
+//   ["Prénom", "Texte du message", "gauche"]
+// ou
+//   ["Prénom", "Texte du message", "droite"]
+//
+// Pour AJOUTER une situation : copier un bloc { ... },
+// le coller après le précédent, en les séparant par une virgule.
+// Les guillemets à l'intérieur d'un message doivent être écrits \".
+// ================================================================
+
+const situations = [
+  {
+    titre: "Une vidéo qui circule",
+    groupe: "Groupe de classe",
+    messages: [
+      ["Mathis", "J'ai retrouvé la vidéo de Sami en sport 😂", "gauche"],
+      ["Sami", "Ne la partage pas, je te l'ai déjà demandé.", "droite"],
+      ["Mathis", "Trop tard, je viens de l'envoyer au groupe !", "gauche"],
+      ["Léa", "Ce n'est pas drôle, Sami t'a demandé d'arrêter.", "gauche"],
+      ["Sami", "Vous pouvez la supprimer ? Je ne veux pas que tout le collège la voie.", "droite"],
+      ["Tom", "Elle est déjà dans deux autres groupes…", "gauche"]
+    ]
+  },
+  {
+    titre: "Un groupe qui exclut",
+    groupe: "Projet de classe",
+    messages: [
+      ["Jade", "On crée un nouveau groupe sans Léon ?", "gauche"],
+      ["Hugo", "Pourquoi ? Il fait aussi partie de notre équipe.", "droite"],
+      ["Jade", "Il nous énerve. Comme ça, il ne verra plus les infos.", "gauche"],
+      ["Lina", "Mais on doit préparer notre exposé tous ensemble.", "gauche"],
+      ["Jade", "On dira juste qu'on a oublié de l'ajouter…", "gauche"],
+      ["Hugo", "Non, ça revient à l'écarter exprès. Je ne suis pas d'accord.", "droite"]
+    ]
+  }
+
+  // COLLER UNE NOUVELLE SITUATION ICI, précédée d'une virgule.
+  // Exemple :
+  // ,{
+  //   titre: "Un autre exemple",
+  //   groupe: "Discussion privée",
+  //   messages: [
+  //     ["Lina", "Salut !", "gauche"],
+  //     ["Noé", "Bonjour !", "droite"]
+  //   ]
+  // }
+];
+
+// ================================================================
+// FIN DES SITUATIONS — ne pas modifier le code situé en dessous.
+// ================================================================
+
+const DELAI_ENTRE_MESSAGES = 3000; // 3 secondes (en millisecondes)
+const $ = (id) => document.getElementById(id);
+const elements = {
+  title: $("scenarioTitle"), label: $("situationLabel"),
+  group: $("groupName"), groupAvatar: $("groupAvatar"), participants: $("participantCount"),
+  messages: $("messages"), typing: $("typingArea"), chat: $("chatBody"),
+  count: $("messageCount"), progress: $("progressFill"), progressTrack: $("progressTrack"),
+  state: $("playState"), pause: $("pauseBtn"), pauseText: $("pauseText"),
+  replay: $("replayBtn"), all: $("allBtn"), prev: $("prevBtn"), next: $("nextBtn"),
+  situationCount: $("situationCount")
+};
+let situationIndex = 0;
+let messageIndex = 0;
+let timer = null;
+let playing = false;
+let finished = false;
+
+function clearTimer() { if (timer !== null) { clearTimeout(timer); timer = null; } }
+function pad(num) { return String(num).padStart(2, "0"); }
+function letters(name) { return String(name).trim().slice(0, 1).toUpperCase() || "?"; }
+function currentSituation() { return situations[situationIndex]; }
+function scrollChat() { elements.chat.scrollTop = elements.chat.scrollHeight; }
+function updateProgress() {
+  const total = currentSituation().messages.length;
+  const percent = total ? Math.round((messageIndex / total) * 100) : 100;
+  elements.count.textContent = `${messageIndex} / ${total} messages`;
+  elements.progress.style.width = `${percent}%`;
+  elements.progressTrack.setAttribute("aria-valuenow", String(percent));
+}
+function updateControls() {
+  elements.pause.disabled = finished;
+  elements.all.disabled = finished;
+  elements.pauseText.textContent = playing ? "Pause" : "Reprendre";
+  elements.prev.disabled = situationIndex === 0;
+  elements.next.disabled = situationIndex === situations.length - 1;
+  elements.situationCount.textContent = `${pad(situationIndex + 1)} / ${pad(situations.length)}`;
+}
+function addMessage([author, text, side], animate = true) {
+  const isRight = side === "droite";
+  const row = document.createElement("div");
+  row.className = "message" + (isRight ? " right" : "");
+  if (!animate) row.style.animation = "none";
+  if (!isRight) {
+    const avatar = document.createElement("span");
+    avatar.className = "miniavatar";
+    avatar.textContent = letters(author);
+    avatar.setAttribute("aria-hidden", "true");
+    row.appendChild(avatar);
+  }
+  const bubble = document.createElement("div");
+  bubble.className = "balloon";
+  const sender = document.createElement("div");
+  sender.className = "sender";
+  sender.textContent = author;
+  const content = document.createElement("div");
+  content.textContent = text;
+  bubble.append(sender, content);
+  row.appendChild(bubble);
+  elements.messages.appendChild(row);
+  messageIndex += 1;
+  updateProgress();
+  scrollChat();
+}
+function showTyping() {
+  elements.typing.replaceChildren();
+  const next = currentSituation().messages[messageIndex];
+  if (!next) return;
+  const wrap = document.createElement("div");
+  wrap.className = "typing";
+  const who = document.createElement("div");
+  who.className = "typing-label";
+  who.textContent = `${next[0]} écrit…`;
+  const dots = document.createElement("div");
+  dots.className = "typingdots";
+  dots.setAttribute("aria-label", `${next[0]} écrit`);
+  for (let n = 0; n < 3; n++) dots.appendChild(document.createElement("i"));
+  wrap.append(who, dots);
+  elements.typing.appendChild(wrap);
+  scrollChat();
+}
+function stopPlayback() {
+  playing = false;
+  clearTimer();
+  elements.typing.replaceChildren();
+}
+function endPlayback() {
+  stopPlayback();
+  finished = true;
+  elements.state.textContent = "Conversation terminée · Vous pouvez la rejouer.";
+  updateControls();
+}
+function scheduleNext() {
+  if (!playing || finished) return;
+  if (messageIndex >= currentSituation().messages.length) { endPlayback(); return; }
+  showTyping();
+  elements.state.textContent = "Un nouveau message arrive…";
+  timer = setTimeout(() => {
+    timer = null;
+    if (!playing) return;
+    elements.typing.replaceChildren();
+    addMessage(currentSituation().messages[messageIndex]);
+    if (messageIndex >= currentSituation().messages.length) endPlayback();
+    else scheduleNext();
+  }, DELAI_ENTRE_MESSAGES);
+}
+function pausePlayback() {
+  if (finished) return;
+  if (playing) {
+    stopPlayback();
+    elements.state.textContent = "Lecture en pause.";
+  } else {
+    playing = true;
+    scheduleNext();
+  }
+  updateControls();
+}
+function showAll() {
+  stopPlayback();
+  const all = currentSituation().messages;
+  while (messageIndex < all.length) addMessage(all[messageIndex], false);
+  endPlayback();
+}
+function loadSituation(index) {
+  stopPlayback();
+  situationIndex = Math.max(0, Math.min(situations.length - 1, index));
+  messageIndex = 0;
+  finished = false;
+  const situation = currentSituation();
+  elements.label.textContent = `SITUATION ${pad(situationIndex + 1)} · CONVERSATION FICTIVE`;
+  elements.title.textContent = situation.titre;
+  elements.group.textContent = situation.groupe;
+  elements.groupAvatar.textContent = letters(situation.groupe);
+  const people = new Set(situation.messages.map(msg => msg[0]));
+  elements.participants.textContent = `${people.size} participant${people.size > 1 ? "s" : ""} · simulation`;
+  elements.messages.replaceChildren();
+  elements.typing.replaceChildren();
+  updateProgress();
+  updateControls();
+  elements.chat.scrollTop = 0;
+  playing = true;
+  scheduleNext();
+  updateControls();
+}
+
+$("pauseBtn").addEventListener("click", pausePlayback);
+$("replayBtn").addEventListener("click", () => loadSituation(situationIndex));
+$("allBtn").addEventListener("click", showAll);
+$("prevBtn").addEventListener("click", () => loadSituation(situationIndex - 1));
+$("nextBtn").addEventListener("click", () => loadSituation(situationIndex + 1));
+document.addEventListener("keydown", (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest("button,input,textarea,select")) return;
+  if (event.key === "ArrowRight" && situationIndex < situations.length - 1) loadSituation(situationIndex + 1);
+  if (event.key === "ArrowLeft" && situationIndex > 0) loadSituation(situationIndex - 1);
+});
+
+if (situations.length) loadSituation(0);
+else {
+  elements.title.textContent = "Ajoutez une situation dans le code HTML";
+  elements.state.textContent = "Aucune situation enregistrée.";
+  [elements.replay, elements.pause, elements.all, elements.prev, elements.next].forEach(button => button.disabled = true);
+}
+</script>
+</body>
+</html>
