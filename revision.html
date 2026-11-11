@@ -101,6 +101,18 @@ font-size:28px;line-height:1.35;font-weight:bold;
 text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;
 box-shadow:0 6px 18px var(--shadow)
 }
+.fc-image-container{
+  display:block;width:100%;max-width:100%;margin:18px 0 8px;
+  text-align:center;font-size:15px;font-weight:normal;line-height:1.4;
+  white-space:normal;
+}
+.fc-image-link{display:inline-block;max-width:100%;}
+.fc-image{
+  display:block;width:auto;height:auto;max-width:100%;max-height:340px;
+  object-fit:contain;border-radius:10px;margin:auto;
+}
+.fc-image-fallback{font-size:15px;font-weight:normal;}
+@media(max-width:500px){.fc-image{max-height:230px}}
 .pied{margin-top:35px;text-align:center;color:#777;font-size:13px}
 .message{
 padding:20px;background:var(--paper);border:1px solid var(--border);
@@ -701,8 +713,32 @@ async function startChapter(){
 /*
  * AFFICHAGE DES QUESTIONS
  */
-// Transforme uniquement les adresses HTTP(S) en liens sûrs.
-// Le reste du contenu demeure du texte, jamais du HTML interprété.
+// Les liens restent sûrs : aucun HTML provenant de Firebase n'est interprété.
+// Les partages publics Nuage et les URL directes d'images sont affichés dans la carte.
+function adresseImage(adresse){
+  const chemin=adresse.pathname;
+  const partage=chemin.match(/^\/index\.php\/s\/([a-zA-Z0-9]+)\/?(?:preview\/?)?$/);
+  if(adresse.protocol==="https:" &&
+     /^nuage[0-9]*\.apps\.education\.fr$/i.test(adresse.hostname) && partage){
+    return adresse.origin+"/index.php/s/"+partage[1]+"/preview";
+  }
+  if(/\.(?:png|jpe?g|gif|webp|avif)$/i.test(chemin)){
+    return adresse.href;
+  }
+  return null;
+}
+
+function creerLien(adresse,libelle){
+  const lien=document.createElement("a");
+  lien.href=adresse;
+  lien.target="_blank";
+  lien.rel="noopener noreferrer";
+  lien.textContent=libelle;
+  lien.style.color="var(--blue)";
+  lien.style.textDecoration="underline";
+  return lien;
+}
+
 function afficherTexteAvecLiens(element, valeur){
   const texte=String(valeur??"");
   element.replaceChildren();
@@ -716,15 +752,36 @@ function afficherTexteAvecLiens(element, valeur){
     const ponctuation=brut.slice(url.length);
     try{
       const adresse=new URL(url);
-      if(adresse.protocol!=="http:"&&adresse.protocol!=="https:")throw new Error("Protocole non autorisé");
-      const lien=document.createElement("a");
-      lien.href=adresse.href;
-      lien.target="_blank";
-      lien.rel="noopener noreferrer";
-      lien.textContent=url;
-      lien.style.color="var(--blue)";
-      lien.style.textDecoration="underline";
-      element.append(lien);
+      if(adresse.protocol!=="http:"&&adresse.protocol!=="https:"){
+        throw new Error("Protocole non autorisé");
+      }
+      const sourceImage=adresseImage(adresse);
+      if(sourceImage){
+        const bloc=document.createElement("span");
+        bloc.className="fc-image-container";
+        const lien=creerLien(sourceImage,"");
+        lien.className="fc-image-link";
+        lien.setAttribute("aria-label","Ouvrir l'image dans un nouvel onglet");
+        const img=document.createElement("img");
+        img.className="fc-image";
+        img.src=sourceImage;
+        img.alt="Image associée à la flashcard";
+        img.loading="eager";
+        img.decoding="async";
+        img.addEventListener("error",()=>{
+          // En cas de blocage de l'intégration, l'image reste accessible par un lien.
+          bloc.replaceChildren();
+          const secours=document.createElement("span");
+          secours.className="fc-image-fallback";
+          secours.append("Image non affichable ici : ",creerLien(adresse.href,"ouvrir l'image"));
+          bloc.append(secours);
+        },{once:true});
+        lien.append(img);
+        bloc.append(lien);
+        element.append(bloc);
+      }else{
+        element.append(creerLien(adresse.href,url));
+      }
     }catch(_){
       element.append(document.createTextNode(url));
     }
