@@ -403,6 +403,28 @@
         0 6px 18px var(--shadow);
     }
 
+    #question, #texteReponse {
+      max-width: 100%;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+    #question { flex-direction: column; }
+
+    /* Images affichées à partir de liens publics Nuage / Nextcloud. */
+    .fc-image-container{
+      display:block;width:100%;max-width:100%;margin:18px 0 8px;
+      text-align:center;font-size:15px;font-weight:normal;line-height:1.4;
+      white-space:normal;
+    }
+    .fc-image-link{display:inline-block;max-width:100%;}
+    .fc-image{
+      display:block;width:auto;height:auto;max-width:100%;max-height:340px;
+      object-fit:contain;border-radius:10px;margin:auto;
+    }
+    .fc-image-fallback{font-size:15px;font-weight:normal;}
+    @media(max-width:500px){.fc-image{max-height:230px}}
+
     .pied {
       margin-top: 35px;
 
@@ -987,6 +1009,83 @@
       etatChargement.textContent = "";
     }
 
+    /* Affichage sécurisé des liens et prévisualisation des images. */
+    function adresseImage(adresse){
+      const chemin=adresse.pathname;
+      const partage=chemin.match(/^\/index\.php\/s\/([a-zA-Z0-9]+)\/?(?:preview\/?)?$/);
+      if(adresse.protocol==="https:" &&
+         /^nuage[0-9]*\.apps\.education\.fr$/i.test(adresse.hostname) && partage){
+        return adresse.origin+"/index.php/s/"+partage[1]+"/preview";
+      }
+      if(/\.(?:png|jpe?g|gif|webp|avif)$/i.test(chemin)){
+        return adresse.href;
+      }
+      return null;
+    }
+    
+    function creerLien(adresse,libelle){
+      const lien=document.createElement("a");
+      lien.href=adresse;
+      lien.target="_blank";
+      lien.rel="noopener noreferrer";
+      lien.textContent=libelle;
+      lien.style.color="var(--blue)";
+      lien.style.textDecoration="underline";
+      return lien;
+    }
+    
+    function afficherTexteAvecLiens(element, valeur){
+      const texte=String(valeur??"");
+      element.replaceChildren();
+      const motif=/https?:\/\/[^\s<>"']+/gi;
+      let debut=0;
+      for(const correspondance of texte.matchAll(motif)){
+        const position=correspondance.index;
+        element.append(document.createTextNode(texte.slice(debut,position)));
+        const brut=correspondance[0];
+        const url=brut.replace(/[.,;:!?)}\]]+$/g,"");
+        const ponctuation=brut.slice(url.length);
+        try{
+          const adresse=new URL(url);
+          if(adresse.protocol!=="http:"&&adresse.protocol!=="https:"){
+            throw new Error("Protocole non autorisé");
+          }
+          const sourceImage=adresseImage(adresse);
+          if(sourceImage){
+            const bloc=document.createElement("span");
+            bloc.className="fc-image-container";
+            const lien=creerLien(sourceImage,"");
+            lien.className="fc-image-link";
+            lien.setAttribute("aria-label","Ouvrir l'image dans un nouvel onglet");
+            const img=document.createElement("img");
+            img.className="fc-image";
+            img.src=sourceImage;
+            img.alt="Image associée à la flashcard";
+            img.loading="eager";
+            img.decoding="async";
+            img.addEventListener("error",()=>{
+              // En cas de blocage de l'intégration, l'image reste accessible par un lien.
+              bloc.replaceChildren();
+              const secours=document.createElement("span");
+              secours.className="fc-image-fallback";
+              secours.append("Image non affichable ici : ",creerLien(adresse.href,"ouvrir l'image"));
+              bloc.append(secours);
+            },{once:true});
+            lien.append(img);
+            bloc.append(lien);
+            element.append(bloc);
+          }else{
+            element.append(creerLien(adresse.href,url));
+          }
+        }catch(_){
+          element.append(document.createTextNode(url));
+        }
+        element.append(document.createTextNode(ponctuation));
+        debut=position+brut.length;
+      }
+      element.append(document.createTextNode(texte.slice(debut)));
+    }
+
     function afficherQuestion() {
       if (numeroQuestion >= questions.length) {
         if (toutEpuise) {
@@ -997,7 +1096,7 @@
       questionActuelle = questions[numeroQuestion];
       zoneMatiere.textContent = questionActuelle.matiere || "";
       zoneMatiere.hidden = false;
-      zoneQuestion.textContent = questionActuelle.question || "Question non renseignée";
+      afficherTexteAvecLiens(zoneQuestion, questionActuelle.question || "Question non renseignée");
       zoneReponse.textContent = "";
       zoneReponse.hidden = true;
       boutonReponse.hidden = false;
@@ -1056,7 +1155,7 @@
 
     boutonReponse.addEventListener("click", () => {
       if (!questionActuelle) return;
-      zoneReponse.textContent = questionActuelle.reponse || "Réponse non renseignée";
+      afficherTexteAvecLiens(zoneReponse, questionActuelle.reponse || "Réponse non renseignée");
       zoneReponse.hidden = false;
       boutonReponse.hidden = true;
       boutonSuivante.hidden = false;
