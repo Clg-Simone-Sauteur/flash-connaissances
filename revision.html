@@ -334,8 +334,9 @@ async function enregistrerActivite(classe,matiere,chapitre,nombreQuestions){
 /*
  * CACHE LOCAL : durée de 10 minutes.
  *
- * Les menus et les questions sont volontairement relus dans Firebase
- * à chaque nouvelle sélection de classe, de matière ou de chapitre.
+ * La navigation est relue à chaque sélection de classe. Le choix de
+ * la matière utilise cette liste en mémoire. Les questions sont relues
+ * à chaque ouverture de chapitre.
  * Le cache est actualisé après le chargement, mais n'est pas utilisé
  * pour remplacer les données fraîchement demandées.
  */
@@ -408,13 +409,13 @@ let questionActuelle=null;
 let selectedClass="";
 let selectedSubject="";
 let selectedChapter="";
+let navigationClasse=[];
 
 /*
  * Compteurs de requêtes : empêchent une ancienne réponse Firebase
  * d'écraser les choix les plus récents de l'utilisateur.
  */
 let requeteMatieres=0;
-let requeteChapitres=0;
 let requeteQuestions=0;
 
 function hideQuiz(){
@@ -444,11 +445,11 @@ function initialiserMenus(){
 
 /*
  * ÉTAPE 1 : changement de classe.
- * On relit navigation pour retrouver les matières disponibles
- * dans cette classe, sans réutiliser une ancienne liste en cache.
+ * Une requête récupère les matières et les chapitres de la classe.
  */
 $("classSelect").addEventListener("change",async()=>{
   selectedClass=$("classSelect").value;
+  navigationClasse=[];
   selectedSubject="";
   selectedChapter="";
   questionsChapitre=[];
@@ -456,7 +457,6 @@ $("classSelect").addEventListener("change",async()=>{
   indexQuestion=0;
 
   requeteMatieres++;
-  requeteChapitres++;
   requeteQuestions++;
 
   setOptions($("subjectSelect"),[],"— Choisir une matière —");
@@ -489,11 +489,8 @@ async function chargerMatieres(){
     if(numeroRequete!==requeteMatieres||
        classeDemandee!==selectedClass)return;
 
-    const matieres=unique(
-      snapshot.docs
-        .map(d=>d.data().matiere)
-        .filter(v=>String(v??"").trim())
-    );
+    navigationClasse=snapshot.docs.map(d=>d.data());
+    const matieres=unique(navigationClasse.map(entree=>entree.matiere));
 
     // La liste mise en cache est actualisée, mais non réutilisée
     // pour la prochaine sélection.
@@ -520,16 +517,15 @@ async function chargerMatieres(){
 
 /*
  * ÉTAPE 2 : changement de matière.
- * Les chapitres sont relus depuis navigation à chaque sélection.
+ * Les chapitres sont filtrés à partir de la navigation de la classe.
  */
-$("subjectSelect").addEventListener("change",async()=>{
+$("subjectSelect").addEventListener("change",()=>{
   selectedSubject=$("subjectSelect").value;
   selectedChapter="";
   questionsChapitre=[];
   questionActuelle=null;
   indexQuestion=0;
 
-  requeteChapitres++;
   requeteQuestions++;
 
   setOptions($("chapterSelect"),[],"— Choisir un chapitre —");
@@ -538,63 +534,21 @@ $("subjectSelect").addEventListener("change",async()=>{
 
   if(!selectedClass||!selectedSubject)return;
 
-  await chargerChapitres();
-});
+  const chapitres=unique(
+    navigationClasse
+      .filter(entree=>entree.matiere===selectedSubject)
+      .map(entree=>entree.chapitre)
+  );
 
-async function chargerChapitres(){
-  const numeroRequete=requeteChapitres;
-  const classeDemandee=selectedClass;
-  const matiereDemandee=selectedSubject;
+  cacheSet("ch|"+selectedClass+"|"+selectedSubject,chapitres);
+  setOptions($("chapterSelect"),chapitres,"— Choisir un chapitre —");
 
-  setOptions($("chapterSelect"),[],"Chargement des chapitres…");
-  $("chapterSelect").disabled=true;
-
-  afficherMessage("Chargement des chapitres disponibles…");
-
-  try{
-    const q=query(
-      collection(db,"navigation"),
-      where("classe","==",classeDemandee),
-      where("matiere","==",matiereDemandee)
-    );
-
-    const snapshot=await getDocs(q);
-
-    if(numeroRequete!==requeteChapitres||
-       classeDemandee!==selectedClass||
-       matiereDemandee!==selectedSubject)return;
-
-    const chapitres=unique(
-      snapshot.docs
-        .map(d=>d.data().chapitre)
-        .filter(v=>String(v??"").trim())
-    );
-
-    cacheSet(
-      "ch|"+classeDemandee+"|"+matiereDemandee,
-      chapitres
-    );
-
-    setOptions($("chapterSelect"),chapitres,"— Choisir un chapitre —");
-
-    if(!chapitres.length){
-      afficherMessage(
-        "Aucun chapitre n'est disponible pour cette classe et cette matière."
-      );
-    }else{
-      masquerMessage();
-    }
-  }catch(erreur){
-    console.error("Erreur lors du chargement des chapitres :",erreur);
-
-    if(numeroRequete!==requeteChapitres)return;
-
-    setOptions($("chapterSelect"),[],"— Choisir un chapitre —");
+  if(!chapitres.length){
     afficherMessage(
-      "Impossible de charger les chapitres. Vérifie la connexion à Firebase."
+      "Aucun chapitre n'est disponible pour cette classe et cette matière."
     );
   }
-}
+});
 
 /*
  * ÉTAPE 3 : changement ou rechargement de chapitre.
