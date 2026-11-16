@@ -79,6 +79,24 @@ button:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .pied{margin-top:30px;text-align:center;color:#777;font-size:13px}
 @media(max-width:900px){body{padding:15px}.conteneur{padding:30px 25px}.filtres,.statsGrille{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.conteneur{padding:25px 18px}h1{font-size:32px}h2{font-size:20px}.filtres,.statsGrille,.matieresGrille,.exportGrille{grid-template-columns:1fr}.navigation,.utilisateurConnecte{flex-direction:column;align-items:stretch}button{width:100%}.actions{flex-direction:column;align-items:stretch}.activiteLigne{grid-template-columns:1fr auto}.barreFond{grid-column:1/-1}.periodeSelect{width:100%}}
+.activiteGraphique{margin:14px 0 20px;padding:14px;background:#fff;border:1px solid var(--border);border-radius:12px}
+.activiteGraphique h4{margin:0 0 10px;color:var(--ink2)}
+.activiteGraphiqueControles{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 12px}
+.activiteGraphiqueControles select,.activiteGraphiqueControles input{width:auto;padding:7px 10px}
+.activiteGraphique ol{display:flex;gap:4px;overflow-x:auto;list-style:none;margin:0;padding:4px 4px 10px}
+.activiteGraphique li{flex:1 0 52px;min-width:0;font-size:13px}
+.activitePoint{display:grid;grid-template-rows:28px 156px 28px;justify-items:center;align-items:center;width:100%;padding:0 2px;border-radius:6px;background:transparent;color:var(--ink2);box-shadow:none;font:inherit}
+button.activitePoint:hover,button.activitePoint[aria-pressed="true"]{background:var(--blue-bg);transform:none}
+button.activitePoint:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.activitePointTrace{display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;border-bottom:1px solid var(--border)}
+.activitePointBarre{width:65%;max-width:42px;background:linear-gradient(0deg,var(--blue),var(--blue2));border-radius:5px 5px 0 0}
+.activitePoint time,.activitePoint .valeurJour{font-variant-numeric:tabular-nums;white-space:nowrap}
+.activitePoint .valeurJour{font-weight:bold}
+.activiteDetailJour{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.activiteDetailJour p{margin:0 0 8px}
+.activiteDetailJour table{width:100%;border-collapse:collapse;font-size:14px}
+.activiteDetailJour th,.activiteDetailJour td{padding:8px 4px;border-bottom:1px solid var(--border);text-align:right}
+.activiteDetailJour th:first-child{text-align:left}
 </style>
 </head>
 <body>
@@ -137,6 +155,22 @@ button:disabled{opacity:.55;cursor:not-allowed;transform:none}
       <p class="aide">Cliquez sur une classe pour voir ses matières, puis sur une matière pour voir ses chapitres.</p>
       <div class="resume" id="activiteResume"></div>
       <div class="fil" id="activiteFil"></div>
+      <section id="activiteGraphique" class="activiteGraphique hidden" aria-labelledby="activiteGraphiqueTitre">
+        <h4 id="activiteGraphiqueTitre">Questions chargées par jour</h4>
+        <div class="activiteGraphiqueControles">
+          <label for="activiteGranularite">Affichage</label>
+          <select id="activiteGranularite">
+            <option value="jour">Par jour</option>
+            <option value="heure">Par heure</option>
+          </select>
+          <label for="activiteDateHeure" id="activiteDateHeureLibelle" class="hidden">Journée</label>
+          <input id="activiteDateHeure" type="date" class="hidden">
+        </div>
+        <p id="activiteGraphiqueMessage" class="aide hidden" role="status"></p>
+        <p id="activiteGraphiqueAide" class="aide">Sélectionnez un jour pour voir les classes concernées.</p>
+        <ol id="activiteGraphiqueJours" tabindex="0"></ol>
+        <div id="activiteDetailJour" class="activiteDetailJour hidden" aria-live="polite"></div>
+      </section>
       <div id="activiteListe" class="statsClasses"></div>
       <div id="activiteMessage" class="message"></div>
     </div>
@@ -252,6 +286,7 @@ const MATIERES = ["Mathématiques","Français","Histoire, géographie et Emc","A
 
 let allDocuments = [], groupedQuestions = [], currentGroup = null, pendingConfirmation = null, currentMatiere = "";
 let activiteDocs = [], drill = { classe: null, matiere: null };
+let jourActiviteSelectionne = "";
 
 /* ---------- Utilitaires ---------- */
 function showMessage(el, text, type = "info-message") { el.textContent = text; el.className = "message " + type; }
@@ -314,6 +349,8 @@ let cacheActivite = { cle: "", t: 0, docs: [] };
 
 async function loadActivite(force = false) {
   clearMessage($("activiteMessage"));
+  $("activiteGraphique").classList.add("hidden");
+  $("periodeSelect").disabled = true;
   $("refreshActiviteButton").disabled = true;
   $("activiteListe").innerHTML = `<div class="chargement">Chargement de l'activité...</div>`;
   try {
@@ -334,26 +371,197 @@ async function loadActivite(force = false) {
     console.error(e);
     $("activiteListe").innerHTML = `<div class="empty">Impossible de charger l'activité.</div>`;
     showMessage($("activiteMessage"), "Erreur lors du chargement de l'activité.", "error-message");
-  } finally { $("refreshActiviteButton").disabled = false; }
+  } finally {
+    $("refreshActiviteButton").disabled = false;
+    $("periodeSelect").disabled = false;
+  }
+}
+
+function renderBarresActivite(liste, points, selectionnerJour) {
+  const maximum = Math.max(1, ...points.map(point => point.questions));
+  const fragment = document.createDocumentFragment();
+
+  for (const { libelle, dateTime, visites, questions } of points) {
+    const ligne = document.createElement("li");
+    const point = document.createElement(selectionnerJour ? "button" : "div");
+    point.className = "activitePoint";
+    const ouvertures = visites === 1 ? "1 ouverture de chapitre" : nombre(visites) + " ouvertures de chapitre";
+    const description = libelle + " · " + pluriel(questions, "question") + " · " + ouvertures;
+    point.title = description;
+
+    if (selectionnerJour) {
+      point.type = "button";
+      point.setAttribute("aria-label", description);
+      point.setAttribute("aria-controls", "activiteDetailJour");
+      point.setAttribute("aria-pressed", String(dateTime === jourActiviteSelectionne));
+      point.addEventListener("click", () => {
+        liste.querySelector('[aria-pressed="true"]')?.setAttribute("aria-pressed", "false");
+        point.setAttribute("aria-pressed", "true");
+        selectionnerJour(dateTime);
+      });
+    }
+
+    const temps = document.createElement("time");
+    temps.dateTime = dateTime;
+    temps.textContent = libelle;
+
+    const trace = document.createElement("span");
+    trace.className = "activitePointTrace";
+    trace.setAttribute("aria-hidden", "true");
+    const barre = document.createElement("span");
+    barre.className = "activitePointBarre";
+    barre.style.height = (questions / maximum) * 100 + "%";
+    trace.appendChild(barre);
+
+    const valeur = document.createElement("span");
+    valeur.className = "valeurJour";
+    valeur.textContent = nombre(questions);
+    point.append(valeur, trace, temps);
+    ligne.appendChild(point);
+    fragment.appendChild(ligne);
+  }
+
+  liste.appendChild(fragment);
+  if (selectionnerJour) liste.scrollLeft = liste.scrollWidth;
+}
+
+function renderDetailJour(jour, classes) {
+  const detail = $("activiteDetailJour");
+  detail.replaceChildren();
+  detail.classList.toggle("hidden", !jour);
+  if (!jour) return;
+
+  const titre = document.createElement("p");
+  titre.textContent = "Classes concernées le " + jour.split("-").reverse().join("/");
+  detail.appendChild(titre);
+
+  const lignes = [...(classes || [])]
+    .filter(([, total]) => total.visites > 0 || total.questions > 0)
+    .sort(([a], [b]) => classSortKey(a).localeCompare(classSortKey(b), "fr"));
+  if (!lignes.length) {
+    const vide = document.createElement("p");
+    vide.textContent = "Aucune activité enregistrée pour ce jour.";
+    detail.appendChild(vide);
+    return;
+  }
+
+  const tableau = document.createElement("table");
+  tableau.setAttribute("aria-label", titre.textContent);
+  const entete = tableau.createTHead().insertRow();
+  for (const libelle of ["Classe", "Ouvertures", "Questions chargées"]) {
+    const cellule = document.createElement("th");
+    cellule.scope = "col";
+    cellule.textContent = libelle;
+    entete.appendChild(cellule);
+  }
+
+  const corps = tableau.createTBody();
+  for (const [classe, total] of lignes) {
+    const ligne = corps.insertRow();
+    const cellule = document.createElement("th");
+    cellule.scope = "row";
+    cellule.textContent = libelle(classe);
+    ligne.appendChild(cellule);
+    ligne.insertCell().textContent = nombre(total.visites);
+    ligne.insertCell().textContent = nombre(total.questions);
+  }
+  detail.appendChild(tableau);
+}
+
+function renderActiviteGraphique(totaux) {
+  const liste = $("activiteGraphiqueJours");
+  const message = $("activiteGraphiqueMessage");
+  const dateHeure = $("activiteDateHeure");
+  const horaire = $("activiteGranularite").value === "heure";
+  const { debut, fin } = plageActivite($("periodeSelect").value);
+  const aujourdHui = jourLocal(new Date());
+  const dernierJour = fin && fin < aujourdHui ? fin : aujourdHui;
+
+  $("activiteGraphique").classList.remove("hidden");
+  $("activiteGraphiqueTitre").textContent = horaire ? "Questions chargées par heure" : "Questions chargées par jour";
+  $("activiteDateHeureLibelle").classList.toggle("hidden", !horaire);
+  dateHeure.classList.toggle("hidden", !horaire);
+  $("activiteGraphiqueAide").classList.toggle("hidden", horaire);
+  liste.replaceChildren();
+  liste.scrollLeft = 0;
+  message.classList.add("hidden");
+
+  if (jourActiviteSelectionne < debut || jourActiviteSelectionne > dernierJour) {
+    jourActiviteSelectionne = "";
+  }
+
+  if (horaire) {
+    dateHeure.min = debut;
+    dateHeure.max = dernierJour;
+    if (!dateHeure.value || dateHeure.value < debut || dateHeure.value > dernierJour) {
+      dateHeure.value = jourActiviteSelectionne || dernierJour;
+    }
+
+    const totalJour = totaux.get(dateHeure.value);
+    renderDetailJour(dateHeure.value, totalJour?.classes);
+    const heures = totalJour?.heures;
+    liste.setAttribute("aria-label", "Créneaux enregistrés, en heure de Paris");
+    if (!heures?.size) {
+      message.textContent = "Détail horaire indisponible pour cette journée et cette sélection.";
+      message.classList.remove("hidden");
+      return;
+    }
+    renderBarresActivite(liste, [...heures].sort(([a], [b]) => a.localeCompare(b)).map(([heure, total]) => ({
+      libelle: heure + " h", dateTime: heure + ":00", ...total
+    })));
+    return;
+  }
+
+  const points = [];
+  // Les dates Firestore sont des jours civils. L'UTC permet de les parcourir sans décalage.
+  for (const date = new Date(debut + "T00:00:00Z"); ; date.setUTCDate(date.getUTCDate() + 1)) {
+    const jour = date.toISOString().slice(0, 10);
+    if (jour > dernierJour) break;
+    const { visites, questions } = totaux.get(jour) || { visites: 0, questions: 0 };
+    points.push({ libelle: jour.slice(8) + "/" + jour.slice(5, 7), dateTime: jour, visites, questions });
+  }
+  liste.setAttribute("aria-label", "Activité quotidienne, du jour le plus ancien au plus récent");
+  renderDetailJour(jourActiviteSelectionne, totaux.get(jourActiviteSelectionne)?.classes);
+  renderBarresActivite(liste, points, jour => {
+    jourActiviteSelectionne = jour;
+    dateHeure.value = jour;
+    renderDetailJour(jour, totaux.get(jour)?.classes);
+  });
 }
 
 function renderActivite() {
   const champ = !drill.classe ? "classe" : !drill.matiere ? "matiere" : "chapitre";
   const agg = new Map();
+  const totauxParJour = new Map();
   let totalV = 0, totalQ = 0;
-  const add = (nom, v, q) => {
+  const add = (jour, classe, nom, v, q, heures) => {
     const o = agg.get(nom) || { visites: 0, questions: 0 };
     o.visites += v; o.questions += q; agg.set(nom, o);
+    const totalJour = totauxParJour.get(jour) || { visites: 0, questions: 0, heures: new Map(), classes: new Map() };
+    totalJour.visites += v;
+    totalJour.questions += q;
+    const totalClasse = totalJour.classes.get(classe) || { visites: 0, questions: 0 };
+    totalClasse.visites += v;
+    totalClasse.questions += q;
+    totalJour.classes.set(classe, totalClasse);
+    for (const [heure, donnees] of Object.entries(heures || {})) {
+      if (!/^(?:[01]\d|2[0-3])$/.test(heure) || !donnees) continue;
+      const totalHeure = totalJour.heures.get(heure) || { visites: 0, questions: 0 };
+      totalHeure.visites += Number(donnees.v || 0);
+      totalHeure.questions += Number(donnees.q || 0);
+      totalJour.heures.set(heure, totalHeure);
+    }
+    totauxParJour.set(jour, totalJour);
     totalV += v; totalQ += q;
   };
 
   activiteDocs.forEach(d => {
-    if (!drill.classe) { add(d.classe, Number(d.visites || 0), Number(d.questions || 0)); return; }
+    if (!drill.classe) { add(d.jour, d.classe, d.classe, Number(d.visites || 0), Number(d.questions || 0), d.heures); return; }
     if (d.classe !== drill.classe) return;
     Object.entries(d.details || {}).forEach(([cle, val]) => {
       const [mat, chap] = cle.split("§");
       if (drill.matiere && mat !== drill.matiere) return;
-      add(drill.matiere ? chap : mat, Number(val.v || 0), Number(val.q || 0));
+      add(d.jour, d.classe, drill.matiere ? chap : mat, Number(val.v || 0), Number(val.q || 0), val.heures);
     });
   });
 
@@ -375,6 +583,8 @@ function renderActivite() {
   fil.appendChild(crumb("Toutes les classes", () => { drill = { classe: null, matiere: null }; renderActivite(); }));
   if (drill.classe) fil.append(sep(), crumb(drill.classe, () => { drill.matiere = null; renderActivite(); }));
   if (drill.matiere) fil.append(sep(), crumb(libelle(drill.matiere), () => {}));
+
+  renderActiviteGraphique(totauxParJour);
 
   const liste = $("activiteListe"); liste.innerHTML = "";
   if (!lignes.length) { liste.innerHTML = `<div class="empty">Aucune activité sur cette période.</div>`; return; }
@@ -906,6 +1116,8 @@ $("refreshStatsButton").addEventListener("click", loadStats);
 $("refreshCountsButton").addEventListener("click", loadSubjectCounts);
 $("refreshActiviteButton").addEventListener("click", () => loadActivite(true));
 $("periodeSelect").addEventListener("change", () => loadActivite(false));
+$("activiteGranularite").addEventListener("change", renderActivite);
+$("activiteDateHeure").addEventListener("change", renderActivite);
 $("exportPdfButton").addEventListener("click", exportPdfClasses);
 $("backToSubjectsButton").addEventListener("click", backToSubjects);
 
