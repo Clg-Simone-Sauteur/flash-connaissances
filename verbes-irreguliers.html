@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbes Irréguliers – English Hero</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink:    #1a1a2e;
+            --ink2:   #2d3561;
+            --gold:   #c9a84c;
+            --gold2:  #f0d080;
+            --cream:  #faf8f2;
+            --paper:  #f2ede0;
+            --sage:   #4a7c59;
+            --sage2:  #6aab79;
+            --rose:   #c0392b;
+            --border: #d8cdb4;
+            --shadow: rgba(26,26,46,0.12);
+
+            /* Thème Anglais */
+            --en:    #1a5fa8;
+            --en2:   #4d8fd4;
+            --en-bg: #e4eef8;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .hidden { display: none !important; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 16px 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(26,95,168,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(45,53,97,0.5) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: repeating-linear-gradient(
+                0deg, transparent, transparent 39px, rgba(201,168,76,0.04) 39px, rgba(201,168,76,0.04) 40px
+            );
+            pointer-events: none;
+        }
+
+        /* ═══ SHELL ═══ */
+        .app-shell {
+            position: relative;
+            width: min(1100px, 96vw);
+            min-height: min(700px, 95vh);
+            background: var(--cream);
+            border-radius: 24px;
+            box-shadow: 0 40px 120px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.2);
+            display: flex;
+            overflow: hidden;
+            animation: shellIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        @keyframes shellIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ═══ SIDEBAR ═══ */
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            background: var(--ink);
+            padding: 40px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: -100px; left: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(26,95,168,0.18) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .logo-block { position: relative; z-index: 1; }
+
+        .logo-icon {
+            font-size: 2.8rem;
+            display: block;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 14px rgba(26,95,168,0.55));
+        }
+
+        .logo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--en2);
+            line-height: 1.1;
+            font-weight: 900;
+        }
+
+        .logo-sub {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.78rem;
+            margin-top: 6px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stats sidebar */
+        .sidebar-stats {
+            position: relative; z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(26,95,168,0.25);
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon { font-size: 1.5rem; }
+        .stat-info { flex: 1; }
+        .stat-label { color: rgba(255,255,255,0.4); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; }
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-top: 2px;
+        }
+
+        /* Barre de progression sidebar */
+        .sidebar-progress { position: relative; z-index: 1; }
+
+        .prog-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .prog-bar-bg {
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .prog-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--en), var(--en2));
+            border-radius: 99px;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .prog-fraction {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.75rem;
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        /* Conseil / hint box */
+        .conseil-box {
+            position: relative; z-index: 1;
+            background: rgba(26,95,168,0.15);
+            border: 1px solid rgba(77,143,212,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .conseil-box.visible { display: flex; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .conseil-titre {
+            color: var(--en2);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .conseil-texte {
+            color: rgba(255,255,255,0.75);
+            font-size: 0.82rem;
+            line-height: 1.55;
+        }
+
+        .conseil-exemple {
+            color: var(--en2);
+            font-size: 0.78rem;
+            font-style: italic;
+            padding-top: 4px;
+            border-top: 1px solid rgba(77,143,212,0.18);
+            line-height: 1.5;
+        }
+
+        /* ═══ MAIN ═══ */
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ── SETUP ── */
+        #setup {
+            flex: 1;
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            overflow-y: auto;
+        }
+
+        .setup-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--ink);
+            font-weight: 900;
+        }
+
+        .setup-header h2 .accent { color: var(--en); }
+
+        .setup-header p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .setup-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--ink2);
+            opacity: 0.6;
+            margin-bottom: 12px;
+        }
+
+        /* Range de verbes */
+        .range-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 18px;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .range-group label {
+            color: #95a5a6;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .range-group input[type="number"] {
+            width: 60px;
+            border: none;
+            outline: none;
+            text-align: center;
+            font-size: 1.1rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--ink);
+            background: transparent;
+            -moz-appearance: textfield;
+        }
+
+        .range-group input[type="number"]::-webkit-outer-spin-button,
+        .range-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+        /* Colonnes à tester */
+        .cols-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .col-btn {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 18px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-family: 'DM Sans', sans-serif;
+            position: relative;
+        }
+
+        .col-btn:hover {
+            border-color: var(--en2);
+            background: var(--en-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26,95,168,0.12);
+        }
+
+        .col-btn.selected {
+            border-color: var(--en);
+            background: linear-gradient(135deg, #f0f5fc, #e4eef8);
+            box-shadow: 0 4px 16px rgba(26,95,168,0.15);
+        }
+
+        .col-btn .c-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--ink);
+            display: block;
+        }
+
+        .col-btn .c-ex {
+            font-size: 0.73rem;
+            color: #95a5a6;
+            display: block;
+            margin-top: 3px;
+            font-weight: 300;
+        }
+
+        .col-btn .c-check {
+            position: absolute;
+            top: 10px; right: 12px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .col-btn.selected .c-check { opacity: 1; }
+
+        /* Bouton lancer */
+        .btn-lancer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--en), #154e8a);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 20px 40px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 30px rgba(26,95,168,0.3);
+            margin-top: auto;
+        }
+
+        .btn-lancer:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(26,95,168,0.4);
+        }
+
+        .btn-lancer .arrow { font-size: 1.2rem; transition: transform 0.2s; }
+        .btn-lancer:hover .arrow { transform: translateX(4px); }
+
+        /* ── QUIZ ── */
+        #quiz {
+            flex: 1;
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .quiz-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .verb-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--ink);
+            color: var(--en2);
+            padding: 6px 16px;
+            border-radius: 99px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Carte principale de question */
+        .verb-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 60px;
+            text-align: center;
+            box-shadow: 0 4px 30px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verb-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--en), var(--en2), var(--gold));
+        }
+
+        .verb-question {
+            color: #95a5a6;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .verb-trad {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            color: var(--ink);
+            display: block;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .verb-cols-chips {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .cols-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--en-bg);
+            color: var(--en);
+            border: 1px solid rgba(26,95,168,0.2);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Zone de réponse — inputs multiples */
+        .answer-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--en);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-left: 4px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 18px 24px;
+            border: 3px solid var(--border);
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+            background: white;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .answer-input:focus {
+            border-color: var(--en2);
+            box-shadow: 0 0 0 4px rgba(26,95,168,0.1), 0 2px 10px var(--shadow);
+        }
+
+        .answer-input.correct {
+            border-color: var(--sage);
+            background: #f0faf4;
+            box-shadow: 0 0 0 4px rgba(74,124,89,0.1);
+        }
+
+        .answer-input.wrong {
+            border-color: var(--rose);
+            background: #fdf0ee;
+            box-shadow: 0 0 0 4px rgba(192,57,43,0.1);
+        }
+
+        .correction-msg {
+            font-size: 0.95rem;
+            font-weight: 600;
+            min-height: 1.4em;
+            color: var(--ink);
+            margin-left: 4px;
+        }
+
+        /* Boutons quiz */
+        .quiz-btns {
+            display: flex;
+            gap: 14px;
+        }
+
+        .btn-verify {
+            flex: 1;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 20px rgba(201,168,76,0.3);
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(201,168,76,0.4);
+        }
+
+        .btn-next {
+            flex: 1;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--sage), #357a52);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 20px rgba(74,124,89,0.3);
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(74,124,89,0.4);
+        }
+
+        /* ── RÉSULTAT ── */
+        #result {
+            flex: 1;
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            text-align: center;
+        }
+
+        .result-emoji { font-size: 5rem; animation: pop 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+
+        @keyframes pop {
+            from { transform: scale(0); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .result-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--ink);
+            font-weight: 900;
+        }
+
+        .result-note {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--en);
+            line-height: 1;
+            text-shadow: 0 4px 20px rgba(26,95,168,0.25);
+        }
+
+        .result-detail {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .result-bar-wrap {
+            width: 320px;
+            height: 10px;
+            background: var(--paper);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .result-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--en), var(--en2));
+            border-radius: 99px;
+            transition: width 1s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, var(--ink2), var(--ink));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 18px 48px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 30px rgba(26,26,46,0.25);
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(26,26,46,0.35);
+        }
+
+        /* Médailles */
+        .medals { display: flex; gap: 16px; }
+
+        .medal {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            border: 2px solid transparent;
+        }
+
+        .medal.earned  { border-color: var(--en2); background: #e4eef8; }
+        .medal.unearned{ opacity: 0.2; filter: grayscale(1); }
+
+        /* RESPONSIVE */
+        @media (max-width: 820px) {
+        body {
+            min-height: 100dvh;
+            align-items: flex-start;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+    
+        .app-shell {
+            width: 100%;
+            min-height: calc(100dvh - 16px);
+            border-radius: 16px;
+            flex-direction: column;
+        }
+    
+        .sidebar {
+            width: 100%;
+            padding: 14px 16px;
+            gap: 12px;
+        }
+    
+        .logo-icon {
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+    
+        .logo-title {
+            font-size: 1.25rem;
+        }
+    
+        .logo-sub {
+            font-size: 0.7rem;
+        }
+    
+        .sidebar-stats {
+            flex-direction: row;
+            gap: 8px;
+        }
+    
+        .stat-card {
+            flex: 1;
+            padding: 10px 12px;
+        }
+    
+        .stat-icon {
+            font-size: 1.2rem;
+        }
+    
+        .stat-value {
+            font-size: 1.2rem;
+        }
+    
+        #setup,
+        #quiz,
+        #result {
+            padding: 20px 16px;
+            gap: 20px;
+        }
+    
+        .setup-header h2 {
+            font-size: 1.7rem;
+        }
+    
+        .range-row {
+            gap: 8px;
+        }
+    
+        .range-group {
+            min-width: 0;
+            padding: 10px 12px;
+        }
+    
+        .range-group input[type="number"] {
+            width: 48px;
+        }
+    
+        .cols-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+    
+        .col-btn {
+            padding: 13px 14px;
+        }
+    
+        .btn-lancer,
+        .btn-verify,
+        .btn-next,
+        .btn-retry {
+            min-height: 52px;
+        }
+    
+        .quiz-btns {
+            flex-direction: column;
+            gap: 10px;
+        }
+    
+        .verb-card {
+            padding: 24px 16px;
+            border-radius: 16px;
+        }
+    
+        .verb-trad {
+            font-size: clamp(1.9rem, 9vw, 2.4rem);
+            overflow-wrap: anywhere;
+        }
+    
+        .answer-input {
+            min-height: 52px;
+            font-size: 1.1rem;
+            padding: 14px 16px;
+        }
+    
+        .result-note {
+            font-size: 4rem;
+        }
+    
+        .result-bar-wrap {
+            width: min(320px, 90vw);
+        }
+    
+        #sidebarInfo {
+            margin-top: 0;
+        }
+        }
+
+        .main-panel { min-width: 0; }
+        .verb-reference { color: var(--ink); }
+        .verb-reference summary { cursor: pointer; font-weight: 700; color: var(--en); }
+        .verb-reference p, .verb-reference details { margin-top: 12px; }
+        .reference-table { margin-top: 8px; overflow-x: auto; }
+        .reference-table table { width: 100%; border-collapse: collapse; }
+        .reference-table th, .reference-table td {
+            padding: 7px 8px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+        }
+        .reference-table td small { display: block; color: #4c5b68; }
+        .reference-table td[lang="en"] { min-width: 94px; }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar">
+        <div class="logo-block">
+            <span class="logo-icon">🇬🇧</span>
+            <div class="logo-title">Verbes<br>Irréguliers</div>
+            <div class="logo-sub"><span id="verbCount"></span> verbes · 3 formes</div>
+        </div>
+
+        <!-- Stats (visibles pendant quiz) -->
+        <div class="sidebar-stats" id="sidebarStats" style="display:none;">
+            <div class="stat-card">
+                <span class="stat-icon">⭐</span>
+                <div class="stat-info">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="sideScore">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📝</span>
+                <div class="stat-info">
+                    <div class="stat-label">Verbe</div>
+                    <div class="stat-value" id="sideQNum">1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progression -->
+        <div class="sidebar-progress" id="sidebarProgress" style="display:none;">
+            <div class="prog-label">Progression</div>
+            <div class="prog-bar-bg">
+                <div class="prog-bar-fill" id="progressBar"></div>
+            </div>
+            <div class="prog-fraction" id="progFraction">0 / 0</div>
+        </div>
+
+        <!-- Conseil erreur -->
+        <div class="conseil-box" id="conseilBox">
+            <div class="conseil-titre" id="conseilTitre"></div>
+            <div class="conseil-texte" id="conseilTexte"></div>
+            <div class="conseil-exemple" id="conseilExemple"></div>
+        </div>
+
+        <!-- Info statique setup -->
+        <div id="sidebarInfo" style="margin-top: auto;">
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(26,95,168,0.2);border-radius:12px;padding:16px;color:rgba(255,255,255,0.4);font-size:0.78rem;line-height:1.7;">
+                🔀 Trois formes à maîtriser :<br>
+                <span style="color:rgba(77,143,212,0.8)">Base — Prétérit — Participe passé</span><br><br>
+                Ex : <span style="color:rgba(201,168,76,0.7)">go · went · gone</span><br>
+                ou  <span style="color:rgba(201,168,76,0.7)">write · wrote · written</span><br><br>
+                💡 Choisis les formes à tester et la plage de verbes.
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══ PANNEAU PRINCIPAL ══ -->
+    <div class="main-panel">
+
+        <!-- SETUP -->
+        <div id="setup">
+            <div class="setup-header">
+                <h2>Choisis ton <span class="accent">entraînement</span></h2>
+                <p>Sélectionne la plage de verbes, les formes à tester, puis lance le quiz !</p>
+            </div>
+
+            <!-- Range de verbes -->
+            <div>
+                <div class="setup-section-title">1. Plage de verbes (1 à <span id="rangeMax"></span>)</div>
+                <div class="range-row">
+                    <div class="range-group">
+                        <label for="startRange">De</label>
+                        <input type="number" id="startRange" value="1" min="1" required>
+                    </div>
+                    <div style="color:#bdc3c7;font-size:1.2rem;font-weight:300;">→</div>
+                    <div class="range-group">
+                        <label for="endRange">À</label>
+                        <input type="number" id="endRange" value="20" min="1" required>
+                    </div>
+                    <div style="color:#95a5a6;font-size:0.8rem;flex:1;min-width:160px;">
+                        Les verbes sont mélangés aléatoirement à chaque session.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonnes à tester -->
+            <div>
+                <div class="setup-section-title">2. Formes à tester</div>
+                <div class="cols-grid">
+                    <button class="col-btn selected" id="btnBV" aria-pressed="true" onclick="toggleCol(this)">
+                        <span class="c-check">✓</span>
+                        <span class="c-name">Base verbale</span>
+                        <span class="c-ex">go, write, be…</span>
+                    </button>
+                    <button class="col-btn selected" id="btnPrete" aria-pressed="true" onclick="toggleCol(this)">
+                        <span class="c-check">✓</span>
+                        <span class="c-name">Prétérit</span>
+                        <span class="c-ex">went, wrote, was…</span>
+                    </button>
+                    <button class="col-btn" id="btnPP" aria-pressed="false" onclick="toggleCol(this)">
+                        <span class="c-check">✓</span>
+                        <span class="c-name">Participe passé</span>
+                        <span class="c-ex">gone, written, been…</span>
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn-lancer" onclick="startApp()">
+                Lancer le quiz
+                <span class="arrow">→</span>
+            </button>
+
+            <details class="verb-reference">
+                <summary>Consulter la liste du manuel</summary>
+                <p>Les numéros correspondent au manuel. La prononciation indiquée est britannique.</p>
+                <details><summary>Page 176 · verbes 1 à 51</summary><div id="reference176" class="reference-table"></div></details>
+                <details><summary>Page 177 · verbes 52 à 100</summary><div id="reference177" class="reference-table"></div></details>
+            </details>
+        </div>
+
+        <!-- QUIZ -->
+        <div id="quiz" class="hidden">
+            <div class="quiz-top">
+                <div class="verb-badge">
+                    <span>🇬🇧</span>
+                    <span id="verbBadge">VERBE 1 / 20</span>
+                </div>
+            </div>
+
+            <div class="verb-card">
+                <div class="verb-question">Donne les formes demandées pour ce verbe</div>
+                <span class="verb-trad" id="verbTarget">—</span>
+                <div class="verb-cols-chips" id="verbChips"></div>
+            </div>
+
+            <div class="answer-zone" id="inputArea"></div>
+
+            <div class="quiz-btns">
+                <button id="btnVerify" class="btn-verify" onclick="verifyStep()">✓ Vérifier</button>
+                <button id="btnNext" class="btn-next hidden" onclick="nextQuestion()">Continuer →</button>
+            </div>
+        </div>
+
+        <!-- RÉSULTAT -->
+        <div id="result" class="hidden">
+            <div class="result-emoji" id="resultEmoji">🏆</div>
+            <div class="result-title">Quiz terminé !</div>
+            <div class="result-note" id="finalScore">—</div>
+            <div class="result-bar-wrap">
+                <div class="result-bar" id="resultBar" style="width:0%"></div>
+            </div>
+            <div class="result-detail" id="scoreDetail"></div>
+            <div class="medals" id="medalsRow"></div>
+            <button class="btn-retry" onclick="location.reload()">↺ Recommencer</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/* ══════════════════════════════════
+   DONNÉES — liste du manuel, pages 176 et 177
+══════════════════════════════════ */
+const verbData = [
+    {"bv": "be", "prete": "was, were", "pp": "been", "trad": "être", "ipa": ["biː", "wɒz, wɜː", "biːn"]},
+    {"bv": "beat", "prete": "beat", "pp": "beaten", "trad": "battre", "ipa": ["biːt", "biːt", "ˈbiːtən"]},
+    {"bv": "become", "prete": "became", "pp": "become", "trad": "devenir", "ipa": ["bɪˈkʌm", "bɪˈkeɪm", "bɪˈkʌm"]},
+    {"bv": "begin", "prete": "began", "pp": "begun", "trad": "commencer", "ipa": ["bɪˈɡɪn", "bɪˈɡæn", "bɪˈɡʌn"]},
+    {"bv": "bet", "prete": "bet", "pp": "bet", "trad": "parier", "ipa": ["bet", "bet", "bet"]},
+    {"bv": "bind", "prete": "bound", "pp": "bound", "trad": "relier (un livre)", "ipa": ["baɪnd", "baʊnd", "baʊnd"]},
+    {"bv": "bite", "prete": "bit", "pp": "bitten", "trad": "mordre", "ipa": ["baɪt", "bɪt", "ˈbɪtən"]},
+    {"bv": "bleed", "prete": "bled", "pp": "bled", "trad": "saigner", "ipa": ["bliːd", "bled", "bled"]},
+    {"bv": "blow", "prete": "blew", "pp": "blown", "trad": "souffler", "ipa": ["bləʊ", "bluː", "bləʊn"], "note": "blow one’s nose = se moucher"},
+    {"bv": "break", "prete": "broke", "pp": "broken", "trad": "casser", "ipa": ["breɪk", "brəʊk", "ˈbrəʊkən"]},
+    {"bv": "bring", "prete": "brought", "pp": "brought", "trad": "apporter", "ipa": ["brɪŋ", "brɔːt", "brɔːt"]},
+    {"bv": "build", "prete": "built", "pp": "built", "trad": "construire", "ipa": ["bɪld", "bɪlt", "bɪlt"]},
+    {"bv": "burn", "prete": "burnt", "pp": "burnt", "trad": "brûler", "ipa": ["bɜːn", "bɜːnt", "bɜːnt"], "variants": {"prete": "burned", "pp": "burned"}},
+    {"bv": "burst", "prete": "burst", "pp": "burst", "trad": "éclater", "ipa": ["bɜːst", "bɜːst", "bɜːst"], "note": "burst into = faire irruption dans"},
+    {"bv": "buy", "prete": "bought", "pp": "bought", "trad": "acheter", "ipa": ["baɪ", "bɔːt", "bɔːt"]},
+    {"bv": "catch", "prete": "caught", "pp": "caught", "trad": "attraper", "ipa": ["kætʃ", "kɔːt", "kɔːt"]},
+    {"bv": "choose", "prete": "chose", "pp": "chosen", "trad": "choisir", "ipa": ["tʃuːz", "tʃəʊz", "ˈtʃəʊzən"]},
+    {"bv": "come", "prete": "came", "pp": "come", "trad": "venir", "ipa": ["kʌm", "keɪm", "kʌm"]},
+    {"bv": "cost", "prete": "cost", "pp": "cost", "trad": "coûter", "ipa": ["kɒst", "kɒst", "kɒst"]},
+    {"bv": "cut", "prete": "cut", "pp": "cut", "trad": "couper", "ipa": ["kʌt", "kʌt", "kʌt"]},
+    {"bv": "do", "prete": "did", "pp": "done", "trad": "faire (une tâche)", "ipa": ["duː", "dɪd", "dʌn"]},
+    {"bv": "draw", "prete": "drew", "pp": "drawn", "trad": "dessiner", "ipa": ["drɔː", "druː", "drɔːn"]},
+    {"bv": "dream", "prete": "dreamt", "pp": "dreamt", "trad": "rêver", "ipa": ["driːm", "dremt", "dremt"], "variants": {"prete": "dreamed", "pp": "dreamed"}},
+    {"bv": "drink", "prete": "drank", "pp": "drunk", "trad": "boire", "ipa": ["drɪŋk", "dræŋk", "drʌŋk"]},
+    {"bv": "drive", "prete": "drove", "pp": "driven", "trad": "conduire", "ipa": ["draɪv", "drəʊv", "ˈdrɪvən"]},
+    {"bv": "eat", "prete": "ate", "pp": "eaten", "trad": "manger", "ipa": ["iːt", "et, eɪt", "ˈiːtən"]},
+    {"bv": "fall", "prete": "fell", "pp": "fallen", "trad": "tomber", "ipa": ["fɔːl", "fel", "ˈfɔːlən"]},
+    {"bv": "feed", "prete": "fed", "pp": "fed", "trad": "nourrir", "ipa": ["fiːd", "fed", "fed"]},
+    {"bv": "feel", "prete": "felt", "pp": "felt", "trad": "se sentir, ressentir", "ipa": ["fiːl", "felt", "felt"]},
+    {"bv": "fight", "prete": "fought", "pp": "fought", "trad": "se battre", "ipa": ["faɪt", "fɔːt", "fɔːt"]},
+    {"bv": "find", "prete": "found", "pp": "found", "trad": "trouver", "ipa": ["faɪnd", "faʊnd", "faʊnd"]},
+    {"bv": "fly", "prete": "flew", "pp": "flown", "trad": "voler (dans les airs)", "ipa": ["flaɪ", "fluː", "fləʊn"]},
+    {"bv": "forget", "prete": "forgot", "pp": "forgotten", "trad": "oublier", "ipa": ["fəˈɡet", "fəˈɡɒt", "fəˈɡɒtən"]},
+    {"bv": "forgive", "prete": "forgave", "pp": "forgiven", "trad": "pardonner", "ipa": ["fəˈɡɪv", "fəˈɡeɪv", "fəˈɡɪvən"]},
+    {"bv": "freeze", "prete": "froze", "pp": "frozen", "trad": "geler, se figer", "ipa": ["friːz", "frəʊz", "ˈfrəʊzən"]},
+    {"bv": "get", "prete": "got", "pp": "got", "trad": "obtenir", "ipa": ["ɡet", "ɡɒt", "ɡɒt"], "note": "get into = monter dans", "variants": {"pp": "gotten"}},
+    {"bv": "give", "prete": "gave", "pp": "given", "trad": "donner", "ipa": ["ɡɪv", "ɡeɪv", "ˈɡɪvən"]},
+    {"bv": "go", "prete": "went", "pp": "gone", "trad": "aller", "ipa": ["ɡəʊ", "went", "ɡɒn"]},
+    {"bv": "grow", "prete": "grew", "pp": "grown", "trad": "grandir", "ipa": ["ɡrəʊ", "ɡruː", "ɡrəʊn"]},
+    {"bv": "hang", "prete": "hung", "pp": "hung", "trad": "pendre, suspendre", "ipa": ["hæŋ", "hʌŋ", "hʌŋ"], "note": "hang out = traîner, passer du temps ensemble"},
+    {"bv": "have", "prete": "had", "pp": "had", "trad": "avoir", "ipa": ["hæv", "hæd", "hæd"]},
+    {"bv": "hear", "prete": "heard", "pp": "heard", "trad": "entendre", "ipa": ["hɪə", "hɜːd", "hɜːd"]},
+    {"bv": "hide", "prete": "hid", "pp": "hidden", "trad": "cacher, se cacher", "ipa": ["haɪd", "hɪd", "ˈhɪdən"]},
+    {"bv": "hit", "prete": "hit", "pp": "hit", "trad": "frapper (donner un coup)", "ipa": ["hɪt", "hɪt", "hɪt"]},
+    {"bv": "hold", "prete": "held", "pp": "held", "trad": "tenir", "ipa": ["həʊld", "held", "held"]},
+    {"bv": "hurt", "prete": "hurt", "pp": "hurt", "trad": "blesser, faire mal, avoir mal", "ipa": ["hɜːt", "hɜːt", "hɜːt"]},
+    {"bv": "keep", "prete": "kept", "pp": "kept", "trad": "garder", "ipa": ["kiːp", "kept", "kept"], "note": "keep going = continuer"},
+    {"bv": "know", "prete": "knew", "pp": "known", "trad": "savoir, connaître", "ipa": ["nəʊ", "njuː", "nəʊn"]},
+    {"bv": "lay", "prete": "laid", "pp": "laid", "trad": "poser (à plat)", "ipa": ["leɪ", "leɪd", "leɪd"], "note": "lay the table = mettre la table"},
+    {"bv": "learn", "prete": "learnt", "pp": "learnt", "trad": "apprendre (acquérir un savoir)", "ipa": ["lɜːn", "lɜːnt", "lɜːnt"], "variants": {"prete": "learned", "pp": "learned"}},
+    {"bv": "leave", "prete": "left", "pp": "left", "trad": "quitter, partir, laisser derrière soi", "ipa": ["liːv", "left", "left"]},
+    {"bv": "lend", "prete": "lent", "pp": "lent", "trad": "prêter", "ipa": ["lend", "lent", "lent"], "note": "lend a hand = donner un coup de main · lend an ear = prêter une oreille attentive"},
+    {"bv": "let", "prete": "let", "pp": "let", "trad": "permettre, laisser faire", "ipa": ["let", "let", "let"], "note": "let down = laisser tomber, décevoir"},
+    {"bv": "lie", "prete": "lay", "pp": "lain", "trad": "s’allonger", "ipa": ["laɪ", "leɪ", "leɪn"]},
+    {"bv": "lose", "prete": "lost", "pp": "lost", "trad": "perdre", "ipa": ["luːz", "lɒst", "lɒst"]},
+    {"bv": "make", "prete": "made", "pp": "made", "trad": "fabriquer, faire (créer quelque chose)", "ipa": ["meɪk", "meɪd", "meɪd"]},
+    {"bv": "mean", "prete": "meant", "pp": "meant", "trad": "vouloir dire", "ipa": ["miːn", "ment", "ment"]},
+    {"bv": "meet", "prete": "met", "pp": "met", "trad": "rencontrer", "ipa": ["miːt", "met", "met"]},
+    {"bv": "pay", "prete": "paid", "pp": "paid", "trad": "payer", "ipa": ["peɪ", "peɪd", "peɪd"]},
+    {"bv": "put", "prete": "put", "pp": "put", "trad": "mettre", "ipa": ["pʊt", "pʊt", "pʊt"]},
+    {"bv": "read", "prete": "read", "pp": "read", "trad": "lire", "ipa": ["riːd", "red", "red"]},
+    {"bv": "rent", "prete": "rented", "pp": "rented", "trad": "louer", "ipa": ["rent", "ˈrentɪd", "ˈrentɪd"], "note": "Verbe régulier présent dans la liste du manuel."},
+    {"bv": "ride", "prete": "rode", "pp": "ridden", "trad": "aller à bicyclette, à cheval", "ipa": ["raɪd", "rəʊd", "ˈrɪdən"]},
+    {"bv": "ring", "prete": "rang", "pp": "rung", "trad": "sonner, téléphoner", "ipa": ["rɪŋ", "ræŋ", "rʌŋ"]},
+    {"bv": "rise", "prete": "rose", "pp": "risen", "trad": "monter, s’élever", "ipa": ["raɪz", "rəʊz", "ˈrɪzən"]},
+    {"bv": "run", "prete": "ran", "pp": "run", "trad": "courir", "ipa": ["rʌn", "ræn", "rʌn"]},
+    {"bv": "say", "prete": "said", "pp": "said", "trad": "dire (prononcer des mots)", "ipa": ["seɪ", "sed", "sed"]},
+    {"bv": "see", "prete": "saw", "pp": "seen", "trad": "voir", "ipa": ["siː", "sɔː", "siːn"]},
+    {"bv": "sell", "prete": "sold", "pp": "sold", "trad": "vendre", "ipa": ["sel", "səʊld", "səʊld"]},
+    {"bv": "send", "prete": "sent", "pp": "sent", "trad": "envoyer", "ipa": ["send", "sent", "sent"]},
+    {"bv": "set", "prete": "set", "pp": "set", "trad": "poser, placer, mettre (la table, par exemple)", "ipa": ["set", "set", "set"], "note": "set the table = mettre la table"},
+    {"bv": "shake", "prete": "shook", "pp": "shaken", "trad": "secouer, trembler", "ipa": ["ʃeɪk", "ʃʊk", "ˈʃeɪkən"]},
+    {"bv": "shine", "prete": "shone", "pp": "shone", "trad": "briller", "ipa": ["ʃaɪn", "ʃɒn", "ʃɒn"]},
+    {"bv": "shoot", "prete": "shot", "pp": "shot", "trad": "tirer, marquer, tourner (un film)", "ipa": ["ʃuːt", "ʃɒt", "ʃɒt"]},
+    {"bv": "show", "prete": "showed", "pp": "shown", "trad": "montrer", "ipa": ["ʃəʊ", "ʃəʊd", "ʃəʊn"], "note": "show off = se vanter"},
+    {"bv": "shut", "prete": "shut", "pp": "shut", "trad": "fermer", "ipa": ["ʃʌt", "ʃʌt", "ʃʌt"]},
+    {"bv": "sing", "prete": "sang", "pp": "sung", "trad": "chanter", "ipa": ["sɪŋ", "sæŋ", "sʌŋ"]},
+    {"bv": "sit", "prete": "sat", "pp": "sat", "trad": "s’asseoir", "ipa": ["sɪt", "sæt", "sæt"], "note": "sit down = s’asseoir"},
+    {"bv": "sleep", "prete": "slept", "pp": "slept", "trad": "dormir", "ipa": ["sliːp", "slept", "slept"]},
+    {"bv": "smell", "prete": "smelt", "pp": "smelt", "trad": "sentir (odorat)", "ipa": ["smel", "smelt", "smelt"], "variants": {"prete": "smelled", "pp": "smelled"}},
+    {"bv": "speak", "prete": "spoke", "pp": "spoken", "trad": "parler", "ipa": ["spiːk", "spəʊk", "ˈspəʊkən"]},
+    {"bv": "spend", "prete": "spent", "pp": "spent", "trad": "dépenser (de l’argent), passer (du temps)", "ipa": ["spend", "spent", "spent"]},
+    {"bv": "spread", "prete": "spread", "pp": "spread", "trad": "étaler, répandre", "ipa": ["spred", "spred", "spred"]},
+    {"bv": "stand", "prete": "stood", "pp": "stood", "trad": "se tenir debout", "ipa": ["stænd", "stʊd", "stʊd"]},
+    {"bv": "steal", "prete": "stole", "pp": "stolen", "trad": "voler (dérober)", "ipa": ["stiːl", "stəʊl", "ˈstəʊlən"]},
+    {"bv": "strike", "prete": "struck", "pp": "struck", "trad": "frapper (porter un coup), faire grève", "ipa": ["straɪk", "strʌk", "strʌk"], "note": "strike a deal = conclure un accord"},
+    {"bv": "swear", "prete": "swore", "pp": "sworn", "trad": "jurer", "ipa": ["sweə", "swɔː", "swɔːn"]},
+    {"bv": "swim", "prete": "swam", "pp": "swum", "trad": "nager", "ipa": ["swɪm", "swæm", "swʌm"]},
+    {"bv": "take", "prete": "took", "pp": "taken", "trad": "prendre", "ipa": ["teɪk", "tʊk", "ˈteɪkən"]},
+    {"bv": "teach", "prete": "taught", "pp": "taught", "trad": "enseigner, apprendre à quelqu’un", "ipa": ["tiːtʃ", "tɔːt", "tɔːt"]},
+    {"bv": "tear", "prete": "tore", "pp": "torn", "trad": "déchirer", "ipa": ["teə", "tɔː", "tɔːn"]},
+    {"bv": "tell", "prete": "told", "pp": "told", "trad": "raconter, dire à quelqu’un", "ipa": ["tel", "təʊld", "təʊld"]},
+    {"bv": "think", "prete": "thought", "pp": "thought", "trad": "penser", "ipa": ["θɪŋk", "θɔːt", "θɔːt"]},
+    {"bv": "throw", "prete": "threw", "pp": "thrown", "trad": "jeter, lancer", "ipa": ["θrəʊ", "θruː", "θrəʊn"]},
+    {"bv": "understand", "prete": "understood", "pp": "understood", "trad": "comprendre", "ipa": ["ˌʌndəˈstænd", "ˌʌndəˈstʊd", "ˌʌndəˈstʊd"]},
+    {"bv": "upset", "prete": "upset", "pp": "upset", "trad": "contrarier", "ipa": ["ʌpˈset", "ʌpˈset", "ʌpˈset"]},
+    {"bv": "wake up", "prete": "woke up", "pp": "woken up", "trad": "se réveiller", "ipa": ["ˌweɪk ˈʌp", "ˌwəʊk ˈʌp", "ˌwəʊkən ˈʌp"]},
+    {"bv": "wear", "prete": "wore", "pp": "worn", "trad": "porter (des vêtements)", "ipa": ["weə", "wɔː", "wɔːn"]},
+    {"bv": "win", "prete": "won", "pp": "won", "trad": "gagner", "ipa": ["wɪn", "wʌn", "wʌn"]},
+    {"bv": "write", "prete": "wrote", "pp": "written", "trad": "écrire", "ipa": ["raɪt", "rəʊt", "ˈrɪtən"]},
+];
+
+/* ══════════════════════════════════
+   ÉTAT
+══════════════════════════════════ */
+let sessionVerbs = [];
+let currentIndex  = 0;
+let score         = 0;
+let config        = {};
+
+const startRange = document.getElementById('startRange');
+const endRange = document.getElementById('endRange');
+startRange.max = endRange.max = verbData.length;
+document.getElementById('verbCount').textContent = verbData.length;
+document.getElementById('rangeMax').textContent = verbData.length;
+
+function renderReference(id, first, last) {
+    const rows = verbData.slice(first - 1, last).map((verb, index) => {
+        const forms = [verb.bv, verb.prete, verb.pp].map((form, i) =>
+            `<td lang="en">${form}<small>${verb.ipa[i].split(', ').map(ipa => `/${ipa}/`).join(', ')}</small></td>`
+        ).join('');
+        return `<tr><th scope="row">${first + index}</th>${forms}<td>${verb.trad}${verb.note ? `<small>${verb.note}</small>` : ''}</td></tr>`;
+    }).join('');
+    document.getElementById(id).innerHTML = `<table>
+        <thead><tr><th scope="col">Nº</th><th scope="col">Infinitif</th><th scope="col">Prétérit</th>
+        <th scope="col">Participe passé</th><th scope="col">Traduction</th></tr></thead>
+        <tbody>${rows}</tbody></table>`;
+}
+
+renderReference('reference176', 1, 51);
+renderReference('reference177', 52, verbData.length);
+
+/* ══════════════════════════════════
+   TOGGLE colonnes setup
+══════════════════════════════════ */
+function toggleCol(btn) {
+    btn.setAttribute('aria-pressed', btn.classList.toggle('selected'));
+}
+
+/* ══════════════════════════════════
+   DÉMARRER
+══════════════════════════════════ */
+function startApp() {
+    if (!startRange.reportValidity() || !endRange.reportValidity()) return;
+    const start = startRange.valueAsNumber;
+    const end = endRange.valueAsNumber;
+
+    config = {
+        bv:    document.getElementById('btnBV').classList.contains('selected'),
+        prete: document.getElementById('btnPrete').classList.contains('selected'),
+        pp:    document.getElementById('btnPP').classList.contains('selected')
+    };
+
+    if (!config.bv && !config.prete && !config.pp) {
+        alert("Choisis au moins une forme à tester !");
+        return;
+    }
+    if (start > end) {
+        alert("Le numéro de début doit être inférieur ou égal au numéro de fin.");
+        startRange.focus();
+        return;
+    }
+
+    sessionVerbs = verbData.slice(start - 1, end);
+    for (let index = sessionVerbs.length - 1; index > 0; index--) {
+        const other = Math.floor(Math.random() * (index + 1));
+        [sessionVerbs[index], sessionVerbs[other]] = [sessionVerbs[other], sessionVerbs[index]];
+    }
+    currentIndex = 0;
+    score = 0;
+
+    document.getElementById('setup').classList.add('hidden');
+    document.getElementById('quiz').classList.remove('hidden');
+    document.getElementById('sidebarStats').style.display = 'flex';
+    document.getElementById('sidebarProgress').style.display = 'block';
+    document.getElementById('sidebarInfo').style.display = 'none';
+
+    showQuestion();
+}
+
+/* ══════════════════════════════════
+   AFFICHER QUESTION
+══════════════════════════════════ */
+function showQuestion() {
+    const v = sessionVerbs[currentIndex];
+    const total = sessionVerbs.length;
+
+    // Sidebar
+    document.getElementById('sideScore').innerText = score;
+    document.getElementById('sideQNum').innerText  = `${currentIndex + 1}/${total}`;
+    document.getElementById('progressBar').style.width = `${(currentIndex / total) * 100}%`;
+    document.getElementById('progFraction').innerText  = `${currentIndex} / ${total}`;
+    document.getElementById('verbBadge').innerText     = `Verbe ${currentIndex + 1} / ${total}`;
+
+    // Cacher conseil
+    document.getElementById('conseilBox').classList.remove('visible');
+
+    // Mot cible
+    document.getElementById('verbTarget').innerText = v.trad;
+    document.getElementById('verbBadge').title = `Nº ${verbData.indexOf(v) + 1} dans le manuel`;
+
+    // Chips des colonnes demandées
+    const chips = document.getElementById('verbChips');
+    chips.innerHTML = '';
+    if (config.bv)    chips.innerHTML += `<span class="cols-chip">🔤 Base verbale</span>`;
+    if (config.prete) chips.innerHTML += `<span class="cols-chip">⏪ Prétérit</span>`;
+    if (config.pp)    chips.innerHTML += `<span class="cols-chip">✅ Participe passé</span>`;
+
+    // Zone d'inputs
+    const area = document.getElementById('inputArea');
+    area.innerHTML = '';
+
+    if (config.bv) {
+        area.innerHTML += `
+            <div class="input-row">
+                <label class="input-label" for="ansBV">🔤 Base verbale</label>
+                <input type="text" class="answer-input" lang="en" autocapitalize="none" id="ansBV" aria-describedby="ansBVCorr" autocomplete="off" spellcheck="false">
+                <div class="correction-msg" id="ansBVCorr" aria-live="polite"></div>
+            </div>`;
+    }
+    if (config.prete) {
+        area.innerHTML += `
+            <div class="input-row">
+                <label class="input-label" for="ansPrete">⏪ Prétérit</label>
+                <input type="text" class="answer-input" lang="en" autocapitalize="none" id="ansPrete" aria-describedby="ansPreteCorr" autocomplete="off" spellcheck="false">
+                <div class="correction-msg" id="ansPreteCorr" aria-live="polite"></div>
+            </div>`;
+    }
+    if (config.pp) {
+        area.innerHTML += `
+            <div class="input-row">
+                <label class="input-label" for="ansPP">✅ Participe passé</label>
+                <input type="text" class="answer-input" lang="en" autocapitalize="none" id="ansPP" aria-describedby="ansPPCorr" autocomplete="off" spellcheck="false">
+                <div class="correction-msg" id="ansPPCorr" aria-live="polite"></div>
+            </div>`;
+    }
+
+    // Boutons
+    document.getElementById('btnVerify').classList.remove('hidden');
+    document.getElementById('btnNext').classList.add('hidden');
+
+    // Focus sur le premier input
+    const firstInput = area.querySelector('input');
+    firstInput.focus();
+
+    // Entrée clavier
+    area.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.repeat && !e.isComposing) {
+                e.preventDefault();
+                verifyStep();
+            }
+        });
+    });
+}
+
+/* ══════════════════════════════════
+   VÉRIFIER
+══════════════════════════════════ */
+function verifyStep() {
+    const verifyButton = document.getElementById('btnVerify');
+    if (verifyButton.classList.contains('hidden')) return;
+    const v = sessionVerbs[currentIndex];
+
+    function checkField(inputId, form) {
+        const input = document.getElementById(inputId);
+        const corrEl = document.getElementById(inputId + 'Corr');
+        const correctVal = v[form];
+        const valids = correctVal.split(', ');
+        const variant = v.variants?.[form];
+        if (variant) valids.push(variant);
+
+        let user = input.value.toLowerCase().trim().replace(/\s+/g, ' ');
+        if (form === 'bv') user = user.replace(/^to /, '');
+        const typedForms = form === 'prete' && v.bv === 'be'
+            ? user.split(/\s*(?:[,/;]|\band\b)\s*|\s+/)
+            : [user];
+        const correct = typedForms.every(value => valids.includes(value));
+        input.readOnly = true;
+        input.setAttribute('aria-invalid', String(!correct));
+
+        if (correct) {
+            input.classList.add('correct');
+            corrEl.innerHTML = `<span style="color:var(--sage)">✅ Parfait !</span>`;
+            return true;
+        } else {
+            input.classList.add('wrong');
+            corrEl.innerHTML = `<span style="color:var(--rose)">❌</span> <strong lang="en" style="color:var(--sage)">${correctVal}</strong>`;
+            return false;
+        }
+    }
+
+    const bvOk = !config.bv || checkField('ansBV', 'bv');
+    const preteOk = !config.prete || checkField('ansPrete', 'prete');
+    const ppOk = !config.pp || checkField('ansPP', 'pp');
+
+    if (bvOk && preteOk && ppOk) {
+        score++;
+        document.getElementById('sideScore').innerText = score;
+    } else {
+        // Afficher conseil
+        showConseil(v, bvOk, preteOk, ppOk);
+    }
+
+    if (v.bv === 'read') {
+        const pronunciation = document.createElement('p');
+        pronunciation.className = 'correction-msg';
+        pronunciation.textContent = 'Prononciation de « read » : /riːd/ à l’infinitif, /red/ au prétérit et au participe passé.';
+        document.getElementById('inputArea').append(pronunciation);
+    }
+
+    verifyButton.classList.add('hidden');
+    const nextButton = document.getElementById('btnNext');
+    nextButton.textContent = currentIndex + 1 === sessionVerbs.length ? 'Voir le résultat →' : 'Continuer →';
+    nextButton.classList.remove('hidden');
+    nextButton.focus({ preventScroll: true });
+}
+
+/* ══════════════════════════════════
+   CONSEIL D'ERREUR
+══════════════════════════════════ */
+function showConseil(v, bvOk, preteOk, ppOk) {
+    const incorrect = [];
+    if (!bvOk) incorrect.push('la base verbale');
+    if (!preteOk) incorrect.push('le prétérit');
+    if (!ppOk) incorrect.push('le participe passé');
+
+    document.getElementById('conseilTitre').textContent = 'Formes à revoir';
+    document.getElementById('conseilTexte').textContent = 'À revoir : ' + incorrect.join(', ') + '.';
+    document.getElementById('conseilExemple').textContent = `${v.bv} · ${v.prete} · ${v.pp}`;
+    document.getElementById('conseilBox').classList.add('visible');
+}
+
+/* ══════════════════════════════════
+   SUIVANT
+══════════════════════════════════ */
+function nextQuestion() {
+    if (document.getElementById('btnNext').classList.contains('hidden')) return;
+    document.getElementById('btnNext').classList.add('hidden');
+    currentIndex++;
+    document.getElementById('conseilBox').classList.remove('visible');
+    if (currentIndex < sessionVerbs.length) showQuestion();
+    else finish();
+}
+
+/* ══════════════════════════════════
+   FIN
+══════════════════════════════════ */
+function finish() {
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('result').classList.remove('hidden');
+    document.getElementById('sidebarStats').style.display = 'none';
+    document.getElementById('sidebarProgress').style.display = 'none';
+    document.getElementById('conseilBox').classList.remove('visible');
+
+    const total = sessionVerbs.length;
+    const pct   = score / total;
+    const note  = Math.round(pct * 20 * 10) / 10;
+
+    document.getElementById('finalScore').innerText   = note.toLocaleString('fr-FR') + "/20";
+    document.getElementById('scoreDetail').innerText  = `${score} / ${total} · Toutes les formes justes par verbe`;
+
+    // Barre animée
+    setTimeout(() => {
+        document.getElementById('resultBar').style.width = (pct * 100) + "%";
+    }, 200);
+
+    // Emoji
+    const emoji = pct >= 0.9 ? "🏆" : pct >= 0.7 ? "🎯" : pct >= 0.5 ? "📚" : "💪";
+    document.getElementById('resultEmoji').innerText = emoji;
+
+    // Médailles
+    const medals = [
+        { emoji: "🥉", seuil: 0.5 },
+        { emoji: "🥈", seuil: 0.7 },
+        { emoji: "🥇", seuil: 0.9 },
+        { emoji: "🏆", seuil: 1.0 }
+    ];
+    document.getElementById('medalsRow').innerHTML = medals.map(m =>
+        `<div class="medal ${pct >= m.seuil ? 'earned' : 'unearned'}">${m.emoji}</div>`
+    ).join('');
+    document.querySelector('.btn-retry').focus();
+}
+</script>
+</body>
+</html>
