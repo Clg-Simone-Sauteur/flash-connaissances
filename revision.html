@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -142,7 +143,7 @@ html,body{width:210mm;height:297mm;margin:0;padding:0;background:#fff;display:bl
 width:210mm;height:297mm;max-width:none;min-height:0;margin:0;
 padding:0;background:#fff;border-radius:0;box-shadow:none;overflow:visible
 }
-.conteneur:before,.entete,.configuration,.screen-only,.pied,.pdf-header{display:none!important}
+.conteneur:before,.entete,.configuration,.screen-only,.pied{display:none!important}
 .print-only{display:block!important}
 #quizSection{display:block!important;margin:0;padding:0}
 #printCards{display:block!important;margin:0;padding:0}
@@ -164,8 +165,6 @@ margin-bottom:3mm;color:#555
 }
 .pdf-question{font-size:16px;font-weight:bold;line-height:1.25;text-align:left;white-space:pre-line}
 .pdf-answer{font-size:15px;font-weight:bold;line-height:1.25;text-align:left;white-space:pre-line}
-.pdf-back .pdf-answer{font-size:15px}
-.pdf-back .libelle{font-size:10px}
 .pdf-question,.pdf-answer{max-width:100%;overflow-wrap:anywhere}
 .pdf-card:has(.fc-image-container) .numero,
 .pdf-card:has(.fc-image-container) .libelle{margin-bottom:1.5mm}
@@ -178,7 +177,6 @@ display:inline-block;width:48%;vertical-align:middle
 }
 }
 .print-only{display:none}
-.pdf-header,.print-card-list{display:none}
 </style>
 </head>
 
@@ -246,7 +244,7 @@ display:inline-block;width:48%;vertical-align:middle
 </div>
 </div>
 
-<div id="printCards" class="print-only print-card-list"></div>
+<div id="printCards" class="print-only"></div>
 </section>
 
 <div class="pied screen-only">Flash connaissances · Révision du collège Simone Sauteur</div>
@@ -340,40 +338,11 @@ async function enregistrerActivite(classe,matiere,chapitre,nombreQuestions){
   }
 }
 
-/*
- * CACHE LOCAL : durée de 10 minutes.
- *
- * La navigation est relue à chaque sélection de classe. Le choix de
- * la matière utilise cette liste en mémoire. Les questions sont relues
- * à chaque ouverture de chapitre.
- * Le cache est actualisé après le chargement, mais n'est pas utilisé
- * pour remplacer les données fraîchement demandées.
- */
-const TTL=10*60*1000;
-
-function cacheSet(k,v){
-  try{
-    localStorage.setItem("fc:"+k,JSON.stringify({
-      t:Date.now(),
-      v
-    }));
-  }catch(erreur){
-    console.warn("Cache local indisponible :",erreur);
-  }
-}
-
 const CLASSES=[
   "6e A","6e B","6e C","6e D","6e E","6e F",
   "5e A","5e B","5e C","5e D","5e E","5e F",
   "4e A","4e B","4e C","4e D","4e E","4e F",
   "3e A","3e B","3e C","3e D","3e E","3e F"
-];
-
-const MATIERES=[
-  "Mathématiques","Français","Histoire, géographie et Emc",
-  "Anglais","Espagnol","Allemand","Physique-chimie","SVT",
-  "Technologie","EPS","Arts plastiques","Éducation musicale",
-  "EMI","Latin","Enseignement professionnel"
 ];
 
 const $=id=>document.getElementById(id);
@@ -412,6 +381,7 @@ function setOptions(select,values,placeholder){
 }
 
 let questionsChapitre=[];
+let nombreCartesChapitre=0;
 let indexQuestion=0;
 let questionActuelle=null;
 
@@ -428,6 +398,7 @@ let requeteMatieres=0;
 let requeteQuestions=0;
 
 function hideQuiz(){
+  nombreCartesChapitre=0;
   $("printCards").replaceChildren();
   $("quizSection").classList.add("hidden");
   $("chapterActions").classList.add("hidden");
@@ -502,10 +473,6 @@ async function chargerMatieres(){
     navigationClasse=snapshot.docs.map(d=>d.data());
     const matieres=unique(navigationClasse.map(entree=>entree.matiere));
 
-    // La liste mise en cache est actualisée, mais non réutilisée
-    // pour la prochaine sélection.
-    cacheSet("matieres|"+classeDemandee,matieres);
-
     setOptions($("subjectSelect"),matieres,"— Choisir une matière —");
 
     if(!matieres.length){
@@ -550,7 +517,6 @@ $("subjectSelect").addEventListener("change",()=>{
       .map(entree=>entree.chapitre)
   );
 
-  cacheSet("ch|"+selectedClass+"|"+selectedSubject,chapitres);
   setOptions($("chapterSelect"),chapitres,"— Choisir un chapitre —");
 
   if(!chapitres.length){
@@ -617,22 +583,10 @@ async function startChapter(){
        chapitreDemande!==selectedChapter)return;
 
     questionsChapitre=snapshot.docs
-      .map(d=>{
-        const x=d.data();
-
-        return {
-          id:d.id,
-          question:x.question,
-          reponse:x.reponse,
-          statut:x.statut
-        };
-      })
-      .filter(question=>norm(question.statut)==="active");
-
-    cacheSet(
-      "q|"+classeDemandee+"|"+matiereDemandee+"|"+chapitreDemande,
-      questionsChapitre
-    );
+      .map(document=>document.data())
+      .filter(carte=>norm(carte.statut)==="active")
+      .map(({question,reponse})=>({question,reponse}));
+    nombreCartesChapitre=questionsChapitre.length;
 
     if(!questionsChapitre.length){
       afficherMessage("Aucune question active disponible dans ce chapitre.");
@@ -812,7 +766,6 @@ $("jeNeSavaisPas").addEventListener("click",()=>{
 
   // La question sera proposée à nouveau à la fin du parcours.
   questionsChapitre.push(questionActuelle);
-  preparerPDF();
   passerQuestion();
 });
 
@@ -843,126 +796,83 @@ $("backChapter").addEventListener("click",()=>{
  * Huit cartes par feuille A4, avec les versos dans l'ordre
  * prévu pour l'impression recto-verso et la découpe.
  */
+function creerCartePDF(carte,position,verso){
+  const fiche=document.createElement("div");
+  fiche.className="pdf-card";
+
+  if(!carte){
+    fiche.style.visibility="hidden";
+    return fiche;
+  }
+
+  const numero=document.createElement("div");
+  numero.className="numero";
+  numero.textContent="Carte "+position;
+
+  const libelle=document.createElement("div");
+  libelle.className="libelle";
+  libelle.textContent=verso?"Réponse":"Question";
+
+  const texte=document.createElement("div");
+  texte.className=verso?"pdf-answer":"pdf-question";
+  afficherTexteAvecLiens(texte,verso?carte.reponse:carte.question);
+
+  fiche.append(numero,libelle,texte);
+  return fiche;
+}
+
 function preparerPDF(){
-  const box=$("printCards");
-  box.innerHTML="";
+  const feuilles=$("printCards");
+  feuilles.replaceChildren();
 
-  const taillePage=8;
+  const cartesParFeuille=8;
+  // Le quiz ajoute les cartes à revoir après celles du chapitre.
+  const cartes=questionsChapitre.slice(0,nombreCartesChapitre);
 
-  for(
-    let debut=0;
-    debut<questionsChapitre.length;
-    debut+=taillePage
-  ){
-    const groupe=questionsChapitre.slice(debut,debut+taillePage);
-
+  for(let debut=0;debut<cartes.length;debut+=cartesParFeuille){
+    const groupe=cartes.slice(debut,debut+cartesParFeuille);
     const recto=document.createElement("div");
     recto.className="print-sheet";
-
-    groupe.forEach((q,i)=>{
-      const card=document.createElement("div");
-      card.className="pdf-card";
-
-      const numero=document.createElement("div");
-      numero.className="numero";
-      numero.textContent="Carte "+(debut+i+1);
-
-      const libelle=document.createElement("div");
-      libelle.className="libelle";
-      libelle.textContent="Question";
-
-      const question=document.createElement("div");
-      question.className="pdf-question";
-      afficherTexteAvecLiens(question,q.question);
-
-      card.append(numero,libelle,question);
-      recto.appendChild(card);
-    });
-
-    while(recto.children.length<taillePage){
-      const vide=document.createElement("div");
-      vide.className="pdf-card";
-      vide.style.visibility="hidden";
-      recto.appendChild(vide);
-    }
-
-    box.appendChild(recto);
-
     const verso=document.createElement("div");
-    verso.className="print-sheet back";
+    verso.className="print-sheet";
 
-    for(let ligne=0;ligne<4;ligne++){
-      const debutLigne=ligne*2;
+    for(let colonneGauche=0;colonneGauche<cartesParFeuille;colonneGauche+=2){
+      const colonneDroite=colonneGauche+1;
+      const gauche=groupe[colonneGauche];
+      const droite=groupe[colonneDroite];
+      const numeroGauche=debut+colonneGauche+1;
+      const numeroDroite=numeroGauche+1;
 
-      [debutLigne+1,debutLigne].forEach(pos=>{
-        const q=groupe[pos];
-        const card=document.createElement("div");
-        card.className="pdf-card pdf-back";
-
-        if(q){
-          const numero=document.createElement("div");
-          numero.className="numero";
-          numero.textContent="Carte "+(debut+pos+1);
-
-          const libelle=document.createElement("div");
-          libelle.className="libelle";
-          libelle.textContent="Réponse";
-
-          const answer=document.createElement("div");
-          answer.className="pdf-answer";
-          afficherTexteAvecLiens(answer,q.reponse);
-
-          card.append(numero,libelle,answer);
-        }else{
-          card.style.visibility="hidden";
-        }
-
-        verso.appendChild(card);
-      });
+      recto.append(creerCartePDF(gauche,numeroGauche,false),creerCartePDF(droite,numeroDroite,false));
+      verso.append(creerCartePDF(droite,numeroDroite,true),creerCartePDF(gauche,numeroGauche,true));
     }
 
-    box.appendChild(verso);
+    feuilles.append(recto,verso);
   }
 }
 
 const boutonImpression=$("printButton");
 
 boutonImpression.addEventListener("click",async()=>{
+  const feuilles=$("printCards");
+  if(!feuilles.firstElementChild)return;
+
   const chapitreEnCours=requeteQuestions;
   const libelle=boutonImpression.textContent;
   boutonImpression.disabled=true;
   boutonImpression.textContent="Préparation de l’impression…";
 
-  // Reprend la préparation si l'élève ajoute une carte à revoir pendant l'attente.
-  const delaiMax=Date.now()+8000;
-  const cartes=$("printCards");
+  let minuterie;
   try{
-    let premiereFeuille;
-    do{
-      premiereFeuille=cartes.firstElementChild;
-      const images=Array.from(cartes.querySelectorAll("img"));
-      let minuterie;
-      try{
-        await Promise.race([
-          Promise.allSettled(images.map(image=>image.decode())),
-          new Promise(resolve=>{
-            minuterie=setTimeout(resolve,Math.max(0,delaiMax-Date.now()));
-          })
-        ]);
-      }finally{
-        clearTimeout(minuterie);
-      }
-      if(chapitreEnCours!==requeteQuestions)return;
-    }while(premiereFeuille!==cartes.firstElementChild&&Date.now()<delaiMax);
+    const images=Array.from(feuilles.querySelectorAll("img"));
+    await Promise.race([
+      Promise.allSettled(images.map(image=>image.decode())),
+      new Promise(resolve=>{minuterie=setTimeout(resolve,8000)})
+    ]);
 
-    for(const image of cartes.querySelectorAll("img")){
-      if(!image.complete||!image.naturalWidth){
-        image.replaceWith(document.createTextNode("Image indisponible"));
-      }
-    }
-
-    if(cartes.firstElementChild)window.print();
+    if(chapitreEnCours===requeteQuestions)window.print();
   }finally{
+    clearTimeout(minuterie);
     boutonImpression.disabled=false;
     boutonImpression.textContent=libelle;
   }
