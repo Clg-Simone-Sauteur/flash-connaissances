@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -167,6 +166,16 @@ margin-bottom:3mm;color:#555
 .pdf-answer{font-size:15px;font-weight:bold;line-height:1.25;text-align:left;white-space:pre-line}
 .pdf-back .pdf-answer{font-size:15px}
 .pdf-back .libelle{font-size:10px}
+.pdf-question,.pdf-answer{max-width:100%;overflow-wrap:anywhere}
+.pdf-card:has(.fc-image-container) .numero,
+.pdf-card:has(.fc-image-container) .libelle{margin-bottom:1.5mm}
+.pdf-card .fc-image-container{margin:2mm 0 0;font-size:11px;text-align:center}
+.pdf-card .fc-image-link{display:block}
+.pdf-card .fc-image{max-height:27mm;border-radius:0}
+.pdf-card .fc-image-fallback{font-size:11px}
+.pdf-card:has(.fc-image-container ~ .fc-image-container) .fc-image-container{
+display:inline-block;width:48%;vertical-align:middle
+}
 }
 .print-only{display:none}
 .pdf-header,.print-card-list{display:none}
@@ -419,6 +428,7 @@ let requeteMatieres=0;
 let requeteQuestions=0;
 
 function hideQuiz(){
+  $("printCards").replaceChildren();
   $("quizSection").classList.add("hidden");
   $("chapterActions").classList.add("hidden");
 }
@@ -863,7 +873,7 @@ function preparerPDF(){
 
       const question=document.createElement("div");
       question.className="pdf-question";
-      question.textContent=q.question||"";
+      afficherTexteAvecLiens(question,q.question);
 
       card.append(numero,libelle,question);
       recto.appendChild(card);
@@ -900,7 +910,7 @@ function preparerPDF(){
 
           const answer=document.createElement("div");
           answer.className="pdf-answer";
-          answer.textContent=q.reponse||"";
+          afficherTexteAvecLiens(answer,q.reponse);
 
           card.append(numero,libelle,answer);
         }else{
@@ -915,9 +925,47 @@ function preparerPDF(){
   }
 }
 
-$("printButton").addEventListener("click",()=>{
-  preparerPDF();
-  window.print();
+const boutonImpression=$("printButton");
+
+boutonImpression.addEventListener("click",async()=>{
+  const chapitreEnCours=requeteQuestions;
+  const libelle=boutonImpression.textContent;
+  boutonImpression.disabled=true;
+  boutonImpression.textContent="Préparation de l’impression…";
+
+  // Reprend la préparation si l'élève ajoute une carte à revoir pendant l'attente.
+  const delaiMax=Date.now()+8000;
+  const cartes=$("printCards");
+  try{
+    let premiereFeuille;
+    do{
+      premiereFeuille=cartes.firstElementChild;
+      const images=Array.from(cartes.querySelectorAll("img"));
+      let minuterie;
+      try{
+        await Promise.race([
+          Promise.allSettled(images.map(image=>image.decode())),
+          new Promise(resolve=>{
+            minuterie=setTimeout(resolve,Math.max(0,delaiMax-Date.now()));
+          })
+        ]);
+      }finally{
+        clearTimeout(minuterie);
+      }
+      if(chapitreEnCours!==requeteQuestions)return;
+    }while(premiereFeuille!==cartes.firstElementChild&&Date.now()<delaiMax);
+
+    for(const image of cartes.querySelectorAll("img")){
+      if(!image.complete||!image.naturalWidth){
+        image.replaceWith(document.createTextNode("Image indisponible"));
+      }
+    }
+
+    if(cartes.firstElementChild)window.print();
+  }finally{
+    boutonImpression.disabled=false;
+    boutonImpression.textContent=libelle;
+  }
 });
 
 initialiserMenus();
