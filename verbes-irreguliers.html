@@ -998,6 +998,7 @@
                 <div class="result-bar" id="resultBar" style="width:0%"></div>
             </div>
             <div class="result-detail" id="scoreDetail"></div>
+            <div class="result-detail hidden" id="reviewDetail"></div>
             <div class="medals" id="medalsRow"></div>
             <button class="btn-retry" onclick="location.reload()">↺ Recommencer</button>
         </div>
@@ -1116,6 +1117,9 @@ const verbData = [
    ÉTAT
 ══════════════════════════════════ */
 let sessionVerbs = [];
+let reviewVerbs  = [];
+let currentRound = [];
+let reviewScore  = 0;
 let currentIndex  = 0;
 let score         = 0;
 let config        = {};
@@ -1178,8 +1182,11 @@ function startApp() {
         const other = Math.floor(Math.random() * (index + 1));
         [sessionVerbs[index], sessionVerbs[other]] = [sessionVerbs[other], sessionVerbs[index]];
     }
+    currentRound = sessionVerbs;
+    reviewVerbs = [];
     currentIndex = 0;
     score = 0;
+    reviewScore = 0;
 
     document.getElementById('setup').classList.add('hidden');
     document.getElementById('quiz').classList.remove('hidden');
@@ -1194,15 +1201,16 @@ function startApp() {
    AFFICHER QUESTION
 ══════════════════════════════════ */
 function showQuestion() {
-    const v = sessionVerbs[currentIndex];
-    const total = sessionVerbs.length;
+    const v = currentRound[currentIndex];
+    const total = currentRound.length;
+    const roundLabel = currentRound === reviewVerbs ? 'Rattrapage' : 'Verbe';
 
     // Sidebar
-    document.getElementById('sideScore').innerText = score;
+    document.getElementById('sideScore').innerText = currentRound === reviewVerbs ? reviewScore : score;
     document.getElementById('sideQNum').innerText  = `${currentIndex + 1}/${total}`;
     document.getElementById('progressBar').style.width = `${(currentIndex / total) * 100}%`;
     document.getElementById('progFraction').innerText  = `${currentIndex} / ${total}`;
-    document.getElementById('verbBadge').innerText     = `Verbe ${currentIndex + 1} / ${total}`;
+    document.getElementById('verbBadge').innerText     = `${roundLabel} ${currentIndex + 1} / ${total}`;
 
     // Cacher conseil
     document.getElementById('conseilBox').classList.remove('visible');
@@ -1272,7 +1280,7 @@ function showQuestion() {
 function verifyStep() {
     const verifyButton = document.getElementById('btnVerify');
     if (verifyButton.classList.contains('hidden')) return;
-    const v = sessionVerbs[currentIndex];
+    const v = currentRound[currentIndex];
 
     function checkField(inputId, form) {
         const input = document.getElementById(inputId);
@@ -1306,10 +1314,16 @@ function verifyStep() {
     const preteOk = !config.prete || checkField('ansPrete', 'prete');
     const ppOk = !config.pp || checkField('ansPP', 'pp');
 
+    const reviewing = currentRound === reviewVerbs;
     if (bvOk && preteOk && ppOk) {
-        score++;
-        document.getElementById('sideScore').innerText = score;
+        if (reviewing) {
+            reviewScore++;
+        } else {
+            score++;
+        }
+        document.getElementById('sideScore').innerText = reviewing ? reviewScore : score;
     } else {
+        if (!reviewing) reviewVerbs.push(v);
         // Afficher conseil
         showConseil(v, bvOk, preteOk, ppOk);
     }
@@ -1323,7 +1337,11 @@ function verifyStep() {
 
     verifyButton.classList.add('hidden');
     const nextButton = document.getElementById('btnNext');
-    nextButton.textContent = currentIndex + 1 === sessionVerbs.length ? 'Voir le résultat →' : 'Continuer →';
+    let nextLabel = 'Continuer →';
+    if (currentIndex + 1 === currentRound.length) {
+        nextLabel = !reviewing && reviewVerbs.length ? 'Revoir les verbes ratés →' : 'Voir le résultat →';
+    }
+    nextButton.textContent = nextLabel;
     nextButton.classList.remove('hidden');
     nextButton.focus({ preventScroll: true });
 }
@@ -1351,8 +1369,15 @@ function nextQuestion() {
     document.getElementById('btnNext').classList.add('hidden');
     currentIndex++;
     document.getElementById('conseilBox').classList.remove('visible');
-    if (currentIndex < sessionVerbs.length) showQuestion();
-    else finish();
+    if (currentIndex === currentRound.length) {
+        if (currentRound === reviewVerbs || reviewVerbs.length === 0) {
+            finish();
+            return;
+        }
+        currentRound = reviewVerbs;
+        currentIndex = 0;
+    }
+    showQuestion();
 }
 
 /* ══════════════════════════════════
@@ -1370,7 +1395,12 @@ function finish() {
     const note  = Math.round(pct * 20 * 10) / 10;
 
     document.getElementById('finalScore').innerText   = note.toLocaleString('fr-FR') + "/20";
-    document.getElementById('scoreDetail').innerText  = `${score} / ${total} · Toutes les formes justes par verbe`;
+    document.getElementById('scoreDetail').innerText  = `${score} / ${total} · Verbes réussis au premier passage`;
+    const reviewDetail = document.getElementById('reviewDetail');
+    if (reviewVerbs.length) {
+        reviewDetail.textContent = `Rattrapage · ${reviewScore} / ${reviewVerbs.length} verbes réussis`;
+        reviewDetail.classList.remove('hidden');
+    }
 
     // Barre animée
     setTimeout(() => {
